@@ -21,7 +21,7 @@ bool touchInBox(touchPosition touch, int x, int y, int w, int h)
 touchPosition touch;
 bool gameRunning = true;
 
-PrintConsole topScreen, bottomScreen, versionWin;
+PrintConsole topScreen, bottomScreen, versionWin, killBox;
 
 FS_Archive sdmcArchive;
 
@@ -77,12 +77,19 @@ int main(int argc, char **argv)
 	//sdmcInit();
 	consoleInit(GFX_BOTTOM, &bottomScreen);
 	consoleInit(GFX_BOTTOM, &versionWin);
+	consoleInit(GFX_BOTTOM, &killBox);
 	
 	consoleSetWindow(&versionWin, 6, 26, 34, 2);
+	consoleSetWindow(&killBox, 0, 28, 40, 2);
 
 	consoleSelect(&versionWin);
 	std::cout << "     Tap red area any time to exit";
 	std::cout << "Breakout Version: " ANSI RED CEND << versiontxtt << CRESET " " ANSI YELLOW CEND << versiontxtn;
+
+	consoleSelect(&killBox);
+	std::cout << ANSI B_RED CEND;
+	for (int i = 0; i < 80; i++)
+		std::cout << " ";
 
 	/*consoleSelect(&topScreen);
 	std::cout << ANSI "29;07" PEND "by Matthew Rease\n";*/
@@ -121,13 +128,16 @@ int main(int argc, char **argv)
 		std::cout << ANSI "1;0" PEND "                                                            ";
 		std::cout << ANSI "0;0" PEND "X = " << paddle.x << " Y = " << paddle.y << " Width = " << paddle.width << " Height = " << paddle.height;
 		std::cout << ANSI "1;0" PEND "H-Mid = " << (paddle.x + (paddle.width / 2)) << "   H-Mid-Length = " << (paddle.width / 2);
+		std::cout << ANSI "2;0" PEND;
 
 		sf2d_swapbuffers();
 		
-		/*if(touchInBox(touch, 239, 217, 81, 24)) {
-			printf("touched");
+		hidTouchRead(&touch);
+
+		if(touchInBox(touch, 0, 224, 320, 16)) {
+			std::cout << "Exiting...\n";
 			break;
-		}*/
+		}
 	}
 
 	// Exit services

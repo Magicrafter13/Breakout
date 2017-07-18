@@ -1,4 +1,3 @@
-#include <3ds.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -9,8 +8,12 @@ using std::string;
 #include <sys/types.h>
 #include <iostream>
 #include <fstream>
+#include <math.h>
+#include <3ds.h>
 #include <sf2d.h>
+#include <sfil.h>
 #include <vector>
+#include "Title_png.h"
 
 //Boost:
 /*#include <boost/filesystem.hpp>

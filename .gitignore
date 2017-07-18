@@ -263,7 +263,7 @@ __pycache__/
 # Extra Visual Studio crap that should be .gitignore'd by default :/
 *.vcxproj
 *.vcxproj.filters
-Breakout/build
+#Breakout/build
 *.sln
 
 # Stuff I don't want on the repo

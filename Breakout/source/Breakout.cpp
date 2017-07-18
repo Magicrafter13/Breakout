@@ -100,6 +100,7 @@ int main(int argc, char **argv)
 
 	sf2d_set_clear_color(RGBA8(0x95, 0x95, 0x95, 0xFF));
 	sf2d_set_vblank_wait(1);
+	sf2d_texture *img_title = sfil_load_PNG_buffer(Title_png, SF2D_PLACE_RAM);
 
 	mRectangle paddle;
 	paddle.setDefaults(175, 215, 50, 10);
@@ -122,6 +123,7 @@ int main(int argc, char **argv)
 
 		sf2d_start_frame(GFX_TOP, GFX_LEFT);
 		sf2d_draw_rectangle(paddle.x, paddle.y, paddle.width, paddle.height, RGBA8(0xC0, 0x61, 0x0A, 0xFF)); //Brown rectangle to be paddle
+		sf2d_draw_texture(img_title, 80, 20);
 		sf2d_end_frame();
 
 		std::cout << ANSI "0;0" PEND "                                                            ";
@@ -142,6 +144,7 @@ int main(int argc, char **argv)
 
 	// Exit services
 	sf2d_fini();
+	sf2d_free_texture(img_title);
 	
 	return 0;
 }

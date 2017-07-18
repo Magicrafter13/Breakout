@@ -12,6 +12,7 @@ using std::string;
 #include <3ds.h>
 #include <sf2d.h>
 #include <sfil.h>
+#include <sftd.h>
 #include <vector>
 #include "Title_png.h"
 

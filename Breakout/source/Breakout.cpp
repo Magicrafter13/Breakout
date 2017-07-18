@@ -12,6 +12,7 @@ int breakout();
 int lives = 3;
 mRectangle paddle;
 brick brick_array[50];
+ball the_ball;
 
 bool touchInBox(touchPosition touch, int x, int y, int w, int h)
 {
@@ -78,6 +79,7 @@ int main(int argc, char **argv)
 	sf2d_texture *img_title = sfil_load_PNG_buffer(Title_png, SF2D_PLACE_RAM);
 
 	paddle.setDefaults(175, 215, 50, 10, 0xC0, 0x61, 0x0A, 0xFF);
+	the_ball.setDefaults(200, 120, 7, 0xC3, 0xC3, 0xC3, 0xFF, 200.3, 115.2, 202.5, 119.8, 204.9, 117.1, 0xFF, 0xFF, 0xFF, 0xFF);
 	int brick_R[5] = { 0xFF, 0xFF, 0xFF, 0x00, 0x00 };
 	int brick_G[5] = { 0x00, 0x80, 0xFF, 0xFF, 0x00 };
 	int brick_B[5] = { 0x00, 0x00, 0x00, 0x00, 0xFF };
@@ -171,6 +173,7 @@ int breakout()
 	draw_rect(paddle);
 	for (int i = 0; i < 50; i++)
 		draw_brick(brick_array[i]);
+	draw_ball(the_ball);
 	sf2d_end_frame();
 	sf2d_swapbuffers();
 	return 0;

@@ -5,7 +5,7 @@
 //init
 int debugTF = 1;
 char versiontxtt[8] = " Alpha ";
-char versiontxtn[9] = " 1.01.0 ";
+char versiontxtn[9] = " 1.02.0 ";
 int vernumqik = 0;
 
 int breakout();

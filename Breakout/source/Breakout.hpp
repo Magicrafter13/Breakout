@@ -22,7 +22,7 @@ using namespace boost;*/
 
 //Decided not to use this because it's f***ing impossible to setup boost.
 
-extern PrintConsole topScreen, bottomScreen, versionWin;
+extern PrintConsole topScreen, bottomScreen, versionWin, killBox;
 
 extern char versiontxtt[8];
 extern char versiontxtn[9];
@@ -30,6 +30,12 @@ extern int vernumqik;
 int credits();
 extern int debugTF;
 const char * keyBoard(char * hintTxt, int maxNumbers, bool multiLine);
+
+/**
+ *Global Variables Init
+ *(Lives Object Positions etc)
+ */
+extern int lives;
 
 #define ANSI "\x1b["
 #define RED "31"

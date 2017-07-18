@@ -21,9 +21,18 @@
     <ClCompile Include="source\Breakout.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\draw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="source\Breakout.h">
+    <ClInclude Include="source\draw.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Breakout.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\shapes.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

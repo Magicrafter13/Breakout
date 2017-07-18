@@ -1,5 +1,4 @@
-Breakout.o: \
- c:/Users/scuba/Documents/GitHub/Breakout/Breakout/source/Breakout.cpp \
+draw.o: c:/Users/scuba/Documents/GitHub/Breakout/Breakout/source/draw.cpp \
  c:/Users/scuba/Documents/GitHub/Breakout/Breakout/source/Breakout.hpp \
  c:/devkitPro/libctru/include/3ds.h \
  c:/devkitPro/libctru/include/3ds/types.h \

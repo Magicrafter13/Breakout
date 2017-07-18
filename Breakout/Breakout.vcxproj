@@ -141,9 +141,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Breakout.cpp" />
+    <ClCompile Include="source\draw.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="source\Breakout.h" />
+    <ClInclude Include="source\Breakout.hpp" />
+    <ClInclude Include="source\draw.hpp" />
+    <ClInclude Include="source\shapes.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

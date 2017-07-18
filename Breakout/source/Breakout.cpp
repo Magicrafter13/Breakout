@@ -1,10 +1,17 @@
-#include "Breakout.h"
+#include "Breakout.hpp"
+#include "shapes.hpp"
+#include "draw.hpp"
 
 //init
 int debugTF = 1;
 char versiontxtt[8] = " Alpha ";
 char versiontxtn[9] = " 1.01.0 ";
 int vernumqik = 0;
+
+int breakout();
+int lives = 3;
+mRectangle paddle;
+brick BRICK01;
 
 bool touchInBox(touchPosition touch, int x, int y, int w, int h)
 {
@@ -34,38 +41,6 @@ void closeSD()
 {
 	FSUSER_CloseArchive(sdmcArchive);
 }
-
-class mRectangle {
-public:
-	int x;
-	int y;
-	int width;
-	int height;
-	int default_x;
-	int default_y;
-	int default_width;
-	int default_height;
-	int setDefaults(int i_x, int i_y, int i_width, int i_height)
-	{
-		x = i_x;
-		default_x = i_x;
-		y = i_y;
-		default_y = i_y;
-		width = i_width;
-		default_width = i_width;
-		height = i_height;
-		default_height = i_height;
-		return 0;
-	}
-	int reset()
-	{
-		x = default_x;
-		y = default_y;
-		width = default_width;
-		height = default_height;
-		return 0;
-	}
-};
 
 int main(int argc, char **argv)
 {
@@ -102,8 +77,10 @@ int main(int argc, char **argv)
 	sf2d_set_vblank_wait(1);
 	sf2d_texture *img_title = sfil_load_PNG_buffer(Title_png, SF2D_PLACE_RAM);
 
-	mRectangle paddle;
-	paddle.setDefaults(175, 215, 50, 10);
+	paddle.setDefaults(175, 215, 50, 10, 0xC0, 0x61, 0x0A, 0xFF);
+	BRICK01.setDefaults(10, 10, 10, 5, 0xFF, 0xFF, 0x00, 0xFF);
+	
+	std::cout << ANSI "2;0" PEND "Press Select to begin.";
 
 	// Main loop
 	while (aptMainLoop())
@@ -112,14 +89,20 @@ int main(int argc, char **argv)
 		u32 kDown = hidKeysDown();
 		u32 kHeld = hidKeysHeld();
 		if (kDown & KEY_START) break; // break in order to return to hbmenu
-		if (kHeld & KEY_LEFT) paddle.width--;
-		if (kHeld & KEY_RIGHT) paddle.width++;
-		if (kHeld & KEY_UP) paddle.height--;
-		if (kHeld & KEY_DOWN) paddle.height++;
-		if (kHeld & KEY_Y) paddle.x--;
-		if (kHeld & KEY_A) paddle.x++;
-		if (kHeld & KEY_X) paddle.y--;
-		if (kHeld & KEY_B) paddle.y++;
+		if (kDown & KEY_SELECT)
+		{
+			int result = 3;
+			sf2d_swapbuffers();
+			paddle.setColor(0x00, 0x00, 0x00, 0xFF);
+			while (true)
+			{
+				result = breakout();
+				if (result != 0)
+					break;
+			}
+			if (result == 3)
+				break;
+		}
 
 		sf2d_start_frame(GFX_TOP, GFX_LEFT);
 		sf2d_draw_rectangle(paddle.x, paddle.y, paddle.width, paddle.height, RGBA8(0xC0, 0x61, 0x0A, 0xFF)); //Brown rectangle to be paddle
@@ -146,5 +129,32 @@ int main(int argc, char **argv)
 	sf2d_fini();
 	sf2d_free_texture(img_title);
 	
+	return 0;
+}
+
+int breakout()
+{
+	if (lives == 0)
+		return 2;
+	hidScanInput();
+	u32 kDown = hidKeysDown();
+	if (kDown & KEY_SELECT)
+		return 2;
+	u32 kHeld = hidKeysHeld();
+	if (kHeld & KEY_START)
+		return 3;
+	if (kHeld & KEY_LEFT)
+		if (paddle.x > 1)
+			paddle.x -= 2;
+	if (kHeld & KEY_RIGHT)
+		if (paddle.x < 399 - paddle.width)
+			paddle.x += 2;
+	if (kDown & KEY_A)
+		std::cout << "what was I gonna add here... oh yeah color change, not important :p\n";
+	sf2d_start_frame(GFX_TOP, GFX_LEFT);
+	draw_rect(paddle);
+	draw_brick(BRICK01);
+	sf2d_end_frame();
+	sf2d_swapbuffers();
 	return 0;
 }

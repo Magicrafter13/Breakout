@@ -3,7 +3,7 @@
 //init
 int debugTF = 1;
 char versiontxtt[8] = " Alpha ";
-char versiontxtn[9] = " 1.00.0 ";
+char versiontxtn[9] = " 1.01.0 ";
 int vernumqik = 0;
 
 bool touchInBox(touchPosition touch, int x, int y, int w, int h)

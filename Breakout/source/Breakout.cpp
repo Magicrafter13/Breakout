@@ -11,7 +11,7 @@ int vernumqik = 0;
 int breakout();
 int lives = 3;
 mRectangle paddle;
-brick BRICK01;
+brick brick_array[50];
 
 bool touchInBox(touchPosition touch, int x, int y, int w, int h)
 {
@@ -78,7 +78,24 @@ int main(int argc, char **argv)
 	sf2d_texture *img_title = sfil_load_PNG_buffer(Title_png, SF2D_PLACE_RAM);
 
 	paddle.setDefaults(175, 215, 50, 10, 0xC0, 0x61, 0x0A, 0xFF);
-	BRICK01.setDefaults(10, 10, 10, 5, 0xFF, 0xFF, 0x00, 0xFF);
+	int brick_R[5] = { 0xFF, 0xFF, 0xFF, 0x00, 0x00 };
+	int brick_G[5] = { 0x00, 0x80, 0xFF, 0xFF, 0x00 };
+	int brick_B[5] = { 0x00, 0x00, 0x00, 0x00, 0xFF };
+	int brick_A[5] = { 0xFA, 0xFA, 0xFA, 0xFA, 0xFA }; //250 instead of 255. I want to the bricks to fade out by 25 each frame (lasting 10 frames)
+	int array_step = 0;
+	for (int a = 0; a < 5; a++)
+	{
+		for (int b = 0; b < 10; b++)
+		{
+			brick_array[array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, brick_R[a], brick_G[a], brick_B[a], brick_A[a]);
+			brick_array[array_step].exists = true;
+			array_step++;
+		}
+	}
+	std::cout << ANSI "20;0" PEND "Array Step : " << array_step << "\n";
+	std::cout << "Brick 11 Y: " << brick_array[10].brick_mrect.y << " Brick 22 X: " << brick_array[21].brick_mrect.x << "\n";
+	std::cout << "RGB Data Brick 50: " << brick_array[49].brick_mrect.color << "\n";
+	//BRICK01.setDefaults(2, 2, 36, 16, 0xFF, 0xFF, 0x00, 0xFF);
 	
 	std::cout << ANSI "2;0" PEND "Press Select to begin.";
 
@@ -93,7 +110,6 @@ int main(int argc, char **argv)
 		{
 			int result = 3;
 			sf2d_swapbuffers();
-			paddle.setColor(0x00, 0x00, 0x00, 0xFF);
 			while (true)
 			{
 				result = breakout();
@@ -153,7 +169,8 @@ int breakout()
 		std::cout << "what was I gonna add here... oh yeah color change, not important :p\n";
 	sf2d_start_frame(GFX_TOP, GFX_LEFT);
 	draw_rect(paddle);
-	draw_brick(BRICK01);
+	for (int i = 0; i < 50; i++)
+		draw_brick(brick_array[i]);
 	sf2d_end_frame();
 	sf2d_swapbuffers();
 	return 0;

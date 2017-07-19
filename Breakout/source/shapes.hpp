@@ -1,17 +1,17 @@
 //#include "Breakout.hpp"
 class mRectangle {
 public:
-	int x;
-	int y;
-	int width;
-	int height;
-	int color;
-	int default_x;
-	int default_y;
-	int default_width;
-	int default_height;
-	int default_color;
-	void setDefaults(int i_x, int i_y, int i_width, int i_height, int R, int G, int B, int A)
+	float x;
+	float y;
+	float width;
+	float height;
+	u32 color;
+	float default_x;
+	float default_y;
+	float default_width;
+	float default_height;
+	u32 default_color;
+	void setDefaults(float i_x, float i_y, float i_width, float i_height, int R, int G, int B, int A)
 	{
 		x = i_x;
 		default_x = i_x;
@@ -36,12 +36,12 @@ public:
 	{
 		color = RGBA8(R, G, B, A);
 	}
-	void setPosition(int sx, int sy)
+	void setPosition(float sx, float sy)
 	{
 		x = sx;
 		y = sy;
 	}
-	void setSize(int swidth, int sheight)
+	void setSize(float swidth, float sheight)
 	{
 		width = swidth;
 		height = sheight;
@@ -52,7 +52,7 @@ class brick {
 public:
 	bool exists;
 	mRectangle brick_mrect;
-	void setDefaults(int bx, int by, int bwidth, int bheight, int R, int G, int B, int A)
+	void setDefaults(float bx, float by, float bwidth, float bheight, int R, int G, int B, int A)
 	{
 		brick_mrect.setDefaults(bx, by, bwidth, bheight, R, G, B, A);
 		exists = true;
@@ -61,15 +61,15 @@ public:
 
 class mCircle {
 public:
-	int x;
-	int y;
-	int rad;
+	float x;
+	float y;
+	float rad;
 	u32 color;
-	int default_x;
-	int default_y;
-	int default_rad;
+	float default_x;
+	float default_y;
+	float default_rad;
 	u32 default_color;
-	void setDefaults(int i_x, int i_y, int i_rad, int R, int G, int B, int A)
+	void setDefaults(float i_x, float i_y, float i_rad, int R, int G, int B, int A)
 	{
 		x = i_x;
 		default_x = i_x;
@@ -91,12 +91,12 @@ public:
 	{
 		color = RGBA8(R, G, B, A);
 	}
-	void setPosition(int sx, int sy)
+	void setPosition(float sx, float sy)
 	{
 		x = sx;
 		y = sy;
 	}
-	void setRadius(int srad)
+	void setRadius(float srad)
 	{
 		rad = srad;
 	}
@@ -165,26 +165,95 @@ public:
 	bool exists;
 	mCircle ball_mcirc;
 	mTriangle ball_mtri;
-	void setDefaults(int bx, int by, int brad, int R, int G, int B, int A, float tx1, float ty1, float tx2, float ty2, float tx3, float ty3, int TR, int TG, int TB, int TA)
+	void setDefaults(float bx, float by, float brad, int R, int G, int B, int A, float tx1, float ty1, float tx2, float ty2, float tx3, float ty3, int TR, int TG, int TB, int TA)
 	{
 		ball_mcirc.setDefaults(bx, by, brad, R, G, B, A);
 		ball_mtri.setDefaults(tx1, ty1, tx2, ty2, tx3, ty3, TR, TG, TB, TA);
 		exists = true;
 	}
-	int getLeft()
+	void reset()
 	{
-		return ball_mcirc.x;
+		ball_mcirc.reset();
+		ball_mtri.reset();
 	}
-	int getRight()
+	int getLeft(bool X)
 	{
-		return ball_mcirc.x + (ball_mcirc.rad * 2);
+		if (X)
+			return ball_mcirc.x - ball_mcirc.rad;
+		else
+			return ball_mcirc.y;
 	}
-	int getTop()
+	int getRight(bool X)
 	{
-		return ball_mcirc.y;
+		if (X)
+			return ball_mcirc.x + ball_mcirc.rad;
+		else
+			return ball_mcirc.y;
 	}
-	int getBottom()
+	int getTop(bool X)
 	{
-		return ball_mcirc.y + (ball_mcirc.rad * 2);
+		if (X)
+			return ball_mcirc.x;
+		else
+			return ball_mcirc.y - ball_mcirc.rad;
+	}
+	int getBottom(bool X) //true for X false for Y
+	{
+		if (X)
+			return ball_mcirc.x;
+		else
+			return ball_mcirc.y + ball_mcirc.rad;
+	}
+	void move(float dx, float dy)
+	{
+		ball_mcirc.x += dx;
+		ball_mtri.x1 += dx;
+		ball_mtri.x2 += dx;
+		ball_mtri.x3 += dx;
+		ball_mcirc.y += dy;
+		ball_mtri.y1 += dy;
+		ball_mtri.y2 += dy;
+		ball_mtri.y3 += dy;
+	}
+};
+
+class paddle {
+public:
+	mRectangle paddle_mrect;
+	void setDefaults(float bx, float by, float bwidth, float bheight, int R, int G, int B, int A)
+	{
+		paddle_mrect.setDefaults(bx, by, bwidth, bheight, R, G, B, A);
+	}
+	void reset()
+	{
+		paddle_mrect.reset();
+	}
+	int getLeft(bool X)
+	{
+		if (X)
+			return paddle_mrect.x;
+		else
+			return paddle_mrect.y + (paddle_mrect.height / 2);
+	}
+	int getRight(bool X)
+	{
+		if (X)
+			return paddle_mrect.x + paddle_mrect.width;
+		else
+			return paddle_mrect.y + (paddle_mrect.height / 2);
+	}
+	int getTop(bool X)
+	{
+		if (X)
+			return paddle_mrect.x + (paddle_mrect.width / 2);
+		else
+			return paddle_mrect.y;
+	}
+	int getBottom(bool X)
+	{
+		if (X)
+			return paddle_mrect.x + (paddle_mrect.width / 2);
+		else
+			return paddle_mrect.y + paddle_mrect.height;
 	}
 };

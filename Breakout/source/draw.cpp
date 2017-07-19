@@ -31,3 +31,8 @@ void draw_ball(ball ball_to_draw)
 		draw_triangle(ball_to_draw.ball_mtri);
 	}
 }
+
+void draw_paddle(paddle paddle_to_draw)
+{
+	draw_rect(paddle_to_draw.paddle_mrect);
+}

@@ -24,8 +24,15 @@ void draw_circ(mCircle circle_to_draw);
  * param: ball: the ball to be drawn (has to be of brick class)
  */
 void draw_ball(ball ball_to_draw);
+
 /**
  * brief: draws a triangle (using sf2dlib)
  * param: mTriangle: the triangle you want drawn (has to be of mTriangle class)
  */
 void draw_triangle(mTriangle tri_to_draw);
+
+/**
+ * brief: draws a (the) paddle ... I don't need to explain these anymore. Just read the other things in draw.hpp
+ * param: paddle _paddle
+ */
+void draw_paddle(paddle paddle_to_draw);

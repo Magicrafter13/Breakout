@@ -10,7 +10,8 @@ int vernumqik = 0;
 
 int breakout();
 int lives = 3;
-mRectangle paddle;
+float ball_dx, ball_dy;
+paddle the_paddle;
 brick brick_array[50];
 ball the_ball;
 
@@ -45,6 +46,7 @@ void closeSD()
 
 int main(int argc, char **argv)
 {
+	srand(time(NULL));
 	//hidInit();
 	//gfxInitDefault();
 	sf2d_init();
@@ -78,7 +80,7 @@ int main(int argc, char **argv)
 	sf2d_set_vblank_wait(1);
 	sf2d_texture *img_title = sfil_load_PNG_buffer(Title_png, SF2D_PLACE_RAM);
 
-	paddle.setDefaults(175, 215, 50, 10, 0xC0, 0x61, 0x0A, 0xFF);
+	the_paddle.setDefaults(175, 215-50, 50, 50, 0xC0, 0x61, 0x0A, 0xFF);
 	the_ball.setDefaults(200, 120, 7, 0xC3, 0xC3, 0xC3, 0xFF, 200.3, 115.2, 202.5, 119.8, 204.9, 117.1, 0xFF, 0xFF, 0xFF, 0xFF);
 	int brick_R[5] = { 0xFF, 0xFF, 0xFF, 0x00, 0x00 };
 	int brick_G[5] = { 0x00, 0x80, 0xFF, 0xFF, 0x00 };
@@ -110,7 +112,15 @@ int main(int argc, char **argv)
 		if (kDown & KEY_START) break; // break in order to return to hbmenu
 		if (kDown & KEY_SELECT)
 		{
+			lives = 3;
 			int result = 3;
+			the_ball.reset();
+			ball_dx = 0; ball_dy = 0;
+			while (ball_dx == 0 || ball_dy == 0)
+			{
+				ball_dx = (rand() % 6) / 3;
+				if (ball_dx > 0) ball_dy = 3 - ball_dx; else ball_dy = ball_dx + 3;
+			}
 			sf2d_swapbuffers();
 			while (true)
 			{
@@ -123,14 +133,14 @@ int main(int argc, char **argv)
 		}
 
 		sf2d_start_frame(GFX_TOP, GFX_LEFT);
-		sf2d_draw_rectangle(paddle.x, paddle.y, paddle.width, paddle.height, RGBA8(0xC0, 0x61, 0x0A, 0xFF)); //Brown rectangle to be paddle
+		sf2d_draw_rectangle(the_paddle.paddle_mrect.x, the_paddle.paddle_mrect.y, the_paddle.paddle_mrect.width, the_paddle.paddle_mrect.height, RGBA8(0xC0, 0x61, 0x0A, 0xFF)); //Brown rectangle to be paddle
 		sf2d_draw_texture(img_title, 80, 20);
 		sf2d_end_frame();
 
 		std::cout << ANSI "0;0" PEND "                                                            ";
 		std::cout << ANSI "1;0" PEND "                                                            ";
-		std::cout << ANSI "0;0" PEND "X = " << paddle.x << " Y = " << paddle.y << " Width = " << paddle.width << " Height = " << paddle.height;
-		std::cout << ANSI "1;0" PEND "H-Mid = " << (paddle.x + (paddle.width / 2)) << "   H-Mid-Length = " << (paddle.width / 2);
+		std::cout << ANSI "0;0" PEND "X = " << the_paddle.paddle_mrect.x << " Y = " << the_paddle.paddle_mrect.y << " Width = " << the_paddle.paddle_mrect.width << " Height = " << the_paddle.paddle_mrect.height;
+		std::cout << ANSI "1;0" PEND "H-Mid = " << (the_paddle.paddle_mrect.x + (the_paddle.paddle_mrect.width / 2)) << "   H-Mid-Length = " << (the_paddle.paddle_mrect.width / 2);
 		std::cout << ANSI "2;0" PEND;
 
 		sf2d_swapbuffers();
@@ -150,30 +160,68 @@ int main(int argc, char **argv)
 	return 0;
 }
 
+bool mov_left = false;
+bool mov_right = false;
 int breakout()
 {
 	if (lives == 0)
 		return 2;
 	hidScanInput();
 	u32 kDown = hidKeysDown();
+	u32 kHeld = hidKeysHeld();
 	if (kDown & KEY_SELECT)
 		return 2;
-	u32 kHeld = hidKeysHeld();
 	if (kHeld & KEY_START)
 		return 3;
 	if (kHeld & KEY_LEFT)
-		if (paddle.x > 1)
-			paddle.x -= 2;
+		mov_left = true;
 	if (kHeld & KEY_RIGHT)
-		if (paddle.x < 399 - paddle.width)
-			paddle.x += 2;
+		mov_right = true;
 	if (kDown & KEY_A)
 		std::cout << "what was I gonna add here... oh yeah color change, not important :p\n";
+	for (int i = 0; i < 3; i++)
+	{
+		if (mov_left)
+			if (the_paddle.paddle_mrect.x > 1)
+				the_paddle.paddle_mrect.x -= 0.666;
+		if (mov_right)
+			if (the_paddle.paddle_mrect.x < 399 - the_paddle.paddle_mrect.width)
+			the_paddle.paddle_mrect.x += 0.666;
+		if ((the_ball.getLeft(true) <= 0) || (the_ball.getRight(true) >= 400))
+			ball_dx = -ball_dx;
+		if (the_ball.getTop(false) <= 0 || (the_ball.getBottom(false) >= 240))
+			ball_dy = -ball_dy;
+		if (((the_paddle.getTop(false) <= the_ball.getBottom(false) && the_ball.getBottom(false) <= the_paddle.getBottom(false)) || (the_paddle.getBottom(false) >= the_ball.getTop(false) && the_ball.getTop(false) >= the_paddle.getTop(false))) && (the_paddle.paddle_mrect.x <= the_ball.ball_mcirc.x && the_ball.ball_mcirc.x <= the_paddle.paddle_mrect.x + the_paddle.paddle_mrect.width))
+			ball_dy = -ball_dy;
+		if (((the_paddle.getLeft(true) <= the_ball.getRight(true) && the_ball.getRight(true) <= the_paddle.getRight(true)) || (the_paddle.getRight(true) >= the_ball.getLeft(true) && the_ball.getLeft(true) >= the_paddle.getLeft(true))) && (the_paddle.paddle_mrect.y <= the_ball.ball_mcirc.y && the_ball.ball_mcirc.y <= the_paddle.paddle_mrect.y + the_paddle.paddle_mrect.height))
+			ball_dx = -ball_dx;
+		/*if (the_ball.getTop(false) > 240)
+		{
+			lives--;
+			the_ball.reset();
+			ball_dx = 0; ball_dy = 0;
+			while (ball_dx == 0 || ball_dy == 0)
+			{
+				ball_dx = (rand() % 6) - 3;
+				if (ball_dx > 0) ball_dy = 3 - ball_dx; else ball_dy = ball_dx + 3;
+			}
+		}*/
+		the_ball.move(ball_dx / 3, ball_dy / 3);
+	}
 	sf2d_start_frame(GFX_TOP, GFX_LEFT);
-	draw_rect(paddle);
+	draw_paddle(the_paddle);
 	for (int i = 0; i < 50; i++)
 		draw_brick(brick_array[i]);
 	draw_ball(the_ball);
+	std::cout << ANSI "15;0" PEND;
+	for (int i = 0; i < 6; i++)
+		std::cout << "                                        ";
+	std::cout << ANSI "15;0" PEND "Ball Position: " << the_ball.ball_mcirc.x << "," << the_ball.ball_mcirc.y << "\n";
+	std::cout << "Ball Direction: " << ball_dx << "," << ball_dy << "\n";
+	std::cout << "Paddle Position: " << the_paddle.paddle_mrect.x << "," << the_paddle.paddle_mrect.y << "\n";
+	std::cout << "Paddle Direction: " << "Left: " << mov_left << " Right: " << mov_right << "\n";
+	mov_left = false;
+	mov_right = false;
 	sf2d_end_frame();
 	sf2d_swapbuffers();
 	return 0;

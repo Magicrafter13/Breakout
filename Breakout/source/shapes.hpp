@@ -1,17 +1,16 @@
-//#include "Breakout.hpp"
-class mRectangle {
+class mRectangle{
 public:
-	float x;
-	float y;
-	float width;
-	float height;
+	double x;
+	double y;
+	double width;
+	double height;
 	u32 color;
-	float default_x;
-	float default_y;
-	float default_width;
-	float default_height;
+	double default_x;
+	double default_y;
+	double default_width;
+	double default_height;
 	u32 default_color;
-	void setDefaults(float i_x, float i_y, float i_width, float i_height, int R, int G, int B, int A)
+	void setDefaults(double i_x, double i_y, double i_width, double i_height, int R, int G, int B, int A)
 	{
 		x = i_x;
 		default_x = i_x;
@@ -36,40 +35,40 @@ public:
 	{
 		color = RGBA8(R, G, B, A);
 	}
-	void setPosition(float sx, float sy)
+	void setPosition(double sx, double sy)
 	{
 		x = sx;
 		y = sy;
 	}
-	void setSize(float swidth, float sheight)
+	void setSize(double swidth, double sheight)
 	{
 		width = swidth;
 		height = sheight;
 	}
 };
 
-class brick {
+class brick{
 public:
 	bool exists;
 	mRectangle brick_mrect;
-	void setDefaults(float bx, float by, float bwidth, float bheight, int R, int G, int B, int A)
+	void setDefaults(double bx, double by, double bwidth, double bheight, int R, int G, int B, int A)
 	{
 		brick_mrect.setDefaults(bx, by, bwidth, bheight, R, G, B, A);
 		exists = true;
 	}
 };
 
-class mCircle {
+class mCircle{
 public:
-	float x;
-	float y;
-	float rad;
+	double x;
+	double y;
+	double rad;
 	u32 color;
-	float default_x;
-	float default_y;
-	float default_rad;
+	double default_x;
+	double default_y;
+	double default_rad;
 	u32 default_color;
-	void setDefaults(float i_x, float i_y, float i_rad, int R, int G, int B, int A)
+	void setDefaults(double i_x, double i_y, double i_rad, int R, int G, int B, int A)
 	{
 		x = i_x;
 		default_x = i_x;
@@ -91,12 +90,12 @@ public:
 	{
 		color = RGBA8(R, G, B, A);
 	}
-	void setPosition(float sx, float sy)
+	void setPosition(double sx, double sy)
 	{
 		x = sx;
 		y = sy;
 	}
-	void setRadius(float srad)
+	void setRadius(double srad)
 	{
 		rad = srad;
 	}
@@ -104,21 +103,21 @@ public:
 
 class mTriangle {
 public:
-	float x1;
-	float y1;
-	float x2;
-	float y2;
-	float x3;
-	float y3;
+	double x1;
+	double y1;
+	double x2;
+	double y2;
+	double x3;
+	double y3;
 	u32 color;
-	float default_x1;
-	float default_y1;
-	float default_x2;
-	float default_y2;
-	float default_x3;
-	float default_y3;
+	double default_x1;
+	double default_y1;
+	double default_x2;
+	double default_y2;
+	double default_x3;
+	double default_y3;
 	u32 default_color;
-	void setDefaults(float i_x1, float i_y1, float i_x2, float i_y2, float i_x3, float i_y3, int R, int G, int B, int A)
+	void setDefaults(double i_x1, double i_y1, double i_x2, double i_y2, double i_x3, double i_y3, int R, int G, int B, int A)
 	{
 		x1 = i_x1;
 		default_x1 = i_x1;
@@ -149,7 +148,7 @@ public:
 	{
 		color = RGBA8(R, G, B, A);
 	}
-	void setPosition(float sx1, float sy1, float sx2, float sy2, float sx3, float sy3)
+	void setPosition(double sx1, double sy1, double sx2, double sy2, double sx3, double sy3)
 	{
 		x1 = sx1;
 		y1 = sy1;
@@ -165,7 +164,7 @@ public:
 	bool exists;
 	mCircle ball_mcirc;
 	mTriangle ball_mtri;
-	void setDefaults(float bx, float by, float brad, int R, int G, int B, int A, float tx1, float ty1, float tx2, float ty2, float tx3, float ty3, int TR, int TG, int TB, int TA)
+	void setDefaults(double bx, double by, double brad, int R, int G, int B, int A, double tx1, double ty1, double tx2, double ty2, double tx3, double ty3, int TR, int TG, int TB, int TA)
 	{
 		ball_mcirc.setDefaults(bx, by, brad, R, G, B, A);
 		ball_mtri.setDefaults(tx1, ty1, tx2, ty2, tx3, ty3, TR, TG, TB, TA);
@@ -176,35 +175,35 @@ public:
 		ball_mcirc.reset();
 		ball_mtri.reset();
 	}
-	int getLeft(bool X)
+	double getLeft(bool X)
 	{
 		if (X)
 			return ball_mcirc.x - ball_mcirc.rad;
 		else
 			return ball_mcirc.y;
 	}
-	int getRight(bool X)
+	double getRight(bool X)
 	{
 		if (X)
 			return ball_mcirc.x + ball_mcirc.rad;
 		else
 			return ball_mcirc.y;
 	}
-	int getTop(bool X)
+	double getTop(bool X)
 	{
 		if (X)
 			return ball_mcirc.x;
 		else
 			return ball_mcirc.y - ball_mcirc.rad;
 	}
-	int getBottom(bool X) //true for X false for Y
+	double getBottom(bool X) //true for X false for Y
 	{
 		if (X)
 			return ball_mcirc.x;
 		else
 			return ball_mcirc.y + ball_mcirc.rad;
 	}
-	void move(float dx, float dy)
+	void move(double dx, double dy)
 	{
 		ball_mcirc.x += dx;
 		ball_mtri.x1 += dx;
@@ -220,7 +219,7 @@ public:
 class paddle {
 public:
 	mRectangle paddle_mrect;
-	void setDefaults(float bx, float by, float bwidth, float bheight, int R, int G, int B, int A)
+	void setDefaults(double bx, double by, double bwidth, double bheight, int R, int G, int B, int A)
 	{
 		paddle_mrect.setDefaults(bx, by, bwidth, bheight, R, G, B, A);
 	}
@@ -228,31 +227,31 @@ public:
 	{
 		paddle_mrect.reset();
 	}
-	int getLeft(bool X)
+	double getLeft(bool X)
 	{
 		if (X)
 			return paddle_mrect.x;
 		else
-			return paddle_mrect.y + (paddle_mrect.height / 2);
+			return paddle_mrect.y + (paddle_mrect.height / 2.0);
 	}
-	int getRight(bool X)
+	double getRight(bool X)
 	{
 		if (X)
 			return paddle_mrect.x + paddle_mrect.width;
 		else
-			return paddle_mrect.y + (paddle_mrect.height / 2);
+			return paddle_mrect.y + (paddle_mrect.height / 2.0);
 	}
-	int getTop(bool X)
+	double getTop(bool X)
 	{
 		if (X)
-			return paddle_mrect.x + (paddle_mrect.width / 2);
+			return paddle_mrect.x + (paddle_mrect.width / 2.0);
 		else
 			return paddle_mrect.y;
 	}
-	int getBottom(bool X)
+	double getBottom(bool X)
 	{
 		if (X)
-			return paddle_mrect.x + (paddle_mrect.width / 2);
+			return paddle_mrect.x + (paddle_mrect.width / 2.0);
 		else
 			return paddle_mrect.y + paddle_mrect.height;
 	}

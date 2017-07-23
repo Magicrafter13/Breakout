@@ -88,7 +88,8 @@ Breakout.o: \
  c:/devkitPro/libctru/include/sfil.h c:/devkitPro/libctru/include/sftd.h \
  c:/Users/scuba/Documents/GitHub/Breakout/Breakout/build/Title_png.h \
  c:/Users/scuba/Documents/GitHub/Breakout/Breakout/source/shapes.hpp \
- c:/Users/scuba/Documents/GitHub/Breakout/Breakout/source/draw.hpp
+ c:/Users/scuba/Documents/GitHub/Breakout/Breakout/source/draw.hpp \
+ c:/Users/scuba/Documents/GitHub/Breakout/Breakout/source/physics.hpp
 
 c:/Users/scuba/Documents/GitHub/Breakout/Breakout/source/Breakout.hpp:
 
@@ -269,3 +270,5 @@ c:/Users/scuba/Documents/GitHub/Breakout/Breakout/build/Title_png.h:
 c:/Users/scuba/Documents/GitHub/Breakout/Breakout/source/shapes.hpp:
 
 c:/Users/scuba/Documents/GitHub/Breakout/Breakout/source/draw.hpp:
+
+c:/Users/scuba/Documents/GitHub/Breakout/Breakout/source/physics.hpp:

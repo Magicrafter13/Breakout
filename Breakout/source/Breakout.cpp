@@ -1,6 +1,7 @@
 #include "Breakout.hpp"
 #include "shapes.hpp"
 #include "draw.hpp"
+#include "physics.hpp"
 
 //init
 int debugTF = 1;
@@ -10,7 +11,8 @@ int vernumqik = 0;
 
 int breakout();
 int lives = 3;
-float ball_dx, ball_dy;
+double ball_dx, ball_dy;
+bool crushBall = false;
 paddle the_paddle;
 brick brick_array[50];
 ball the_ball;
@@ -30,7 +32,7 @@ bool touchInBox(touchPosition touch, int x, int y, int w, int h)
 touchPosition touch;
 bool gameRunning = true;
 
-PrintConsole topScreen, bottomScreen, versionWin, killBox;
+PrintConsole topScreen, bottomScreen, versionWin, killBox, debugBox;
 
 FS_Archive sdmcArchive;
 
@@ -56,9 +58,11 @@ int main(int argc, char **argv)
 	consoleInit(GFX_BOTTOM, &bottomScreen);
 	consoleInit(GFX_BOTTOM, &versionWin);
 	consoleInit(GFX_BOTTOM, &killBox);
+	consoleInit(GFX_BOTTOM, &debugBox);
 	
 	consoleSetWindow(&versionWin, 6, 26, 34, 2);
 	consoleSetWindow(&killBox, 0, 28, 40, 2);
+	consoleSetWindow(&debugBox, 18, 4, 9, 12);
 
 	consoleSelect(&versionWin);
 	std::cout << "     Tap red area any time to exit";
@@ -80,8 +84,8 @@ int main(int argc, char **argv)
 	sf2d_set_vblank_wait(1);
 	sf2d_texture *img_title = sfil_load_PNG_buffer(Title_png, SF2D_PLACE_RAM);
 
-	the_paddle.setDefaults(175, 215-50, 50, 50, 0xC0, 0x61, 0x0A, 0xFF);
-	the_ball.setDefaults(200, 120, 7, 0xC3, 0xC3, 0xC3, 0xFF, 200.3, 115.2, 202.5, 119.8, 204.9, 117.1, 0xFF, 0xFF, 0xFF, 0xFF);
+	the_paddle.setDefaults(175, 215, 50, 10, 0xC0, 0x61, 0x0A, 0xFF);
+	the_ball.setDefaults(200.0, 120.0, 7.0, 0xC3, 0xC3, 0xC3, 0xFF, 200.3, 115.2, 202.5, 119.8, 204.9, 117.1, 0xFF, 0xFF, 0xFF, 0xFF);
 	int brick_R[5] = { 0xFF, 0xFF, 0xFF, 0x00, 0x00 };
 	int brick_G[5] = { 0x00, 0x80, 0xFF, 0xFF, 0x00 };
 	int brick_B[5] = { 0x00, 0x00, 0x00, 0x00, 0xFF };
@@ -115,11 +119,12 @@ int main(int argc, char **argv)
 			lives = 3;
 			int result = 3;
 			the_ball.reset();
-			ball_dx = 0; ball_dy = 0;
-			while (ball_dx == 0 || ball_dy == 0)
+			ball_dx = 0.0; ball_dy = 0.0;
+			while (ball_dx == 0.0 || ball_dy <= 0.0)
 			{
-				ball_dx = (rand() % 6) / 3;
-				if (ball_dx > 0) ball_dy = 3 - ball_dx; else ball_dy = ball_dx + 3;
+				ball_dx = (rand() % 60) / 10.0;
+				ball_dx -= 3.0;
+				if (ball_dx > 0.0) ball_dy = 3.0 - ball_dx; else ball_dy = ball_dx + 3.0;
 			}
 			sf2d_swapbuffers();
 			while (true)
@@ -162,6 +167,13 @@ int main(int argc, char **argv)
 
 bool mov_left = false;
 bool mov_right = false;
+bool isCollidingH = false;
+bool isCollidingV = false;
+bool leftHit = false;
+bool rightHit = false;
+bool topHit = false;
+bool bottomHit = false;
+
 int breakout()
 {
 	if (lives == 0)
@@ -174,54 +186,174 @@ int breakout()
 	if (kHeld & KEY_START)
 		return 3;
 	if (kHeld & KEY_LEFT)
-		mov_left = true;
+		if (the_paddle.paddle_mrect.x > 1)
+			the_paddle.paddle_mrect.x -= 2;
 	if (kHeld & KEY_RIGHT)
-		mov_right = true;
+		if (the_paddle.paddle_mrect.x < 399 - the_paddle.paddle_mrect.width)
+			the_paddle.paddle_mrect.x += 2;
 	if (kDown & KEY_A)
 		std::cout << "what was I gonna add here... oh yeah color change, not important :p\n";
-	for (int i = 0; i < 3; i++)
+	if ((the_ball.getLeft(true) <= 0) || (the_ball.getRight(true) >= 400))
+		isCollidingH = true;
+	if (the_ball.getTop(false) <= 0 || (the_ball.getBottom(false) >= 240))
+		isCollidingV = true;
+	if (the_paddle.getTop(false) <= the_ball.getBottom(false) && the_ball.getBottom(false) <= the_paddle.getBottom(false) && (the_paddle.paddle_mrect.x <= the_ball.ball_mcirc.x && the_ball.ball_mcirc.x <= the_paddle.paddle_mrect.x + the_paddle.paddle_mrect.width))
 	{
-		if (mov_left)
-			if (the_paddle.paddle_mrect.x > 1)
-				the_paddle.paddle_mrect.x -= 0.666;
-		if (mov_right)
-			if (the_paddle.paddle_mrect.x < 399 - the_paddle.paddle_mrect.width)
-			the_paddle.paddle_mrect.x += 0.666;
-		if ((the_ball.getLeft(true) <= 0) || (the_ball.getRight(true) >= 400))
-			ball_dx = -ball_dx;
-		if (the_ball.getTop(false) <= 0 || (the_ball.getBottom(false) >= 240))
-			ball_dy = -ball_dy;
-		if (((the_paddle.getTop(false) <= the_ball.getBottom(false) && the_ball.getBottom(false) <= the_paddle.getBottom(false)) || (the_paddle.getBottom(false) >= the_ball.getTop(false) && the_ball.getTop(false) >= the_paddle.getTop(false))) && (the_paddle.paddle_mrect.x <= the_ball.ball_mcirc.x && the_ball.ball_mcirc.x <= the_paddle.paddle_mrect.x + the_paddle.paddle_mrect.width))
-			ball_dy = -ball_dy;
-		if (((the_paddle.getLeft(true) <= the_ball.getRight(true) && the_ball.getRight(true) <= the_paddle.getRight(true)) || (the_paddle.getRight(true) >= the_ball.getLeft(true) && the_ball.getLeft(true) >= the_paddle.getLeft(true))) && (the_paddle.paddle_mrect.y <= the_ball.ball_mcirc.y && the_ball.ball_mcirc.y <= the_paddle.paddle_mrect.y + the_paddle.paddle_mrect.height))
-			ball_dx = -ball_dx;
-		/*if (the_ball.getTop(false) > 240)
-		{
-			lives--;
-			the_ball.reset();
-			ball_dx = 0; ball_dy = 0;
-			while (ball_dx == 0 || ball_dy == 0)
-			{
-				ball_dx = (rand() % 6) - 3;
-				if (ball_dx > 0) ball_dy = 3 - ball_dx; else ball_dy = ball_dx + 3;
-			}
-		}*/
-		the_ball.move(ball_dx / 3, ball_dy / 3);
+		isCollidingV = true;
+		topHit = true;
 	}
+	if (the_paddle.getBottom(false) >= the_ball.getTop(false) && the_ball.getTop(false) >= the_paddle.getTop(false) && (the_paddle.paddle_mrect.x <= the_ball.ball_mcirc.x && the_ball.ball_mcirc.x <= the_paddle.paddle_mrect.x + the_paddle.paddle_mrect.width))
+	{
+		isCollidingV = true;
+		bottomHit = true;
+	}
+	if (the_paddle.getLeft(true) <= the_ball.getRight(true) && the_ball.getRight(true) <= the_paddle.getRight(true) && (the_paddle.paddle_mrect.y <= the_ball.ball_mcirc.y && the_ball.ball_mcirc.y <= the_paddle.paddle_mrect.y + the_paddle.paddle_mrect.height))
+	{
+		isCollidingH = true;
+		leftHit = true;
+	}
+	if (the_paddle.getRight(true) >= the_ball.getLeft(true) && the_ball.getLeft(true) >= the_paddle.getLeft(true) && (the_paddle.paddle_mrect.y <= the_ball.ball_mcirc.y && the_ball.ball_mcirc.y <= the_paddle.paddle_mrect.y + the_paddle.paddle_mrect.height))
+	{
+		isCollidingH = true;
+		rightHit = true;
+	}
+	if (topHit && bottomHit)
+	{
+		if (the_ball.ball_mcirc.y - the_paddle.getTop(false) < the_paddle.paddle_mrect.height / 2)
+			bottomHit = false;
+		else
+			topHit = false;
+	}
+	if (leftHit && rightHit)
+	{
+		if (the_ball.ball_mcirc.x - the_paddle.getLeft(true) < the_paddle.paddle_mrect.width / 2)
+			rightHit = false;
+		else
+			topHit = false;
+	}
+	/*if (the_ball.getTop(false) > 240)
+	{
+		lives--;
+		the_ball.reset();
+		ball_dx = 0; ball_dy = 0;
+		while (ball_dx == 0 || ball_dy == 0)
+		{
+			ball_dx = (rand() % 60) - 10;
+			if (ball_dx > 0) ball_dy = 3 - ball_dx; else ball_dy = ball_dx + 3;
+		}
+	}*/
+	//Add gravity powerup (magnet but different) rotates around paddle until button pressed.
+	if (isCollidingH)
+	{
+		double amount = 0.0;
+		if (rightHit)
+			amount = the_paddle.getRight(true) - the_ball.getLeft(true);
+		if (leftHit)
+			amount = the_paddle.getLeft(true) - the_ball.getRight(true);
+		if (rightHit || leftHit)
+		{
+			for (double i = 0.0; i < abs(ball_dx); i += 0.1)
+			{
+				if (abs(ball_dx) > 3.0)
+				{
+					if (amount >= 1.0 && amount <= 3.0)
+					{
+						ball_dx /= 2.0;
+						ball_dy /= 2.0;
+					}
+				}
+				else {
+					if (amount >= 5.0)
+					{
+						ball_dx *= 2.0;
+						ball_dy *= 2.0;
+						the_ball.move(amount, 0);
+					}
+				}
+			}
+		}
+		else {
+			amount = the_ball.getLeft(true);
+			if (amount <= -1.0)
+				the_ball.move(-amount, 0.0);
+			amount = the_ball.getRight(true);
+			if (amount >= 401.0)
+				the_ball.move((400.0 - amount), 0.0);
+		}
+		ball_dx = -ball_dx;
+	}
+	if (isCollidingV)
+	{
+		double amount = 0.0;
+		if (bottomHit)
+			amount = the_paddle.getBottom(false) - the_ball.getTop(false);
+		if (topHit)
+			amount = the_paddle.getTop(false) - the_ball.getBottom(false);
+		if (bottomHit || topHit)
+		{
+			for (double i = 0.0; i < abs(ball_dx); i += 0.1)
+			{
+				if (abs(ball_dy) > 3.0)
+				{
+					if (amount >= 1.0 && amount <= 3.0)
+					{
+						ball_dy /= 2.0;
+						ball_dx /= 2.0;
+					}
+				}
+				else {
+					if (amount >= 5.0)
+					{
+						ball_dy *= 2.0;
+						ball_dx *= 2.0;
+						if (ball_dx > 0.0)
+							the_ball.move(0.0, 0.1);
+						else
+							the_ball.move(0.0, -0.1);
+					}
+				}
+			}
+		}
+		else {
+			amount = the_ball.getTop(false);
+			if (amount <= -1.0)
+				the_ball.move(0.0, -amount);
+			amount = the_ball.getBottom(false);
+			if (amount >= 241.0)
+				the_ball.move(0.0, (240.0 - amount));
+		}
+		ball_dy = -ball_dy;
+	}
+	//s
+	the_ball.move(ball_dx, ball_dy);
+
+	/*-new collision detector, will move accordingly if works*/
+
+	//-end-
 	sf2d_start_frame(GFX_TOP, GFX_LEFT);
 	draw_paddle(the_paddle);
 	for (int i = 0; i < 50; i++)
 		draw_brick(brick_array[i]);
 	draw_ball(the_ball);
-	std::cout << ANSI "15;0" PEND;
-	for (int i = 0; i < 6; i++)
+	std::cout << ANSI "13;0" PEND;
+	for (int i = 0; i < 8; i++)
 		std::cout << "                                        ";
-	std::cout << ANSI "15;0" PEND "Ball Position: " << the_ball.ball_mcirc.x << "," << the_ball.ball_mcirc.y << "\n";
+	std::cout << ANSI "13;0" PEND;
+	std::cout << "Ball hit: Top: " << topHit << " Bottom: " << bottomHit << "\n";
+	std::cout << "Ball hit: Left: " << leftHit << " Right: " << rightHit << "\n";
+	std::cout << "Ball Position: " << the_ball.ball_mcirc.x << "," << the_ball.ball_mcirc.y << "\n";
 	std::cout << "Ball Direction: " << ball_dx << "," << ball_dy << "\n";
 	std::cout << "Paddle Position: " << the_paddle.paddle_mrect.x << "," << the_paddle.paddle_mrect.y << "\n";
 	std::cout << "Paddle Direction: " << "Left: " << mov_left << " Right: " << mov_right << "\n";
+	
 	mov_left = false;
 	mov_right = false;
+	isCollidingH = false;
+	isCollidingV = false;
+	leftHit = false;
+	rightHit = false;
+	topHit = false;
+	bottomHit = false;
 	sf2d_end_frame();
 	sf2d_swapbuffers();
 	return 0;

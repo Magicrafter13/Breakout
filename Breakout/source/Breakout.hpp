@@ -8,13 +8,17 @@ using std::string;
 #include <sys/types.h>
 #include <iostream>
 #include <fstream>
-#include <math.h>
+#define _USE_MATH_DEFINES
+#include <cmath>
 #include <3ds.h>
 #include <sf2d.h>
 #include <sfil.h>
 #include <sftd.h>
 #include <vector>
 #include "Title_png.h"
+
+extern double ball_dx, ball_dy;
+extern bool crushBall;
 
 //Boost:
 /*#include <boost/filesystem.hpp>
@@ -23,7 +27,7 @@ using namespace boost;*/
 
 //Decided not to use this because it's f***ing impossible to setup boost.
 
-extern PrintConsole topScreen, bottomScreen, versionWin, killBox;
+extern PrintConsole topScreen, bottomScreen, versionWin, killBox, debugBox;
 
 extern char versiontxtt[8];
 extern char versiontxtn[9];

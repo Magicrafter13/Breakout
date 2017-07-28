@@ -167,14 +167,9 @@ int main(int argc, char **argv)
 
 bool mov_left = false;
 bool mov_right = false;
-bool isCollidingH = false;
-bool isCollidingV = false;
-bool leftHit = false;
-bool rightHit = false;
-bool topHit = false;
-bool bottomHit = false;
-bool paddle_left = false;
-bool paddle_right = false;
+bool hitWallH = false;
+bool hitWallV = false;
+bool hasHit = false;
 
 int breakout()
 {
@@ -189,54 +184,22 @@ int breakout()
 		return 3;
 	if (kHeld & KEY_LEFT)
 		if (the_paddle.paddle_mrect.x > 1)
-			paddle_left = true;
+			the_paddle.paddle_mrect.x -= 2;
 	if (kHeld & KEY_RIGHT)
 		if (the_paddle.paddle_mrect.x < 399 - the_paddle.paddle_mrect.width)
-			paddle_right = true;
-	float ball_speed_x = ball_dx / 100.0;
-	float ball_speed_y = ball_dy / 100.0;
+			the_paddle.paddle_mrect.x += 2;
 	for (int i = 0; i < 100; i++)
 	{
-		THAT'S IT I'M FUCKING DONE. I CAN'T DO IT! I CAN'T PROGRAM HIT DETECTION.
-			I GIVE UP OKAY I ADMIT IT, I HAVE TO USE AN EXTERNAL LIBRARY.
+		if (i == 101)
+			std::cout << "Yeah sorry about that breakdown (no pun intended) in the last commit... let's never discuss that...";
 	}
 	if ((the_ball.getLeft(true) <= 0) || (the_ball.getRight(true) >= 400))
-		isCollidingH = true;
+		hitWallH = true;
 	if (the_ball.getTop(false) <= 0 || (the_ball.getBottom(false) >= 240))
-		isCollidingV = true;
+		hitWallV = true;
 	if (the_paddle.getTop(false) <= the_ball.getBottom(false) && the_ball.getBottom(false) <= the_paddle.getBottom(false) && (the_paddle.paddle_mrect.x <= the_ball.ball_mcirc.x && the_ball.ball_mcirc.x <= the_paddle.paddle_mrect.x + the_paddle.paddle_mrect.width))
 	{
-		isCollidingV = true;
-		topHit = true;
-	}
-	if (the_paddle.getBottom(false) >= the_ball.getTop(false) && the_ball.getTop(false) >= the_paddle.getTop(false) && (the_paddle.paddle_mrect.x <= the_ball.ball_mcirc.x && the_ball.ball_mcirc.x <= the_paddle.paddle_mrect.x + the_paddle.paddle_mrect.width))
-	{
-		isCollidingV = true;
-		bottomHit = true;
-	}
-	if (the_paddle.getLeft(true) <= the_ball.getRight(true) && the_ball.getRight(true) <= the_paddle.getRight(true) && (the_paddle.paddle_mrect.y <= the_ball.ball_mcirc.y && the_ball.ball_mcirc.y <= the_paddle.paddle_mrect.y + the_paddle.paddle_mrect.height))
-	{
-		isCollidingH = true;
-		leftHit = true;
-	}
-	if (the_paddle.getRight(true) >= the_ball.getLeft(true) && the_ball.getLeft(true) >= the_paddle.getLeft(true) && (the_paddle.paddle_mrect.y <= the_ball.ball_mcirc.y && the_ball.ball_mcirc.y <= the_paddle.paddle_mrect.y + the_paddle.paddle_mrect.height))
-	{
-		isCollidingH = true;
-		rightHit = true;
-	}
-	if (topHit && bottomHit)
-	{
-		if (the_ball.ball_mcirc.y - the_paddle.getTop(false) < the_paddle.paddle_mrect.height / 2)
-			bottomHit = false;
-		else
-			topHit = false;
-	}
-	if (leftHit && rightHit)
-	{
-		if (the_ball.ball_mcirc.x - the_paddle.getLeft(true) < the_paddle.paddle_mrect.width / 2)
-			rightHit = false;
-		else
-			topHit = false;
+		hasHit = true;
 	}
 	/*if (the_ball.getTop(false) > 240)
 	{
@@ -250,87 +213,29 @@ int breakout()
 		}
 	}*/
 	//Add gravity powerup (magnet but different) rotates around paddle until button pressed.
-	if (isCollidingH)
+	if (hitWallH)
 	{
 		double amount = 0.0;
-		if (rightHit)
-			amount = the_paddle.getRight(true) - the_ball.getLeft(true);
-		if (leftHit)
-			amount = the_paddle.getLeft(true) - the_ball.getRight(true);
-		if (rightHit || leftHit)
-		{
-			for (double i = 0.0; i < abs(ball_dx); i += 0.1)
-			{
-				if (abs(ball_dx) > 3.0)
-				{
-					if (amount >= 1.0 && amount <= 3.0)
-					{
-						ball_dx /= 2.0;
-						ball_dy /= 2.0;
-					}
-				}
-				else {
-					if (amount >= 5.0)
-					{
-						ball_dx *= 2.0;
-						ball_dy *= 2.0;
-						the_ball.move(amount, 0);
-					}
-				}
-			}
-		}
-		else {
-			amount = the_ball.getLeft(true);
-			if (amount <= -1.0)
-				the_ball.move(-amount, 0.0);
-			amount = the_ball.getRight(true);
-			if (amount >= 401.0)
-				the_ball.move((400.0 - amount), 0.0);
-		}
+		amount = the_ball.getLeft(true);
+		if (amount <= -1.0)
+			the_ball.move(-amount, 0.0);
+		amount = the_ball.getRight(true);
+		if (amount >= 401.0)
+			the_ball.move((400.0 - amount), 0.0);
 		ball_dx = -ball_dx;
 	}
-	if (isCollidingV)
+	if (hitWallV)
 	{
 		double amount = 0.0;
-		if (bottomHit)
-			amount = the_paddle.getBottom(false) - the_ball.getTop(false);
-		if (topHit)
-			amount = the_paddle.getTop(false) - the_ball.getBottom(false);
-		if (bottomHit || topHit)
-		{
-			for (double i = 0.0; i < abs(ball_dx); i += 0.1)
-			{
-				if (abs(ball_dy) > 3.0)
-				{
-					if (amount >= 1.0 && amount <= 3.0)
-					{
-						ball_dy /= 2.0;
-						ball_dx /= 2.0;
-					}
-				}
-				else {
-					if (amount >= 5.0)
-					{
-						ball_dy *= 2.0;
-						ball_dx *= 2.0;
-						if (ball_dx > 0.0)
-							the_ball.move(0.0, 0.1);
-						else
-							the_ball.move(0.0, -0.1);
-					}
-				}
-			}
-		}
-		else {
-			amount = the_ball.getTop(false);
-			if (amount <= -1.0)
-				the_ball.move(0.0, -amount);
-			amount = the_ball.getBottom(false);
-			if (amount >= 241.0)
-				the_ball.move(0.0, (240.0 - amount));
-		}
+		amount = the_ball.getTop(false);
+		if (amount <= -1.0)
+			the_ball.move(0.0, -amount);
+		amount = the_ball.getBottom(false);
+		if (amount >= 241.0)
+			the_ball.move(0.0, (240.0 - amount));
 		ball_dy = -ball_dy;
 	}
+
 	//s
 	the_ball.move(ball_dx, ball_dy);
 
@@ -346,8 +251,8 @@ int breakout()
 	for (int i = 0; i < 8; i++)
 		std::cout << "                                        ";
 	std::cout << ANSI "13;0" PEND;
-	std::cout << "Ball hit: Top: " << topHit << " Bottom: " << bottomHit << "\n";
-	std::cout << "Ball hit: Left: " << leftHit << " Right: " << rightHit << "\n";
+	std::cout << "Ball hit: Top: " << hasHit << " Bottom: -\n";
+	std::cout << "Ball hit: Left: - Right: -\n";
 	std::cout << "Ball Position: " << the_ball.ball_mcirc.x << "," << the_ball.ball_mcirc.y << "\n";
 	std::cout << "Ball Direction: " << ball_dx << "," << ball_dy << "\n";
 	std::cout << "Paddle Position: " << the_paddle.paddle_mrect.x << "," << the_paddle.paddle_mrect.y << "\n";
@@ -355,12 +260,11 @@ int breakout()
 	
 	mov_left = false;
 	mov_right = false;
-	isCollidingH = false;
-	isCollidingV = false;
-	leftHit = false;
-	rightHit = false;
-	topHit = false;
-	bottomHit = false;
+	hasHit = false;
+	hitWallH = false;
+	hitWallV = false;
+	mov_left = false;
+	mov_right = false;
 	sf2d_end_frame();
 	sf2d_swapbuffers();
 	return 0;

@@ -11,8 +11,8 @@ std::vector<double> frame_y;
 
 //init
 int debugTF = 1;
-char versiontxtt[8] = " Alpha ";
-char versiontxtn[9] = " 1.02.0 ";
+char versiontxtt[8] = "  Beta ";
+char versiontxtn[9] = "01.00.00";
 int vernumqik = 0;
 
 int breakout();

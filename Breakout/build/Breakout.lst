@@ -3138,8 +3138,8 @@
 001c1a6c 00000068 R dotab_stdnull
 001c1ad4 00000003 R DIRECTORY_PARENT
 001c1ad8 r __EH_FRAME_BEGIN__
-001c3c94 R __exidx_start
-001c4e64 R __exidx_end
+001c3c7c R __exidx_start
+001c4e2c R __exidx_end
 001c5000 00000004 D lives
 001c5004 00000008 D versiontxtt
 001c500c 00000009 D versiontxtn

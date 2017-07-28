@@ -35,7 +35,7 @@ INCLUDES	:=	include
 				#/c/local/boost_1_64_0/boost
 #ROMFS		:=	romfs
 APP_TITLE   :=  Breakout
-APP_DESCRIPTION := Breakout Alpha Release
+APP_DESCRIPTION := Breakout Beta Release
 APP_AUTHOR  :=  Matthew Rease
 
 #---------------------------------------------------------------------------------
@@ -49,7 +49,7 @@ CFLAGS	:=	-g -Wall -O2 -mword-relocations \
 
 CFLAGS	+=	$(INCLUDE) -DARM11 -D_3DS
 
-CXXFLAGS	:= $(CFLAGS) -fno-rtti -fexceptions -std=gnu++11 -DBOOST_SYSTEM_NO_DEPRECATED
+CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++11 -DBOOST_SYSTEM_NO_DEPRECATED
 
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map) -DBOOST_SYSTEM_NO_DEPRECATED

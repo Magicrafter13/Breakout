@@ -173,6 +173,8 @@ bool leftHit = false;
 bool rightHit = false;
 bool topHit = false;
 bool bottomHit = false;
+bool paddle_left = false;
+bool paddle_right = false;
 
 int breakout()
 {
@@ -187,12 +189,17 @@ int breakout()
 		return 3;
 	if (kHeld & KEY_LEFT)
 		if (the_paddle.paddle_mrect.x > 1)
-			the_paddle.paddle_mrect.x -= 2;
+			paddle_left = true;
 	if (kHeld & KEY_RIGHT)
 		if (the_paddle.paddle_mrect.x < 399 - the_paddle.paddle_mrect.width)
-			the_paddle.paddle_mrect.x += 2;
-	if (kDown & KEY_A)
-		std::cout << "what was I gonna add here... oh yeah color change, not important :p\n";
+			paddle_right = true;
+	float ball_speed_x = ball_dx / 100.0;
+	float ball_speed_y = ball_dy / 100.0;
+	for (int i = 0; i < 100; i++)
+	{
+		THAT'S IT I'M FUCKING DONE. I CAN'T DO IT! I CAN'T PROGRAM HIT DETECTION.
+			I GIVE UP OKAY I ADMIT IT, I HAVE TO USE AN EXTERNAL LIBRARY.
+	}
 	if ((the_ball.getLeft(true) <= 0) || (the_ball.getRight(true) >= 400))
 		isCollidingH = true;
 	if (the_ball.getTop(false) <= 0 || (the_ball.getBottom(false) >= 240))

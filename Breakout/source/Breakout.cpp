@@ -3,6 +3,10 @@
 #include "draw.hpp"
 #include "physics.hpp"
 
+int frame = 0;
+std::vector<double> frame_x;
+std::vector<double> frame_y;
+
 //init
 int debugTF = 1;
 char versiontxtt[8] = " Alpha ";
@@ -127,6 +131,9 @@ int main(int argc, char **argv)
 				if (ball_dx > 0.0) ball_dy = 3.0 - ball_dx; else ball_dy = ball_dx + 3.0;
 			}
 			sf2d_swapbuffers();
+			frame = 0;
+			frame_x.clear();
+			frame_y.clear();
 			while (true)
 			{
 				result = breakout();
@@ -170,6 +177,7 @@ bool mov_right = false;
 bool hitWallH = false;
 bool hitWallV = false;
 bool hasHit = false;
+bool isMovingRight = false;
 
 int breakout()
 {
@@ -195,23 +203,31 @@ int breakout()
 	}
 	if ((the_ball.getLeft(true) <= 0) || (the_ball.getRight(true) >= 400))
 		hitWallH = true;
-	if (the_ball.getTop(false) <= 0 || (the_ball.getBottom(false) >= 240))
+	if (the_ball.getTop(false) <= 0)
 		hitWallV = true;
 	if (the_paddle.getTop(false) <= the_ball.getBottom(false) && the_ball.getBottom(false) <= the_paddle.getBottom(false) && (the_paddle.paddle_mrect.x <= the_ball.ball_mcirc.x && the_ball.ball_mcirc.x <= the_paddle.paddle_mrect.x + the_paddle.paddle_mrect.width))
 	{
 		hasHit = true;
 	}
-	/*if (the_ball.getTop(false) > 240)
+	if (hasHit)
+	{
+		if (the_ball.getBottom(false) >= the_paddle.getTop(false) + (the_paddle.paddle_mrect.height / 2))
+		{
+			hasHit = false;
+		}
+	}
+	if (the_ball.getTop(false) > 240)
 	{
 		lives--;
 		the_ball.reset();
-		ball_dx = 0; ball_dy = 0;
-		while (ball_dx == 0 || ball_dy == 0)
+		ball_dx = 0.0; ball_dy = 0.0;
+		while (ball_dx == 0.0 || ball_dy <= 0.0)
 		{
-			ball_dx = (rand() % 60) - 10;
-			if (ball_dx > 0) ball_dy = 3 - ball_dx; else ball_dy = ball_dx + 3;
+			ball_dx = (rand() % 60) / 10.0;
+			ball_dx -= 3.0;
+			if (ball_dx > 0.0) ball_dy = 3.0 - ball_dx; else ball_dy = ball_dx + 3.0;
 		}
-	}*/
+	}
 	//Add gravity powerup (magnet but different) rotates around paddle until button pressed.
 	if (hitWallH)
 	{
@@ -235,17 +251,79 @@ int breakout()
 			the_ball.move(0.0, (240.0 - amount));
 		ball_dy = -ball_dy;
 	}
+	if (hasHit)
+	{
+		int angle = 1;
+		if (the_ball.getBottom(true) >= the_paddle.paddle_mrect.x + (the_paddle.paddle_mrect.width / 3.0))
+			angle = 2;
+		if (the_ball.getBottom(true) >= the_paddle.paddle_mrect.x + ((the_paddle.paddle_mrect.width / 3.0) * 2.0))
+			angle = 3;
+		if (ball_dx == abs(ball_dx))
+			isMovingRight = true;
+		else
+			isMovingRight = false;
+		if (isMovingRight)
+		{
+			if (angle == 1)
+			{
+				ball_dx = -ball_dx;
+				ball_dy = -ball_dy;
+			}
+			if (angle == 2)
+				ball_dy = -ball_dy;
+			if (angle == 3)
+			{
+				double direction_angle = atan2(ball_dy, ball_dx) * (180.0 / M_PI);
+				std::cout << ANSI "5;0" PEND;
+				for (int i = 0; i < 2; i++)
+					std::cout << "                                        ";
+				std::cout << "isMovingRight | true :: d_angle = " << direction_angle << "\n";
+				direction_angle -= 90.0;
+				if (direction_angle < 0.0)
+					direction_angle += 360.0;
+				ball_dx = 3.0 * cos(direction_angle * (M_PI / 180.0));
+				ball_dy = 3.0 * sin(direction_angle * (M_PI / 180.0));
+				std::cout << "dx = " << ball_dx << " dy = " << ball_dy << "\n";
+			}
+		}
+		else {
+			if (angle == 3)
+			{
+				ball_dx = -ball_dx;
+				ball_dy = -ball_dy;
+			}
+			if (angle == 2)
+				ball_dy = -ball_dy;
+			if (angle == 1)
+			{
+				double direction_angle = atan2(ball_dy, ball_dx) * (180.0 / M_PI);
+				std::cout << ANSI "3;0" PEND;
+				for (int i = 0; i < 2; i++)
+					std::cout << "                                        ";
+				std::cout << "isMovingRight | false :: d_angle = " << direction_angle << "\n";
+				direction_angle += 90.0;
+				if (direction_angle > 360.0)
+					direction_angle -= 360.0;
+				ball_dx = 3.0 * cos(direction_angle * (M_PI / 180.0));
+				ball_dy = 3.0 * sin(direction_angle * (M_PI / 180.0));
+				std::cout << "dx = " << ball_dx << " dy = " << ball_dy << "\n";
+			}
+		}
+	}
 
-	//s
 	the_ball.move(ball_dx, ball_dy);
 
 	/*-new collision detector, will move accordingly if works*/
 
 	//-end-
+	frame_x.push_back(the_ball.ball_mcirc.x);
+	frame_y.push_back(the_ball.ball_mcirc.y);
 	sf2d_start_frame(GFX_TOP, GFX_LEFT);
 	draw_paddle(the_paddle);
 	for (int i = 0; i < 50; i++)
 		draw_brick(brick_array[i]);
+	for (int i = 0; i < frame; i++)
+		sf2d_draw_fill_circle(frame_x[i], frame_y[i], 3, RGBA8(0xFF, 0xFF, 0x00, 0xFF));
 	draw_ball(the_ball);
 	std::cout << ANSI "13;0" PEND;
 	for (int i = 0; i < 8; i++)
@@ -267,5 +345,6 @@ int breakout()
 	mov_right = false;
 	sf2d_end_frame();
 	sf2d_swapbuffers();
+	frame++;
 	return 0;
 }

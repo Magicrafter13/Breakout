@@ -269,3 +269,5 @@ __pycache__/
 # Stuff I don't want on the repo
 *.cia
 *.rsf
+/Breakout/sample.cxi
+*.cxi

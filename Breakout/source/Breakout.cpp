@@ -123,13 +123,13 @@ int main(int argc, char **argv)
 			lives = 3;
 			int result = 3;
 			the_ball.reset();
-			ball_dx = 0.0; ball_dy = 0.0;
-			while (ball_dx == 0.0 || ball_dy <= 0.0)
+			double angle = 0.0;
+			while (angle < 30.0 || angle > 150.0 || (angle > 80 && angle < 100))
 			{
-				ball_dx = (rand() % 60) / 10.0;
-				ball_dx -= 3.0;
-				if (ball_dx > 0.0) ball_dy = 3.0 - ball_dx; else ball_dy = ball_dx + 3.0;
+				angle = rand() % 360;
 			}
+			ball_dx = 3.0 * cos(angle * (M_PI / 180.0));
+			ball_dy = 3.0 * sin(angle * (M_PI / 180.0));
 			sf2d_swapbuffers();
 			frame = 0;
 			frame_x.clear();
@@ -220,13 +220,13 @@ int breakout()
 	{
 		lives--;
 		the_ball.reset();
-		ball_dx = 0.0; ball_dy = 0.0;
-		while (ball_dx == 0.0 || ball_dy <= 0.0)
+		double angle = 0.0;
+		while (angle < 30.0 || angle > 150.0 || (angle > 80 && angle < 100))
 		{
-			ball_dx = (rand() % 60) / 10.0;
-			ball_dx -= 3.0;
-			if (ball_dx > 0.0) ball_dy = 3.0 - ball_dx; else ball_dy = ball_dx + 3.0;
+			angle = rand() % 360;
 		}
+		ball_dx = 3.0 * cos(angle * (M_PI / 180.0));
+		ball_dy = 3.0 * sin(angle * (M_PI / 180.0));
 	}
 	//Add gravity powerup (magnet but different) rotates around paddle until button pressed.
 	if (hitWallH)

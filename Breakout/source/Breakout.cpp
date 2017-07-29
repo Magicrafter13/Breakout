@@ -1,7 +1,6 @@
 #include "Breakout.hpp"
 #include "shapes.hpp"
 #include "draw.hpp"
-#include "physics.hpp"
 
 /* debug stuff: this allows you to see the balls trail, although after a while sf2d will max out on objects or something so only use if for short term trajectory study
 int frame = 0;
@@ -14,6 +13,7 @@ int debugTF = 1;
 char versiontxtt[8] = "  Beta ";
 char versiontxtn[9] = "01.00.00";
 int vernumqik = 0;
+u32 kDown, kHeld;
 
 int breakout();
 int lives = 3;
@@ -26,12 +26,13 @@ ball the_ball;
 
 bool touchInBox(touchPosition touch, int x, int y, int w, int h)
 {
-	int tx=touch.px;
-	int ty=touch.py;
+	int tx = touch.px;
+	int ty = touch.py;
 	u32 kDown = hidKeysDown();
-	if (kDown & KEY_TOUCH && tx > x && tx < x+w && ty > y && ty < y+h) {
+	if (kDown & KEY_TOUCH && tx > x && tx < x + w && ty > y && ty < y + h) {
 		return true;
-	} else {
+	}
+	else {
 		return false;
 	}
 }
@@ -66,7 +67,7 @@ int main(int argc, char **argv)
 	consoleInit(GFX_BOTTOM, &versionWin);
 	consoleInit(GFX_BOTTOM, &killBox);
 	consoleInit(GFX_BOTTOM, &debugBox);
-	
+
 	consoleSetWindow(&versionWin, 6, 26, 34, 2);
 	consoleSetWindow(&killBox, 0, 28, 40, 2);
 	consoleSetWindow(&debugBox, 18, 4, 9, 12);
@@ -84,7 +85,7 @@ int main(int argc, char **argv)
 	std::cout << ANSI "29;07" PEND "by Matthew Rease\n";*/
 
 	consoleSelect(&bottomScreen);
-	
+
 	hidTouchRead(&touch);
 
 	sf2d_set_clear_color(RGBA8(0x95, 0x95, 0x95, 0xFF));
@@ -111,7 +112,7 @@ int main(int argc, char **argv)
 	std::cout << "Brick 11 Y: " << brick_array[10].brick_mrect.y << " Brick 22 X: " << brick_array[21].brick_mrect.x << "\n";
 	std::cout << "RGB Data Brick 50: " << brick_array[49].brick_mrect.color << "\n";
 	//BRICK01.setDefaults(2, 2, 36, 16, 0xFF, 0xFF, 0x00, 0xFF);
-	
+
 	std::cout << ANSI "2;0" PEND "Press Select to begin.";
 
 	// Main loop
@@ -119,7 +120,6 @@ int main(int argc, char **argv)
 	{
 		hidScanInput();
 		u32 kDown = hidKeysDown();
-		u32 kHeld = hidKeysHeld();
 		if (kDown & KEY_START) break; // break in order to return to hbmenu
 		if (kDown & KEY_SELECT)
 		{
@@ -157,10 +157,10 @@ int main(int argc, char **argv)
 		std::cout << ANSI "2;0" PEND;
 
 		sf2d_swapbuffers();
-		
+
 		hidTouchRead(&touch);
 
-		if(touchInBox(touch, 0, 224, 320, 16)) {
+		if (touchInBox(touch, 0, 224, 320, 16)) {
 			std::cout << "Exiting...\n";
 			break;
 		}
@@ -169,12 +169,10 @@ int main(int argc, char **argv)
 	// Exit services
 	sf2d_fini();
 	sf2d_free_texture(img_title);
-	
+
 	return 0;
 }
 
-bool mov_left = false;
-bool mov_right = false;
 bool hitWallH = false;
 bool hitWallV = false;
 bool hasHitPadd = false;
@@ -182,18 +180,21 @@ bool hasHitWall = false;
 bool isMovingRight = false;
 bool isInPaddle = false;
 bool isInWall = false;
+bool brickHitV = false;
+bool brickHitH = false;
+int angle;
 
 int breakout()
 {
 	hidScanInput();
-	u32 kDown = hidKeysDown();
-	u32 kHeld = hidKeysHeld();
+	kDown = hidKeysDown();
+	kHeld = hidKeysHeld();
 	if (kDown & KEY_SELECT || lives == 0)
 		return 2;
 	if (kHeld & KEY_START)
 		return 3;
 	if (kHeld & KEY_LEFT && the_paddle.paddle_mrect.x > 1)
-			the_paddle.paddle_mrect.x -= 2;
+		the_paddle.paddle_mrect.x -= 2;
 	if (kHeld & KEY_RIGHT && the_paddle.paddle_mrect.x < 399 - the_paddle.paddle_mrect.width)
 		the_paddle.paddle_mrect.x += 2;
 
@@ -201,27 +202,24 @@ int breakout()
 	{
 		lives--;
 		the_ball.reset();
-		double angle = 0.0;
-		while (angle < 30.0 || angle > 150.0 || (angle > 80 && angle < 100))
-			angle = rand() % 360;
-		ball_dx = 3.0 * cos(angle * (M_PI / 180.0));
-		ball_dy = 3.0 * sin(angle * (M_PI / 180.0));
-		ball_angle = angle;
+		while (ball_angle < 30.0 || ball_angle > 150.0 || (ball_angle > 80 && ball_angle < 100))
+			ball_angle = rand() % 360;
 		return 0;
 	}
 
-	for (int i = 0; i < 3000; i++)
+	bool hasInteracted = false;
+	for (int i = 0; i < 300; i++)
 	{
-		bool hasInteracted = false;
+		hasInteracted = false;
 		if (the_paddle.getTop(false) <= the_ball.getBottom(false) && (the_paddle.paddle_mrect.x <= the_ball.ball_mcirc.x && the_ball.ball_mcirc.x <= the_paddle.paddle_mrect.x + the_paddle.paddle_mrect.width /*balls x coordinate is <= paddles x coordinate + it's width*/))
 			hasHitPadd = true;
 		else
 			hasHitPadd = false;
-		if (hasHitPadd && the_ball.getBottom(false) >= the_paddle.getTop(false) + 0.002)
-				hasHitPadd = false;
+		if (hasHitPadd && the_ball.getBottom(false) >= the_paddle.getTop(false) + 0.02)
+			hasHitPadd = false;
 
 		//Add gravity powerup (magnet but different) rotates around paddle until button pressed.
-		if (the_ball.getLeft(true) <= 0.000 || the_ball.getRight(true) >= 400.000 || the_ball.getTop(false) <= 0.000)
+		if (the_ball.getLeft(true) <= 0.00 || the_ball.getRight(true) >= 400.00 || the_ball.getTop(false) <= 0.00)
 			hasHitWall = true;
 		else
 			hasHitWall = false;
@@ -229,7 +227,7 @@ int breakout()
 		{
 			hasInteracted = true;
 			isInWall = true;
-			if (the_ball.getTop(false) <= 0.000)
+			if (the_ball.getTop(false) <= 0.00)
 				ball_angle = -ball_angle + 360.0;
 			else
 				ball_angle = -ball_angle + 180.0;
@@ -237,14 +235,13 @@ int breakout()
 
 		if (hasHitPadd && !isInPaddle)
 		{
-			std::cout << ANSI "3;0" PEND "Has made contact";
 			hasInteracted = true;
 			isInPaddle = true;
-			int angle = 1;
+			angle = 1;
 			if (the_ball.getBottom(true) >= the_paddle.paddle_mrect.x + (the_paddle.paddle_mrect.width / 3.0))
-				angle = 2;
-			if (the_ball.getBottom(true) >= the_paddle.paddle_mrect.x + ((the_paddle.paddle_mrect.width / 3.0) * 2.0))
-				angle = 3;
+				angle += 1;
+			if (the_ball.getBottom(true) >= the_paddle.paddle_mrect.x + ((the_paddle.paddle_mrect.width / (2.0 / 3.0))))
+				angle += 1;
 			if (ball_angle < 90.0)
 				isMovingRight = true;
 			else
@@ -269,67 +266,96 @@ int breakout()
 				}
 			}
 		}
-		ball_dx = 3.0 * cos(ball_angle * (M_PI / 180.0));
-		ball_dy = 3.0 * sin(ball_angle * (M_PI / 180.0));
+		for (int j = 0; j < 50; j++)
+		{
+			if (
+				(
+					the_ball.getTop(true) >= brick_array[j].brick_mrect.x &&
+					the_ball.getTop(true) <= brick_array[j].brick_mrect.x + brick_array[j].brick_mrect.width &&
+					the_ball.getTop(false) >= brick_array[j].brick_mrect.y &&
+					the_ball.getTop(false) <= brick_array[j].brick_mrect.y + brick_array[j].brick_mrect.height
+					) || (
+						the_ball.getBottom(true) >= brick_array[j].brick_mrect.x &&
+						the_ball.getBottom(true) <= brick_array[j].brick_mrect.x + brick_array[j].brick_mrect.width &&
+						the_ball.getBottom(false) >= brick_array[j].brick_mrect.y &&
+						the_ball.getBottom(false) <= brick_array[j].brick_mrect.y + brick_array[j].brick_mrect.height
+						)
+				)
+				brickHitV = true;
+			if (
+				(
+					the_ball.getLeft(true) >= brick_array[j].brick_mrect.x &&
+					the_ball.getLeft(true) <= brick_array[j].brick_mrect.x + brick_array[j].brick_mrect.width &&
+					the_ball.getLeft(false) >= brick_array[j].brick_mrect.y &&
+					the_ball.getLeft(false) <= brick_array[j].brick_mrect.y + brick_array[j].brick_mrect.height
+					) || (
+						the_ball.getRight(true) >= brick_array[j].brick_mrect.x &&
+						the_ball.getRight(true) <= brick_array[j].brick_mrect.x + brick_array[j].brick_mrect.width &&
+						the_ball.getRight(false) >= brick_array[j].brick_mrect.y &&
+						the_ball.getRight(false) <= brick_array[j].brick_mrect.y + brick_array[j].brick_mrect.height
+						)
+				)
+				brickHitH = true;
+			if (brickHitV || brickHitH)
+			{
+				if (brick_array[j].exists)
+				{
+					brick_array[j].destroy();
+					if (brickHitV && brickHitH)
+					{
+						ball_angle -= 180.0;
+						if (ball_angle < 0.0)
+							ball_angle += 360.0;
+					}
+					else if (brickHitV)
+						ball_angle = -ball_angle + 360.0;
+					else if (brickHitH)
+						ball_angle = -ball_angle + 180.0;
+				}
+				brickHitV = false;
+				brickHitH = false;
+			}
+		}
+		ball_dx = 2.0 * cos(ball_angle * (M_PI / 180.0));
+		ball_dy = 2.0 * sin(ball_angle * (M_PI / 180.0));
 		if (hasHitPadd && isInPaddle)
-			the_ball.move(ball_dx / 3000.0, ball_dy / 3000.0);
+			the_ball.move(ball_dx / 300.0, ball_dy / 300.0);
 		else if (isInPaddle && !hasHitPadd)
 			isInPaddle = false;
 		if (hasHitWall && isInWall)
-			the_ball.move(ball_dx / 3000.0, ball_dy / 3000.0);
+			the_ball.move(ball_dx / 300.0, ball_dy / 300.0);
 		else if (isInWall && !hasHitWall)
 			isInWall = false;
 		if (!hasInteracted && !hasHitPadd && !hasHitWall && !isInPaddle && !isInWall)
-			the_ball.move(ball_dx / 3000.0, ball_dy / 3000.0);
+			the_ball.move(ball_dx / 300.0, ball_dy / 300.0);
 		if (hasHitPadd && hasHitWall)
 		{
 			lives--;
 			the_ball.reset();
-			double angle = 0.0;
-			while (angle < 30.0 || angle > 150.0 || (angle > 80 && angle < 100))
-				angle = rand() % 360;
-			ball_dx = 3.0 * cos(angle * (M_PI / 180.0));
-			ball_dy = 3.0 * sin(angle * (M_PI / 180.0));
-			ball_angle = angle;
+			ball_angle = 0.0;
+			while (ball_angle < 30.0 || ball_angle > 150.0 || (ball_angle > 80 && ball_angle < 100))
+				ball_angle = rand() % 360;
 			return 0;
 		}
 	}
 
-	/*-new collision detector, will move accordingly if works*/
-
-	//-end-
-	//See line 134 for details
-	/*frame_x.push_back(the_ball.ball_mcirc.x);
-	frame_y.push_back(the_ball.ball_mcirc.y);*/
 	sf2d_start_frame(GFX_TOP, GFX_LEFT);
 	draw_paddle(the_paddle);
 	for (int i = 0; i < 50; i++)
-		draw_brick(brick_array[i]);
-	//See line 301 for details
-	/*for (int i = 0; i < frame; i++)
-		sf2d_draw_fill_circle(frame_x[i], frame_y[i], 3, RGBA8(0xFF, 0xFF, 0x00, 0xFF));*/
+		if (brick_array[i].exists)
+			draw_brick(brick_array[i]);
 	draw_ball(the_ball);
-	std::cout << ANSI "13;0" PEND;
+	/*std::cout << ANSI "13;0" PEND;
 	for (int i = 0; i < 8; i++)
-		std::cout << "                                        ";
+	std::cout << "                                        ";
 	std::cout << ANSI "13;0" PEND;
 	std::cout << "Ball hit: Top: " << hasHitPadd << " Bottom: -\n";
 	std::cout << "Ball hit: Left: - Right: -\n";
 	std::cout << "Ball Position: " << the_ball.ball_mcirc.x << "," << the_ball.ball_mcirc.y << "\n";
 	std::cout << "Ball Direction: " << ball_dx << "," << ball_dy << "\n";
 	std::cout << "Paddle Position: " << the_paddle.paddle_mrect.x << "," << the_paddle.paddle_mrect.y << "\n";
-	std::cout << "Paddle Direction: " << "Left: " << mov_left << " Right: " << mov_right << "\n";
-	
-	mov_left = false;
-	mov_right = false;
-	hasHitPadd = false;
-	hitWallH = false;
-	hitWallV = false;
-	mov_left = false;
-	mov_right = false;
+	std::cout << "Paddle Direction: " << "Left: " << mov_left << " Right: " << mov_right << "\n";*/
 	sf2d_end_frame();
 	sf2d_swapbuffers();
-	//See line 308 for details
-	/*frame++;*/
 	return 0;
 }

@@ -1,15 +1,15 @@
-class mRectangle{
+class mRectangle {
+	double default_x;
+	double default_y;
+	double default_width;
+	double default_height;
+	u32 default_color;
 public:
 	double x;
 	double y;
 	double width;
 	double height;
 	u32 color;
-	double default_x;
-	double default_y;
-	double default_width;
-	double default_height;
-	u32 default_color;
 	void setDefaults(double i_x, double i_y, double i_width, double i_height, int R, int G, int B, int A)
 	{
 		x = i_x;
@@ -47,7 +47,7 @@ public:
 	}
 };
 
-class brick{
+class brick {
 public:
 	bool exists;
 	mRectangle brick_mrect;
@@ -56,18 +56,22 @@ public:
 		brick_mrect.setDefaults(bx, by, bwidth, bheight, R, G, B, A);
 		exists = true;
 	}
+	void destroy()
+	{
+		exists = false;
+	}
 };
 
-class mCircle{
+class mCircle {
+	double default_x;
+	double default_y;
+	double default_rad;
+	u32 default_color;
 public:
 	double x;
 	double y;
 	double rad;
 	u32 color;
-	double default_x;
-	double default_y;
-	double default_rad;
-	u32 default_color;
 	void setDefaults(double i_x, double i_y, double i_rad, int R, int G, int B, int A)
 	{
 		x = i_x;
@@ -102,6 +106,13 @@ public:
 };
 
 class mTriangle {
+	double default_x1;
+	double default_y1;
+	double default_x2;
+	double default_y2;
+	double default_x3;
+	double default_y3;
+	u32 default_color;
 public:
 	double x1;
 	double y1;
@@ -110,13 +121,6 @@ public:
 	double x3;
 	double y3;
 	u32 color;
-	double default_x1;
-	double default_y1;
-	double default_x2;
-	double default_y2;
-	double default_x3;
-	double default_y3;
-	u32 default_color;
 	void setDefaults(double i_x1, double i_y1, double i_x2, double i_y2, double i_x3, double i_y3, int R, int G, int B, int A)
 	{
 		x1 = i_x1;

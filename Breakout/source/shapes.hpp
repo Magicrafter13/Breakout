@@ -48,17 +48,31 @@ public:
 };
 
 class brick {
+private:
+	bool internal_is_used;
 public:
 	bool exists;
 	mRectangle brick_mrect;
-	void setDefaults(double bx, double by, double bwidth, double bheight, int R, int G, int B, int A)
+	void setDefaults(double bx, double by, double bwidth, double bheight, int R, int G, int B, int A, bool is_used)
 	{
 		brick_mrect.setDefaults(bx, by, bwidth, bheight, R, G, B, A);
-		exists = true;
+		internal_is_used = is_used;
+		if (internal_is_used)
+			exists = true;
+		else
+			exists = false;
 	}
 	void destroy()
 	{
 		exists = false;
+	}
+	void reset()
+	{
+		if (internal_is_used)
+			exists = true;
+		else
+			exists = false;
+		brick_mrect.reset();
 	}
 };
 

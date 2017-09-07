@@ -21,7 +21,9 @@ double ball_dx, ball_dy;
 double ball_angle;
 bool crushBall = false;
 paddle the_paddle;
-brick brick_array[50];
+int level_count = 2;
+int level = 0;
+brick brick_array[2][50];
 ball the_ball;
 
 bool touchInBox(touchPosition touch, int x, int y, int w, int h)
@@ -103,14 +105,30 @@ int main(int argc, char **argv)
 	{
 		for (int b = 0; b < 10; b++)
 		{
-			brick_array[array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, brick_R[a], brick_G[a], brick_B[a], brick_A[a]);
-			brick_array[array_step].exists = true;
+			brick_array[0][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, brick_R[a], brick_G[a], brick_B[a], brick_A[a], true);
+			brick_array[0][array_step].exists = true;
+			array_step++;
+		}
+	}
+	array_step = 0;
+	for (int a = 0; a < 5; a++)
+	{
+		for (int b = 0; b < 10; b++)
+		{
+			if ((array_step > 1 && array_step < 10) || (array_step > 13 && array_step < 20) || (array_step > 25 && array_step < 30) || (array_step > 37 && array_step < 40) || (array_step > 49 && array_step < 50))
+			{
+				brick_array[1][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, brick_R[a], brick_G[a], brick_B[a], brick_A[a], false);
+				brick_array[1][array_step].exists = false;
+			} else {
+				brick_array[1][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, brick_R[a], brick_G[a], brick_B[a], brick_A[a], true);
+				brick_array[1][array_step].exists = true;
+			}
 			array_step++;
 		}
 	}
 	std::cout << ANSI "20;0" PEND "Array Step : " << array_step << "\n";
-	std::cout << "Brick 11 Y: " << brick_array[10].brick_mrect.y << " Brick 22 X: " << brick_array[21].brick_mrect.x << "\n";
-	std::cout << "RGB Data Brick 50: " << brick_array[49].brick_mrect.color << "\n";
+	std::cout << "Brick 11 Y: " << brick_array[0][10].brick_mrect.y << " Brick 22 X: " << brick_array[0][21].brick_mrect.x << "\n";
+	std::cout << "RGB Data Brick 50: " << brick_array[0][49].brick_mrect.color << "\n";
 	//BRICK01.setDefaults(2, 2, 36, 16, 0xFF, 0xFF, 0x00, 0xFF);
 
 	std::cout << ANSI "2;0" PEND "Press Select to begin.";
@@ -131,10 +149,14 @@ int main(int argc, char **argv)
 				angle = rand() % 360;
 			ball_angle = angle;
 			sf2d_swapbuffers();
-			//See line 6 for details
-			/*frame = 0;
-			frame_x.clear();
-			frame_y.clear();*/
+			for (int i = 0; i < level_count; i++)
+			{
+				for (int j = 0; j < 50; j++)
+				{
+					brick_array[i][j].reset();
+				}
+			}
+			level = 0;
 			while (true)
 			{
 				result = breakout();
@@ -189,6 +211,10 @@ int breakout()
 	hidScanInput();
 	kDown = hidKeysDown();
 	kHeld = hidKeysHeld();
+	if (kDown & KEY_A)
+		level++;
+	if (kDown & KEY_B)
+		level--;
 	if (kDown & KEY_SELECT || lives == 0)
 		return 2;
 	if (kHeld & KEY_START)
@@ -270,37 +296,37 @@ int breakout()
 		{
 			if (
 				(
-					the_ball.getTop(true) >= brick_array[j].brick_mrect.x &&
-					the_ball.getTop(true) <= brick_array[j].brick_mrect.x + brick_array[j].brick_mrect.width &&
-					the_ball.getTop(false) >= brick_array[j].brick_mrect.y &&
-					the_ball.getTop(false) <= brick_array[j].brick_mrect.y + brick_array[j].brick_mrect.height
+					the_ball.getTop(true) >= brick_array[level][j].brick_mrect.x &&
+					the_ball.getTop(true) <= brick_array[level][j].brick_mrect.x + brick_array[level][j].brick_mrect.width &&
+					the_ball.getTop(false) >= brick_array[level][j].brick_mrect.y &&
+					the_ball.getTop(false) <= brick_array[level][j].brick_mrect.y + brick_array[level][j].brick_mrect.height
 					) || (
-						the_ball.getBottom(true) >= brick_array[j].brick_mrect.x &&
-						the_ball.getBottom(true) <= brick_array[j].brick_mrect.x + brick_array[j].brick_mrect.width &&
-						the_ball.getBottom(false) >= brick_array[j].brick_mrect.y &&
-						the_ball.getBottom(false) <= brick_array[j].brick_mrect.y + brick_array[j].brick_mrect.height
+						the_ball.getBottom(true) >= brick_array[level][j].brick_mrect.x &&
+						the_ball.getBottom(true) <= brick_array[level][j].brick_mrect.x + brick_array[level][j].brick_mrect.width &&
+						the_ball.getBottom(false) >= brick_array[level][j].brick_mrect.y &&
+						the_ball.getBottom(false) <= brick_array[level][j].brick_mrect.y + brick_array[level][j].brick_mrect.height
 						)
 				)
 				brickHitV = true;
 			if (
 				(
-					the_ball.getLeft(true) >= brick_array[j].brick_mrect.x &&
-					the_ball.getLeft(true) <= brick_array[j].brick_mrect.x + brick_array[j].brick_mrect.width &&
-					the_ball.getLeft(false) >= brick_array[j].brick_mrect.y &&
-					the_ball.getLeft(false) <= brick_array[j].brick_mrect.y + brick_array[j].brick_mrect.height
+					the_ball.getLeft(true) >= brick_array[level][j].brick_mrect.x &&
+					the_ball.getLeft(true) <= brick_array[level][j].brick_mrect.x + brick_array[level][j].brick_mrect.width &&
+					the_ball.getLeft(false) >= brick_array[level][j].brick_mrect.y &&
+					the_ball.getLeft(false) <= brick_array[level][j].brick_mrect.y + brick_array[level][j].brick_mrect.height
 					) || (
-						the_ball.getRight(true) >= brick_array[j].brick_mrect.x &&
-						the_ball.getRight(true) <= brick_array[j].brick_mrect.x + brick_array[j].brick_mrect.width &&
-						the_ball.getRight(false) >= brick_array[j].brick_mrect.y &&
-						the_ball.getRight(false) <= brick_array[j].brick_mrect.y + brick_array[j].brick_mrect.height
+						the_ball.getRight(true) >= brick_array[level][j].brick_mrect.x &&
+						the_ball.getRight(true) <= brick_array[level][j].brick_mrect.x + brick_array[level][j].brick_mrect.width &&
+						the_ball.getRight(false) >= brick_array[level][j].brick_mrect.y &&
+						the_ball.getRight(false) <= brick_array[level][j].brick_mrect.y + brick_array[level][j].brick_mrect.height
 						)
 				)
 				brickHitH = true;
 			if (brickHitV || brickHitH)
 			{
-				if (brick_array[j].exists)
+				if (brick_array[level][j].exists)
 				{
-					brick_array[j].destroy();
+					brick_array[level][j].destroy();
 					if (brickHitV && brickHitH)
 					{
 						ball_angle -= 180.0;
@@ -342,8 +368,8 @@ int breakout()
 	sf2d_start_frame(GFX_TOP, GFX_LEFT);
 	draw_paddle(the_paddle);
 	for (int i = 0; i < 50; i++)
-		if (brick_array[i].exists)
-			draw_brick(brick_array[i]);
+		if (brick_array[level][i].exists)
+			draw_brick(brick_array[level][i]);
 	draw_ball(the_ball);
 	/*std::cout << ANSI "13;0" PEND;
 	for (int i = 0; i < 8; i++)

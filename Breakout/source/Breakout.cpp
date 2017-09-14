@@ -11,7 +11,7 @@ std::vector<double> frame_y;
 //init
 int debugTF = 1;
 char versiontxtt[8] = "  Beta ";
-char versiontxtn[9] = "01.00.00";
+char versiontxtn[9] = "01.01.00";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
@@ -25,6 +25,25 @@ int level_count = 2;
 int level = 0;
 brick brick_array[2][50];
 ball the_ball;
+double trail_new_frame_x[8];
+double trail_new_frame_y[8];
+mCircle trail_new_frame_circle[8];
+
+void trail_new_frame(ball ball_object)
+{
+	double current_x = ball_object.ball_mcirc.x;
+	double current_y = ball_object.ball_mcirc.y;
+	for (int i = 7; i > 0; i--)
+	{
+		trail_new_frame_x[i] = trail_new_frame_x[i - 1];
+		trail_new_frame_y[i] = trail_new_frame_y[i - 1];
+	}
+	trail_new_frame_x[0] = current_x;
+	trail_new_frame_y[0] = current_y;
+	for (int i = 0; i < 8; i++)
+		trail_new_frame_circle[i].setPosition(trail_new_frame_x[i], trail_new_frame_y[i]);
+	//std::cout << "TrailBall-1 | X = " << trail_new_frame_x[1] << " Y = " << trail_new_frame_y[1] << "\n";
+}
 
 bool touchInBox(touchPosition touch, int x, int y, int w, int h)
 {
@@ -93,6 +112,9 @@ int main(int argc, char **argv)
 	sf2d_set_clear_color(RGBA8(0x95, 0x95, 0x95, 0xFF));
 	sf2d_set_vblank_wait(1);
 	sf2d_texture *img_title = sfil_load_PNG_buffer(Title_png, SF2D_PLACE_RAM);
+
+	for (int i = 0; i < 8; i++)
+		trail_new_frame_circle[7 - i].setDefaults(200.0, 120.0, (0.875 * (i + 1)), 0xC3, 0xC3, 0xC3, (32 * (i + 1)));
 
 	the_paddle.setDefaults(175, 215, 50, 10, 0xC0, 0x61, 0x0A, 0xFF);
 	the_ball.setDefaults(200.0, 120.0, 7.0, 0xC3, 0xC3, 0xC3, 0xFF, 200.3, 115.2, 202.5, 119.8, 204.9, 117.1, 0xFF, 0xFF, 0xFF, 0xFF);
@@ -365,11 +387,15 @@ int breakout()
 		}
 	}
 
+	trail_new_frame(the_ball);
+
 	sf2d_start_frame(GFX_TOP, GFX_LEFT);
 	draw_paddle(the_paddle);
 	for (int i = 0; i < 50; i++)
 		if (brick_array[level][i].exists)
 			draw_brick(brick_array[level][i]);
+	for (int i = 7; i >= 0; i--)
+		draw_circ(trail_new_frame_circle[i]);
 	draw_ball(the_ball);
 	/*std::cout << ANSI "13;0" PEND;
 	for (int i = 0; i < 8; i++)

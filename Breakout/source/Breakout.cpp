@@ -2,12 +2,6 @@
 #include "shapes.hpp"
 #include "draw.hpp"
 
-/* debug stuff: this allows you to see the balls trail, although after a while sf2d will max out on objects or something so only use if for short term trajectory study
-int frame = 0;
-std::vector<double> frame_x;
-std::vector<double> frame_y;
-*/
-
 //init
 int debugTF = 1;
 char versiontxtt[8] = "  Beta ";
@@ -28,6 +22,7 @@ ball the_ball;
 double trail_new_frame_x[8];
 double trail_new_frame_y[8];
 mCircle trail_new_frame_circle[8];
+int points;
 
 void trail_new_frame(ball ball_object)
 {
@@ -42,7 +37,6 @@ void trail_new_frame(ball ball_object)
 	trail_new_frame_y[0] = current_y;
 	for (int i = 0; i < 8; i++)
 		trail_new_frame_circle[i].setPosition(trail_new_frame_x[i], trail_new_frame_y[i]);
-	//std::cout << "TrailBall-1 | X = " << trail_new_frame_x[1] << " Y = " << trail_new_frame_y[1] << "\n";
 }
 
 bool touchInBox(touchPosition touch, int x, int y, int w, int h)
@@ -127,7 +121,7 @@ int main(int argc, char **argv)
 	{
 		for (int b = 0; b < 10; b++)
 		{
-			brick_array[0][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, brick_R[a], brick_G[a], brick_B[a], brick_A[a], true);
+			brick_array[0][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, a, true, (4 - a));
 			brick_array[0][array_step].exists = true;
 			array_step++;
 		}
@@ -139,10 +133,10 @@ int main(int argc, char **argv)
 		{
 			if ((array_step > 1 && array_step < 10) || (array_step > 13 && array_step < 20) || (array_step > 25 && array_step < 30) || (array_step > 37 && array_step < 40) || (array_step > 49 && array_step < 50))
 			{
-				brick_array[1][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, brick_R[a], brick_G[a], brick_B[a], brick_A[a], false);
+				brick_array[1][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, a, false, (4 - a));
 				brick_array[1][array_step].exists = false;
 			} else {
-				brick_array[1][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, brick_R[a], brick_G[a], brick_B[a], brick_A[a], true);
+				brick_array[1][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, a, true, (4 - a));
 				brick_array[1][array_step].exists = true;
 			}
 			array_step++;
@@ -179,6 +173,7 @@ int main(int argc, char **argv)
 				}
 			}
 			level = 0;
+			points = 0;
 			while (true)
 			{
 				result = breakout();
@@ -349,6 +344,7 @@ int breakout()
 				if (brick_array[level][j].exists)
 				{
 					brick_array[level][j].destroy();
+					points += brick_array[level][j].point_value();
 					if (brickHitV && brickHitH)
 					{
 						ball_angle -= 180.0;
@@ -397,6 +393,13 @@ int breakout()
 	for (int i = 7; i >= 0; i--)
 		draw_circ(trail_new_frame_circle[i]);
 	draw_ball(the_ball);
+	std::cout << ANSI "13;0" PEND;
+	for (int i = 0; i < 3; i++)
+		std::cout << "                                        ";
+	std::cout << ANSI "13;0" PEND;
+	std::cout << "Score: " << points << "\n";
+	std::cout << "Point value for brick 1: " << brick_array[level][0].point_value() << "\n";
+	std::cout << "Point Array 1 2 and 3: " << brick_point_value[0] << ", " << brick_point_value[1] << ", and" << brick_point_value[2] << "\n";
 	/*std::cout << ANSI "13;0" PEND;
 	for (int i = 0; i < 8; i++)
 	std::cout << "                                        ";

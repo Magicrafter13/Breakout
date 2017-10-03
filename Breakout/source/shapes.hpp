@@ -1,3 +1,5 @@
+#pragma once
+
 class mRectangle {
 	double default_x;
 	double default_y;
@@ -47,20 +49,28 @@ public:
 	}
 };
 
+extern int brick_color_R[5];
+extern int brick_color_G[5];
+extern int brick_color_B[5];
+extern int brick_color_A[5];
+extern int brick_point_value[5];
+
 class brick {
 private:
 	bool internal_is_used;
+	int internal_brick_type;
 public:
 	bool exists;
 	mRectangle brick_mrect;
-	void setDefaults(double bx, double by, double bwidth, double bheight, int R, int G, int B, int A, bool is_used)
+	void setDefaults(double bx, double by, double bwidth, double bheight, int palette, bool is_used, int brick_type)
 	{
-		brick_mrect.setDefaults(bx, by, bwidth, bheight, R, G, B, A);
+		brick_mrect.setDefaults(bx, by, bwidth, bheight, brick_color_R[palette], brick_color_G[palette], brick_color_B[palette], brick_color_A[palette]);
 		internal_is_used = is_used;
 		if (internal_is_used)
 			exists = true;
 		else
 			exists = false;
+		internal_brick_type = brick_type;
 	}
 	void destroy()
 	{
@@ -73,6 +83,10 @@ public:
 		else
 			exists = false;
 		brick_mrect.reset();
+	}
+	int point_value()
+	{
+		return brick_point_value[internal_brick_type];
 	}
 };
 

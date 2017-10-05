@@ -83,18 +83,19 @@ int main(int argc, char **argv)
 	consoleInit(GFX_BOTTOM, &killBox);
 	consoleInit(GFX_BOTTOM, &debugBox);
 
-	consoleSetWindow(&versionWin, 6, 26, 34, 2);
+	consoleSetWindow(&versionWin, 6, 26, 34, 3);
 	consoleSetWindow(&killBox, 0, 28, 40, 2);
 	consoleSetWindow(&debugBox, 18, 4, 9, 12);
-
-	consoleSelect(&versionWin);
-	std::cout << "     Tap red area any time to exit";
-	std::cout << "Breakout Version: " ANSI RED CEND << versiontxtt << CRESET " " ANSI YELLOW CEND << versiontxtn;
 
 	consoleSelect(&killBox);
 	std::cout << ANSI B_RED CEND;
 	for (int i = 0; i < 80; i++)
 		std::cout << " ";
+
+	consoleSelect(&versionWin);
+	std::cout << "     Tap red area any time to exit";
+	std::cout << "Breakout Version: " ANSI RED CEND << versiontxtt << CRESET " " ANSI YELLOW CEND << versiontxtn;
+	std::cout << ANSI B_RED ASEP GREEN CEND "              Build: 17.10.04.1824";
 
 	/*consoleSelect(&topScreen);
 	std::cout << ANSI "29;07" PEND "by Matthew Rease\n";*/

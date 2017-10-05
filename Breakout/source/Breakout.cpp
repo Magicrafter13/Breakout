@@ -24,6 +24,9 @@ double trail_new_frame_y[8];
 mCircle trail_new_frame_circle[8];
 int points;
 int last_power;
+int times_power_1;
+int times_power_2;
+int times_power_3;
 
 void trail_new_frame(ball ball_object)
 {
@@ -96,7 +99,7 @@ int main(int argc, char **argv)
 	consoleSelect(&versionWin);
 	std::cout << "     Tap red area any time to exit";
 	std::cout << "Breakout Version: " ANSI RED CEND << versiontxtt << CRESET " " ANSI YELLOW CEND << versiontxtn;
-	std::cout << ANSI B_RED ASEP GREEN CEND "              Build: 17.10.04.2020";
+	std::cout << ANSI B_RED ASEP GREEN CEND "              Build: 17.10.05.1257";
 
 	/*consoleSelect(&topScreen);
 	std::cout << ANSI "29;07" PEND "by Matthew Rease\n";*/
@@ -173,6 +176,9 @@ int main(int argc, char **argv)
 			level = 0;
 			points = 0;
 			last_power = 0;
+			times_power_1 = 0;
+			times_power_2 = 0;
+			times_power_3 = 0;
 			while (true)
 			{
 				result = breakout();
@@ -345,6 +351,12 @@ int breakout()
 					brick_array[level][j].destroy();
 					points += brick_array[level][j].point_value();
 					last_power = brick_array[level][j].random_powerup();
+					if (last_power == 1)
+						times_power_1++;
+					if (last_power == 2)
+						times_power_2++;
+					if (last_power == 3)
+						times_power_3++;
 					if (brickHitV && brickHitH)
 					{
 						ball_angle -= 180.0;
@@ -394,13 +406,14 @@ int breakout()
 		draw_circ(trail_new_frame_circle[i]);
 	draw_ball(the_ball);
 	std::cout << ANSI "13;0" PEND;
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 5; i++)
 		std::cout << "                                        ";
 	std::cout << ANSI "13;0" PEND;
 	std::cout << "Score: " << points << "\n";
 	std::cout << "Point value for brick 1: " << brick_array[level][0].point_value() << "\n";
 	std::cout << "Point Array 1 2 and 3: " << brick_point_value[0] << ", " << brick_point_value[1] << ", and" << brick_point_value[2] << "\n";
 	std::cout << "Powerup value last brick: " << last_power << "\n";
+	std::cout << "T1: " << times_power_1 << " T2: " << times_power_2 << " T3: " << times_power_3 << "\n";
 	/*std::cout << ANSI "13;0" PEND;
 	for (int i = 0; i < 8; i++)
 	std::cout << "                                        ";

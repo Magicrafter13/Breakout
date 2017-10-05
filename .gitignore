@@ -260,13 +260,8 @@ paket-files/
 __pycache__/
 *.pyc
 
-# Extra Visual Studio crap that should be .gitignore'd by default :/
-*.vcxproj
-*.vcxproj.filters
-#Breakout/build
-*.sln
-
 # Stuff I don't want on the repo
+*.sln
 *.cia
 *.rsf
 Breakout/sample.cxi

@@ -99,7 +99,7 @@ int main(int argc, char **argv)
 	consoleSelect(&versionWin);
 	std::cout << "     Tap red area any time to exit";
 	std::cout << "Breakout Version: " ANSI RED CEND << versiontxtt << CRESET " " ANSI YELLOW CEND << versiontxtn;
-	std::cout << ANSI B_RED ASEP GREEN CEND "              Build: 17.10.05.1257";
+	std::cout << ANSI B_RED ASEP GREEN CEND "              Build: 17.10.05.1314";
 
 	/*consoleSelect(&topScreen);
 	std::cout << ANSI "29;07" PEND "by Matthew Rease\n";*/
@@ -281,14 +281,20 @@ int breakout()
 				ball_angle = -ball_angle + 180.0;
 		}
 
+		while (ball_angle < 0.0)
+			ball_angle += 360.0;
+		while (ball_angle > 360.0)
+			ball_angle -= 360.0;
+
 		if (hasHitPadd && !isInPaddle)
 		{
 			hasInteracted = true;
 			isInPaddle = true;
+			int paddle_width_third = the_paddle.paddle_mrect.width / 3.0;
 			angle = 1;
-			if (the_ball.getBottom(true) >= the_paddle.paddle_mrect.x + (the_paddle.paddle_mrect.width / 3.0))
+			if (the_ball.getBottom(true) >= the_paddle.paddle_mrect.x + paddle_width_third)
 				angle += 1;
-			if (the_ball.getBottom(true) >= the_paddle.paddle_mrect.x + ((the_paddle.paddle_mrect.width / (2.0 / 3.0))))
+			if (the_ball.getBottom(true) >= the_paddle.paddle_mrect.x + (paddle_width_third * 2.0))
 				angle += 1;
 			if (ball_angle < 90.0)
 				isMovingRight = true;
@@ -299,7 +305,7 @@ int breakout()
 				if (angle == 1)
 					ball_angle += 180.0;
 				if (angle == 2)
-					ball_angle = -ball_angle + 360.0;
+					ball_angle = (360.0 - ball_angle);
 				if (angle == 3)
 					ball_angle += 270.0;
 			}
@@ -307,11 +313,9 @@ int breakout()
 				if (angle == 3)
 					ball_angle += 180.0;
 				if (angle == 2)
-					ball_angle = -ball_angle + 360.0;
+					ball_angle = (360.0 - ball_angle);
 				if (angle == 1)
-				{
 					ball_angle += 90.0;
-				}
 			}
 		}
 		for (int j = 0; j < 50; j++)

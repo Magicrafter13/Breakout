@@ -23,6 +23,7 @@ double trail_new_frame_x[8];
 double trail_new_frame_y[8];
 mCircle trail_new_frame_circle[8];
 int points;
+int last_power;
 
 void trail_new_frame(ball ball_object)
 {
@@ -95,7 +96,7 @@ int main(int argc, char **argv)
 	consoleSelect(&versionWin);
 	std::cout << "     Tap red area any time to exit";
 	std::cout << "Breakout Version: " ANSI RED CEND << versiontxtt << CRESET " " ANSI YELLOW CEND << versiontxtn;
-	std::cout << ANSI B_RED ASEP GREEN CEND "              Build: 17.10.04.1846";
+	std::cout << ANSI B_RED ASEP GREEN CEND "              Build: 17.10.04.2020";
 
 	/*consoleSelect(&topScreen);
 	std::cout << ANSI "29;07" PEND "by Matthew Rease\n";*/
@@ -113,10 +114,6 @@ int main(int argc, char **argv)
 
 	the_paddle.setDefaults(175, 215, 50, 10, 0xC0, 0x61, 0x0A, 0xFF);
 	the_ball.setDefaults(200.0, 120.0, 7.0, 0xC3, 0xC3, 0xC3, 0xFF, 200.3, 115.2, 202.5, 119.8, 204.9, 117.1, 0xFF, 0xFF, 0xFF, 0xFF);
-	int brick_R[5] = { 0xFF, 0xFF, 0xFF, 0x00, 0x00 };
-	int brick_G[5] = { 0x00, 0x80, 0xFF, 0xFF, 0x00 };
-	int brick_B[5] = { 0x00, 0x00, 0x00, 0x00, 0xFF };
-	int brick_A[5] = { 0xFA, 0xFA, 0xFA, 0xFA, 0xFA }; //250 instead of 255. I want to the bricks to fade out by 25 each frame (lasting 10 frames)
 	int array_step = 0;
 	for (int a = 0; a < 5; a++)
 	{
@@ -175,6 +172,7 @@ int main(int argc, char **argv)
 			}
 			level = 0;
 			points = 0;
+			last_power = 0;
 			while (true)
 			{
 				result = breakout();
@@ -346,6 +344,7 @@ int breakout()
 				{
 					brick_array[level][j].destroy();
 					points += brick_array[level][j].point_value();
+					last_power = brick_array[level][j].random_powerup();
 					if (brickHitV && brickHitH)
 					{
 						ball_angle -= 180.0;
@@ -395,12 +394,13 @@ int breakout()
 		draw_circ(trail_new_frame_circle[i]);
 	draw_ball(the_ball);
 	std::cout << ANSI "13;0" PEND;
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 4; i++)
 		std::cout << "                                        ";
 	std::cout << ANSI "13;0" PEND;
 	std::cout << "Score: " << points << "\n";
 	std::cout << "Point value for brick 1: " << brick_array[level][0].point_value() << "\n";
 	std::cout << "Point Array 1 2 and 3: " << brick_point_value[0] << ", " << brick_point_value[1] << ", and" << brick_point_value[2] << "\n";
+	std::cout << "Powerup value last brick: " << last_power << "\n";
 	/*std::cout << ANSI "13;0" PEND;
 	for (int i = 0; i < 8; i++)
 	std::cout << "                                        ";

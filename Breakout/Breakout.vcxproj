@@ -142,6 +142,7 @@
   <ItemGroup>
     <ClCompile Include="source\Breakout.cpp" />
     <ClCompile Include="source\draw.cpp" />
+    <ClCompile Include="source\shapes.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Breakout.hpp" />

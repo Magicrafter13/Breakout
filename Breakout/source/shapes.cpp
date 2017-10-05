@@ -13,7 +13,7 @@ int brick_color_B[5] = {
 };
 int brick_color_A[5] = {
 	0xFA, 0xFA, 0xFA, 0xFA, 0xFA
-};
+}; //250 instead of 255. I want to the bricks to fade out by 25 each frame (lasting 10 frames)
 int brick_point_value[5] = {
 	0, 10, 15, 20, 25
 };

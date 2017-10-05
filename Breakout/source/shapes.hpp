@@ -59,6 +59,54 @@ class brick {
 private:
 	bool internal_is_used;
 	int internal_brick_type;
+	int get_powerup()
+	{
+		switch (internal_brick_type)
+		{
+			case 0: return 0;
+			case 1: {
+				int temp_number = rand() % 100;
+				if (temp_number == 1 || temp_number == 2 || temp_number == 3)
+					return 1;
+				if (temp_number == 4 || temp_number == 5 || temp_number == 6)
+					return 2;
+				if (temp_number == 7 || temp_number == 8 || temp_number == 9)
+					return 3;
+				return 0;
+			}
+			case 2: {
+				int temp_number = rand() % 100;
+				if (temp_number == 1 || temp_number == 2 || temp_number == 3)
+					return 1;
+				if (temp_number == 4 || temp_number == 5 || temp_number == 6)
+					return 2;
+				if (temp_number == 7 || temp_number == 8 || temp_number == 9)
+					return 3;
+				return 0;
+			}
+			case 3: {
+				int temp_number = rand() % 100;
+				if (temp_number == 1 || temp_number == 2 || temp_number == 3 || temp_number == 4 || temp_number == 5 || temp_number == 6 || temp_number == 7 || temp_number == 8)
+					return 1;
+				if (temp_number == 9 || temp_number == 10 || temp_number == 11 || temp_number == 12 || temp_number == 13 || temp_number == 14 || temp_number == 15 || temp_number == 16)
+					return 2;
+				if (temp_number == 17 || temp_number == 18 || temp_number == 19 || temp_number == 20 || temp_number == 21 || temp_number == 22 || temp_number == 23 || temp_number == 24)
+					return 3;
+				return 0;
+			}
+			case 4: {
+				int temp_number = rand() % 100;
+				if (temp_number == 1 || temp_number == 2 || temp_number == 3 || temp_number == 4 || temp_number == 5 || temp_number == 6 || temp_number == 7 || temp_number == 8)
+					return 1;
+				if (temp_number == 9 || temp_number == 10 || temp_number == 11 || temp_number == 12 || temp_number == 13 || temp_number == 14 || temp_number == 15 || temp_number == 16)
+					return 2;
+				if (temp_number == 17 || temp_number == 18 || temp_number == 19 || temp_number == 20 || temp_number == 21 || temp_number == 22 || temp_number == 23 || temp_number == 24)
+					return 3;
+				return 0;
+			}
+		}
+		return 0;
+	}
 public:
 	bool exists;
 	mRectangle brick_mrect;
@@ -88,9 +136,13 @@ public:
 	{
 		return brick_point_value[internal_brick_type];
 	}
-	void random_powerup()
+	int random_powerup()
 	{
-		//use random numbers, and brick type then return powerup
+		return get_powerup();
+		/* returns 1 for laser powerup
+		   returns 2 for bigger paddle
+		   returns 3 for smaller paddle
+		*/
 	}
 };
 

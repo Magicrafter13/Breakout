@@ -290,11 +290,15 @@ int breakout()
 		{
 			hasInteracted = true;
 			isInPaddle = true;
-			int paddle_width_third = the_paddle.paddle_mrect.width / 3.0;
+			int paddle_width_fifth = the_paddle.paddle_mrect.width / 5.0;
 			angle = 1;
-			if (the_ball.getBottom(true) >= the_paddle.paddle_mrect.x + paddle_width_third)
+			if (the_ball.getBottom(true) >= the_paddle.paddle_mrect.x + paddle_width_fifth)
 				angle += 1;
-			if (the_ball.getBottom(true) >= the_paddle.paddle_mrect.x + (paddle_width_third * 2.0))
+			if (the_ball.getBottom(true) >= the_paddle.paddle_mrect.x + (paddle_width_fifth * 2.0))
+				angle += 1;
+			if (the_ball.getBottom(true) >= the_paddle.paddle_mrect.x + (paddle_width_fifth * 3.0))
+				angle += 1;
+			if (the_ball.getBottom(true) >= the_paddle.paddle_mrect.x + (paddle_width_fifth * 4.0))
 				angle += 1;
 			if (ball_angle < 90.0)
 				isMovingRight = true;
@@ -303,19 +307,27 @@ int breakout()
 			if (isMovingRight)
 			{
 				if (angle == 1)
-					ball_angle += 180.0;
+					ball_angle += 165.0;
 				if (angle == 2)
-					ball_angle = (360.0 - ball_angle);
+					ball_angle += 195.0;
 				if (angle == 3)
-					ball_angle += 270.0;
+					ball_angle = (360.0 - ball_angle);
+				if (angle == 4)
+					ball_angle += 255.0;
+				if (angle == 5)
+					ball_angle += 285.0;
 			}
 			else {
+				if (angle == 5)
+					ball_angle += 195.0;
+				if (angle == 4)
+					ball_angle += 165.0;
 				if (angle == 3)
-					ball_angle += 180.0;
-				if (angle == 2)
 					ball_angle = (360.0 - ball_angle);
+				if (angle == 2)
+					ball_angle += 105.0;
 				if (angle == 1)
-					ball_angle += 90.0;
+					ball_angle += 75.0;
 			}
 		}
 		for (int j = 0; j < 50; j++)

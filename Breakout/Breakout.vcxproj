@@ -92,8 +92,8 @@
     <NMakeCleanCommandLine>make clean</NMakeCleanCommandLine>
     <NMakeReBuildCommandLine>make</NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);c:\devkitpro\devkitarm\include;c:\devkitpro\libctru\include;c:\users\scuba\documents\github\citro3d\include;c:\local\boost_1_64_0;</IncludePath>
-    <LibraryPath>c:\devkitpro\libctru\lib;c:\devkitpro\devkitarm\lib;c:\users\scuba\documents\github\citro3d\lib;c:\local\boost_1_64_0\libs;</LibraryPath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);c:\devkitpro\devkitarm\include;c:\devkitpro\libctru\include;</IncludePath>
+    <LibraryPath>c:\devkitpro\libctru\lib;c:\devkitpro\devkitarm\lib;</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <NMakeBuildCommandLine>make</NMakeBuildCommandLine>
@@ -101,8 +101,8 @@
     <NMakeCleanCommandLine>make clean</NMakeCleanCommandLine>
     <NMakeReBuildCommandLine>make</NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);c:\devkitpro\devkitarm\include;c:\devkitpro\libctru\include;c:\users\scuba\documents\github\citro3d\include;c:\local\boost_1_64_0;</IncludePath>
-    <LibraryPath>c:\devkitpro\libctru\lib;c:\devkitpro\devkitarm\lib;c:\users\scuba\documents\github\citro3d\lib;c:\local\boost_1_64_0\libs;</LibraryPath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);c:\devkitpro\devkitarm\include;c:\devkitpro\libctru\include;</IncludePath>
+    <LibraryPath>c:\devkitpro\libctru\lib;c:\devkitpro\devkitarm\lib;</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <NMakeBuildCommandLine>make</NMakeBuildCommandLine>
@@ -110,8 +110,8 @@
     <NMakeCleanCommandLine>make clean</NMakeCleanCommandLine>
     <NMakeReBuildCommandLine>make</NMakeReBuildCommandLine>
     <NMakePreprocessorDefinitions>_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);c:\devkitpro\devkitarm\include;c:\devkitpro\libctru\include;c:\users\scuba\documents\github\citro3d\include;c:\local\boost_1_64_0;</IncludePath>
-    <LibraryPath>c:\devkitpro\libctru\lib;c:\devkitpro\devkitarm\lib;c:\users\scuba\documents\github\citro3d\lib;c:\local\boost_1_64_0\libs;</LibraryPath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);c:\devkitpro\devkitarm\include;c:\devkitpro\libctru\include;</IncludePath>
+    <LibraryPath>c:\devkitpro\libctru\lib;c:\devkitpro\devkitarm\lib;</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <NMakeBuildCommandLine>make</NMakeBuildCommandLine>
@@ -147,6 +147,9 @@
     <ClInclude Include="source\Breakout.hpp" />
     <ClInclude Include="source\draw.hpp" />
     <ClInclude Include="source\shapes.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="data\Title.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

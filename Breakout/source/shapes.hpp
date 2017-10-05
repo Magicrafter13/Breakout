@@ -88,6 +88,10 @@ public:
 	{
 		return brick_point_value[internal_brick_type];
 	}
+	void random_powerup()
+	{
+		//use random numbers, and brick type then return powerup
+	}
 };
 
 class mCircle {

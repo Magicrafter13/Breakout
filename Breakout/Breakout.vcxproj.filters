@@ -26,14 +26,19 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="source\draw.hpp">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="source\Breakout.hpp">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\draw.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\shapes.hpp">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="data\Title.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

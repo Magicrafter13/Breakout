@@ -95,7 +95,7 @@ int main(int argc, char **argv)
 	consoleSelect(&versionWin);
 	std::cout << "     Tap red area any time to exit";
 	std::cout << "Breakout Version: " ANSI RED CEND << versiontxtt << CRESET " " ANSI YELLOW CEND << versiontxtn;
-	std::cout << ANSI B_RED ASEP GREEN CEND "              Build: 17.10.04.1824";
+	std::cout << ANSI B_RED ASEP GREEN CEND "              Build: 17.10.04.1846";
 
 	/*consoleSelect(&topScreen);
 	std::cout << ANSI "29;07" PEND "by Matthew Rease\n";*/

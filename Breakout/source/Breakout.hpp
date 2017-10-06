@@ -31,6 +31,8 @@ extern PrintConsole topScreen, bottomScreen, versionWin, killBox, debugBox;
 
 extern char versiontxtt[8];
 extern char versiontxtn[9];
+extern char buildnumber[14];
+extern char ishupeversion[9];
 extern int vernumqik;
 int credits();
 extern int debugTF;

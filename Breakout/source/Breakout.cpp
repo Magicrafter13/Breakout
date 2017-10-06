@@ -6,6 +6,8 @@
 int debugTF = 1;
 char versiontxtt[8] = "  Beta ";
 char versiontxtn[9] = "01.02.00";
+char buildnumber[14] = "17.10.06.0913";
+char ishupeversion[9] = "00.02.00";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
@@ -87,7 +89,7 @@ int main(int argc, char **argv)
 	consoleInit(GFX_BOTTOM, &killBox);
 	consoleInit(GFX_BOTTOM, &debugBox);
 
-	consoleSetWindow(&versionWin, 6, 26, 34, 3);
+	consoleSetWindow(&versionWin, 6, 26, 34, 4);
 	consoleSetWindow(&killBox, 0, 28, 40, 2);
 	consoleSetWindow(&debugBox, 18, 4, 9, 12);
 
@@ -99,7 +101,8 @@ int main(int argc, char **argv)
 	consoleSelect(&versionWin);
 	std::cout << "     Tap red area any time to exit";
 	std::cout << "Breakout Version: " ANSI RED CEND << versiontxtt << CRESET " " ANSI YELLOW CEND << versiontxtn;
-	std::cout << ANSI B_RED ASEP GREEN CEND "              Build: 17.10.05.1720";
+	std::cout << ANSI B_RED ASEP GREEN CEND "              Build: 17.10.06.0925";
+	std::cout << ANSI B_RED ASEP GREEN CEND "   ISHUPE Engine Version: 00.02.01";
 
 	/*consoleSelect(&topScreen);
 	std::cout << ANSI "29;07" PEND "by Matthew Rease\n";*/
@@ -276,9 +279,9 @@ int breakout()
 			hasInteracted = true;
 			isInWall = true;
 			if (the_ball.getTop(false) <= 0.00)
-				ball_angle = -ball_angle + 360.0;
+				ball_angle = 360.0 - ball_angle;
 			else
-				ball_angle = -ball_angle + 180.0;
+				ball_angle = 180.0 - ball_angle;
 		}
 
 		while (ball_angle < 0.0)
@@ -290,45 +293,31 @@ int breakout()
 		{
 			hasInteracted = true;
 			isInPaddle = true;
-			int paddle_width_fifth = the_paddle.paddle_mrect.width / 5.0;
+			double paddle_width_ninth = the_paddle.paddle_mrect.width / 9.0;
 			angle = 1;
-			if (the_ball.getBottom(true) >= the_paddle.paddle_mrect.x + paddle_width_fifth)
-				angle += 1;
-			if (the_ball.getBottom(true) >= the_paddle.paddle_mrect.x + (paddle_width_fifth * 2.0))
-				angle += 1;
-			if (the_ball.getBottom(true) >= the_paddle.paddle_mrect.x + (paddle_width_fifth * 3.0))
-				angle += 1;
-			if (the_ball.getBottom(true) >= the_paddle.paddle_mrect.x + (paddle_width_fifth * 4.0))
-				angle += 1;
-			if (ball_angle < 90.0)
-				isMovingRight = true;
-			else
-				isMovingRight = false;
-			if (isMovingRight)
+			for (double z = 1.0; z < 9.0; z += 1.0)
 			{
-				if (angle == 1)
-					ball_angle = (360.0 - ball_angle) - 45.0;
-				if (angle == 2)
-					ball_angle = (360.0 - ball_angle) - 22.5;
-				if (angle == 3)
-					ball_angle = (360.0 - ball_angle);
-				if (angle == 4)
-					ball_angle = (360.0 - ball_angle) + 22.5;
-				if (angle == 5)
-					ball_angle = (360.0 - ball_angle) + 45.0;
+				if (the_ball.getBottom(true) >= the_paddle.paddle_mrect.x + (paddle_width_ninth * z))
+					angle += 1;
 			}
-			else {
-				if (angle == 1)
-					ball_angle = (360.0 - ball_angle) - 45.0;
-				if (angle == 2)
-					ball_angle = (360.0 - ball_angle) - 22.5;
-				if (angle == 3)
-					ball_angle = (360.0 - ball_angle);
-				if (angle == 4)
-					ball_angle = (360.0 - ball_angle) + 22.5;
-				if (angle == 5)
-					ball_angle = (360.0 - ball_angle) + 45.0;
-			}
+			if (angle == 1)
+				ball_angle = (360.0 - ball_angle) - 45.0;
+			if (angle == 2)
+				ball_angle = (360.0 - ball_angle) - 33.75;
+			if (angle == 3)
+				ball_angle = (360.0 - ball_angle) - 22.5;
+			if (angle == 4)
+				ball_angle = (360.0 - ball_angle) - 11.25;
+			if (angle == 5)
+				ball_angle = (360.0 - ball_angle);
+			if (angle == 6)
+				ball_angle = (360.0 - ball_angle) + 11.25;
+			if (angle == 7)
+				ball_angle = (360.0 - ball_angle) + 22.5;
+			if (angle == 8)
+				ball_angle = (360.0 - ball_angle) + 33.75;
+			if (angle == 9)
+				ball_angle = (360.0 - ball_angle) + 45.0;
 		}
 		for (int j = 0; j < 50; j++)
 		{

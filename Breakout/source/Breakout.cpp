@@ -6,8 +6,8 @@
 int debugTF = 1;
 char versiontxtt[8] = "  Beta ";
 char versiontxtn[9] = "01.02.00";
-char buildnumber[14] = "17.10.06.0953";
-char ishupeversion[9] = "00.02.01";
+char buildnumber[14] = "17.10.06.1004";
+char ishupeversion[9] = "00.02.02";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
@@ -165,7 +165,7 @@ int main(int argc, char **argv)
 			int result = 3;
 			the_ball.reset();
 			double angle = 0.0;
-			while (angle < 30.0 || angle > 150.0 || (angle > 80 && angle < 100))
+			while (angle < 45.0 || angle > 135.0 || (angle > 85 && angle < 95))
 				angle = rand() % 360;
 			ball_angle = angle;
 			sf2d_swapbuffers();
@@ -301,23 +301,23 @@ int breakout()
 					angle += 1;
 			}
 			if (angle == 1)
-				ball_angle = (360.0 - ball_angle) - 45.0;
+				ball_angle = (360.0 - ball_angle) - 40.0;
 			if (angle == 2)
-				ball_angle = (360.0 - ball_angle) - 33.75;
+				ball_angle = (360.0 - ball_angle) - 30.0;
 			if (angle == 3)
-				ball_angle = (360.0 - ball_angle) - 22.5;
+				ball_angle = (360.0 - ball_angle) - 20.0;
 			if (angle == 4)
-				ball_angle = (360.0 - ball_angle) - 11.25;
+				ball_angle = (360.0 - ball_angle) - 10.0;
 			if (angle == 5)
 				ball_angle = (360.0 - ball_angle);
 			if (angle == 6)
-				ball_angle = (360.0 - ball_angle) + 11.25;
+				ball_angle = (360.0 - ball_angle) + 10.0;
 			if (angle == 7)
-				ball_angle = (360.0 - ball_angle) + 22.5;
+				ball_angle = (360.0 - ball_angle) + 20.0;
 			if (angle == 8)
-				ball_angle = (360.0 - ball_angle) + 33.75;
+				ball_angle = (360.0 - ball_angle) + 30.0;
 			if (angle == 9)
-				ball_angle = (360.0 - ball_angle) + 45.0;
+				ball_angle = (360.0 - ball_angle) + 40.0;
 		}
 		for (int j = 0; j < 50; j++)
 		{

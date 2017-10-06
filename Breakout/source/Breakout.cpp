@@ -6,8 +6,8 @@
 int debugTF = 1;
 char versiontxtt[8] = "  Beta ";
 char versiontxtn[9] = "01.02.00";
-char buildnumber[14] = "17.10.06.0913";
-char ishupeversion[9] = "00.02.00";
+char buildnumber[14] = "17.10.06.0953";
+char ishupeversion[9] = "00.02.01";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
@@ -101,8 +101,8 @@ int main(int argc, char **argv)
 	consoleSelect(&versionWin);
 	std::cout << "     Tap red area any time to exit";
 	std::cout << "Breakout Version: " ANSI RED CEND << versiontxtt << CRESET " " ANSI YELLOW CEND << versiontxtn;
-	std::cout << ANSI B_RED ASEP GREEN CEND "              Build: 17.10.06.0925";
-	std::cout << ANSI B_RED ASEP GREEN CEND "   ISHUPE Engine Version: 00.02.01";
+	std::cout << ANSI B_RED ASEP GREEN CEND "              Build: " << buildnumber;
+	std::cout << ANSI B_RED ASEP GREEN CEND "   ISHUPE Engine Version: " << ishupeversion;
 
 	/*consoleSelect(&topScreen);
 	std::cout << ANSI "29;07" PEND "by Matthew Rease\n";*/

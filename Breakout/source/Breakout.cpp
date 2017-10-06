@@ -99,7 +99,7 @@ int main(int argc, char **argv)
 	consoleSelect(&versionWin);
 	std::cout << "     Tap red area any time to exit";
 	std::cout << "Breakout Version: " ANSI RED CEND << versiontxtt << CRESET " " ANSI YELLOW CEND << versiontxtn;
-	std::cout << ANSI B_RED ASEP GREEN CEND "              Build: 17.10.05.1314";
+	std::cout << ANSI B_RED ASEP GREEN CEND "              Build: 17.10.05.1717";
 
 	/*consoleSelect(&topScreen);
 	std::cout << ANSI "29;07" PEND "by Matthew Rease\n";*/
@@ -307,27 +307,27 @@ int breakout()
 			if (isMovingRight)
 			{
 				if (angle == 1)
-					ball_angle += 165.0;
+					ball_angle = (360.0 - ball_angle) - 45.0;
 				if (angle == 2)
-					ball_angle += 195.0;
+					ball_angle = (360.0 - ball_angle) - 22.5;
 				if (angle == 3)
 					ball_angle = (360.0 - ball_angle);
 				if (angle == 4)
-					ball_angle += 255.0;
+					ball_angle = (360.0 - ball_angle) + 22.5;
 				if (angle == 5)
-					ball_angle += 285.0;
+					ball_angle = (360.0 - ball_angle) + 45.0;
 			}
 			else {
-				if (angle == 5)
-					ball_angle += 195.0;
-				if (angle == 4)
-					ball_angle += 165.0;
+				if (angle == 1)
+					ball_angle = (360.0 - ball_angle) - 45.0;
+				if (angle == 2)
+					ball_angle = (360.0 - ball_angle) - 22.5;
 				if (angle == 3)
 					ball_angle = (360.0 - ball_angle);
-				if (angle == 2)
-					ball_angle += 105.0;
-				if (angle == 1)
-					ball_angle += 75.0;
+				if (angle == 4)
+					ball_angle = (360.0 - ball_angle) + 22.5;
+				if (angle == 5)
+					ball_angle = (360.0 - ball_angle) + 45.0;
 			}
 		}
 		for (int j = 0; j < 50; j++)

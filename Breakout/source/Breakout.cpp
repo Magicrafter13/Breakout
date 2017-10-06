@@ -5,7 +5,7 @@
 //init
 int debugTF = 1;
 char versiontxtt[8] = "  Beta ";
-char versiontxtn[9] = "01.01.00";
+char versiontxtn[9] = "01.02.00";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
@@ -99,7 +99,7 @@ int main(int argc, char **argv)
 	consoleSelect(&versionWin);
 	std::cout << "     Tap red area any time to exit";
 	std::cout << "Breakout Version: " ANSI RED CEND << versiontxtt << CRESET " " ANSI YELLOW CEND << versiontxtn;
-	std::cout << ANSI B_RED ASEP GREEN CEND "              Build: 17.10.05.1717";
+	std::cout << ANSI B_RED ASEP GREEN CEND "              Build: 17.10.05.1720";
 
 	/*consoleSelect(&topScreen);
 	std::cout << ANSI "29;07" PEND "by Matthew Rease\n";*/

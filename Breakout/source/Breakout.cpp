@@ -29,6 +29,7 @@ int last_power;
 int times_power_1;
 int times_power_2;
 int times_power_3;
+bool ball_is_attached;
 
 void trail_new_frame(ball ball_object)
 {
@@ -165,7 +166,7 @@ int main(int argc, char **argv)
 			int result = 3;
 			the_ball.reset();
 			double angle = 0.0;
-			while (angle < 45.0 || angle > 135.0 || (angle > 85 && angle < 95))
+			while (angle < 225.0 || angle > 315.0 || (angle > 265 && angle < 275))
 				angle = rand() % 360;
 			ball_angle = angle;
 			sf2d_swapbuffers();
@@ -182,6 +183,7 @@ int main(int argc, char **argv)
 			times_power_1 = 0;
 			times_power_2 = 0;
 			times_power_3 = 0;
+			ball_is_attached = true;
 			while (true)
 			{
 				result = breakout();
@@ -236,9 +238,9 @@ int breakout()
 	hidScanInput();
 	kDown = hidKeysDown();
 	kHeld = hidKeysHeld();
-	if (kDown & KEY_A)
+	if (kDown & KEY_R)
 		level++;
-	if (kDown & KEY_B)
+	if (kDown & KEY_L)
 		level--;
 	if (kDown & KEY_SELECT || lives == 0)
 		return 2;
@@ -252,151 +254,157 @@ int breakout()
 	if (the_ball.getTop(false) > 240)
 	{
 		lives--;
+		ball_is_attached = true;
 		the_ball.reset();
-		while (ball_angle < 30.0 || ball_angle > 150.0 || (ball_angle > 80 && ball_angle < 100))
+		while (ball_angle < 225.0 || ball_angle > 315.0 || (ball_angle > 265 && ball_angle < 275))
 			ball_angle = rand() % 360;
 		return 0;
 	}
 
 	bool hasInteracted = false;
-	for (int i = 0; i < 300; i++)
+	if (kDown & KEY_A && ball_is_attached == true)
+		ball_is_attached = false;
+	if (!ball_is_attached)
 	{
-		hasInteracted = false;
-		if (the_paddle.getTop(false) <= the_ball.getBottom(false) && (the_paddle.paddle_mrect.x <= the_ball.ball_mcirc.x && the_ball.ball_mcirc.x <= the_paddle.paddle_mrect.x + the_paddle.paddle_mrect.width /*balls x coordinate is <= paddles x coordinate + it's width*/))
-			hasHitPadd = true;
-		else
-			hasHitPadd = false;
-		if (hasHitPadd && the_ball.getBottom(false) >= the_paddle.getTop(false) + 0.02)
-			hasHitPadd = false;
-
-		//Add gravity powerup (magnet but different) rotates around paddle until button pressed.
-		if (the_ball.getLeft(true) <= 0.00 || the_ball.getRight(true) >= 400.00 || the_ball.getTop(false) <= 0.00)
-			hasHitWall = true;
-		else
-			hasHitWall = false;
-		if (hasHitWall && !isInWall)
+		for (int i = 0; i < 300; i++)
 		{
-			hasInteracted = true;
-			isInWall = true;
-			if (the_ball.getTop(false) <= 0.00)
-				ball_angle = 360.0 - ball_angle;
+			hasInteracted = false;
+			if (the_paddle.getTop(false) <= the_ball.getBottom(false) && (the_paddle.paddle_mrect.x <= the_ball.ball_mcirc.x && the_ball.ball_mcirc.x <= the_paddle.paddle_mrect.x + the_paddle.paddle_mrect.width /*balls x coordinate is <= paddles x coordinate + it's width*/))
+				hasHitPadd = true;
 			else
-				ball_angle = 180.0 - ball_angle;
-		}
+				hasHitPadd = false;
+			if (hasHitPadd && the_ball.getBottom(false) >= the_paddle.getTop(false) + 0.02)
+				hasHitPadd = false;
 
-		while (ball_angle < 0.0)
-			ball_angle += 360.0;
-		while (ball_angle > 360.0)
-			ball_angle -= 360.0;
-
-		if (hasHitPadd && !isInPaddle)
-		{
-			hasInteracted = true;
-			isInPaddle = true;
-			double paddle_width_ninth = the_paddle.paddle_mrect.width / 9.0;
-			angle = 1;
-			for (double z = 1.0; z < 9.0; z += 1.0)
+			//Add gravity powerup (magnet but different) rotates around paddle until button pressed.
+			if (the_ball.getLeft(true) <= 0.00 || the_ball.getRight(true) >= 400.00 || the_ball.getTop(false) <= 0.00)
+				hasHitWall = true;
+			else
+				hasHitWall = false;
+			if (hasHitWall && !isInWall)
 			{
-				if (the_ball.getBottom(true) >= the_paddle.paddle_mrect.x + (paddle_width_ninth * z))
-					angle += 1;
+				hasInteracted = true;
+				isInWall = true;
+				if (the_ball.getTop(false) <= 0.00)
+					ball_angle = 360.0 - ball_angle;
+				else
+					ball_angle = 180.0 - ball_angle;
 			}
-			if (angle == 1)
-				ball_angle = (360.0 - ball_angle) - 40.0;
-			if (angle == 2)
-				ball_angle = (360.0 - ball_angle) - 30.0;
-			if (angle == 3)
-				ball_angle = (360.0 - ball_angle) - 20.0;
-			if (angle == 4)
-				ball_angle = (360.0 - ball_angle) - 10.0;
-			if (angle == 5)
-				ball_angle = (360.0 - ball_angle);
-			if (angle == 6)
-				ball_angle = (360.0 - ball_angle) + 10.0;
-			if (angle == 7)
-				ball_angle = (360.0 - ball_angle) + 20.0;
-			if (angle == 8)
-				ball_angle = (360.0 - ball_angle) + 30.0;
-			if (angle == 9)
-				ball_angle = (360.0 - ball_angle) + 40.0;
-		}
-		for (int j = 0; j < 50; j++)
-		{
-			if (
-				(
-					the_ball.getTop(true) >= brick_array[level][j].brick_mrect.x &&
-					the_ball.getTop(true) <= brick_array[level][j].brick_mrect.x + brick_array[level][j].brick_mrect.width &&
-					the_ball.getTop(false) >= brick_array[level][j].brick_mrect.y &&
-					the_ball.getTop(false) <= brick_array[level][j].brick_mrect.y + brick_array[level][j].brick_mrect.height
-					) || (
-						the_ball.getBottom(true) >= brick_array[level][j].brick_mrect.x &&
-						the_ball.getBottom(true) <= brick_array[level][j].brick_mrect.x + brick_array[level][j].brick_mrect.width &&
-						the_ball.getBottom(false) >= brick_array[level][j].brick_mrect.y &&
-						the_ball.getBottom(false) <= brick_array[level][j].brick_mrect.y + brick_array[level][j].brick_mrect.height
-						)
-				)
-				brickHitV = true;
-			if (
-				(
-					the_ball.getLeft(true) >= brick_array[level][j].brick_mrect.x &&
-					the_ball.getLeft(true) <= brick_array[level][j].brick_mrect.x + brick_array[level][j].brick_mrect.width &&
-					the_ball.getLeft(false) >= brick_array[level][j].brick_mrect.y &&
-					the_ball.getLeft(false) <= brick_array[level][j].brick_mrect.y + brick_array[level][j].brick_mrect.height
-					) || (
-						the_ball.getRight(true) >= brick_array[level][j].brick_mrect.x &&
-						the_ball.getRight(true) <= brick_array[level][j].brick_mrect.x + brick_array[level][j].brick_mrect.width &&
-						the_ball.getRight(false) >= brick_array[level][j].brick_mrect.y &&
-						the_ball.getRight(false) <= brick_array[level][j].brick_mrect.y + brick_array[level][j].brick_mrect.height
-						)
-				)
-				brickHitH = true;
-			if (brickHitV || brickHitH)
+
+			while (ball_angle < 0.0)
+				ball_angle += 360.0;
+			while (ball_angle > 360.0)
+				ball_angle -= 360.0;
+
+			if (hasHitPadd && !isInPaddle)
 			{
-				if (brick_array[level][j].exists)
+				hasInteracted = true;
+				isInPaddle = true;
+				double paddle_width_ninth = the_paddle.paddle_mrect.width / 9.0;
+				angle = 1;
+				for (double z = 1.0; z < 9.0; z += 1.0)
 				{
-					brick_array[level][j].destroy();
-					points += brick_array[level][j].point_value();
-					last_power = brick_array[level][j].random_powerup();
-					if (last_power == 1)
-						times_power_1++;
-					if (last_power == 2)
-						times_power_2++;
-					if (last_power == 3)
-						times_power_3++;
-					if (brickHitV && brickHitH)
-					{
-						ball_angle -= 180.0;
-						if (ball_angle < 0.0)
-							ball_angle += 360.0;
-					}
-					else if (brickHitV)
-						ball_angle = -ball_angle + 360.0;
-					else if (brickHitH)
-						ball_angle = -ball_angle + 180.0;
+					if (the_ball.getBottom(true) >= the_paddle.paddle_mrect.x + (paddle_width_ninth * z))
+						angle += 1;
 				}
-				brickHitV = false;
-				brickHitH = false;
+				if (angle == 1)
+					ball_angle = (360.0 - ball_angle) - 40.0;
+				if (angle == 2)
+					ball_angle = (360.0 - ball_angle) - 30.0;
+				if (angle == 3)
+					ball_angle = (360.0 - ball_angle) - 20.0;
+				if (angle == 4)
+					ball_angle = (360.0 - ball_angle) - 10.0;
+				if (angle == 5)
+					ball_angle = (360.0 - ball_angle);
+				if (angle == 6)
+					ball_angle = (360.0 - ball_angle) + 10.0;
+				if (angle == 7)
+					ball_angle = (360.0 - ball_angle) + 20.0;
+				if (angle == 8)
+					ball_angle = (360.0 - ball_angle) + 30.0;
+				if (angle == 9)
+					ball_angle = (360.0 - ball_angle) + 40.0;
 			}
-		}
-		ball_dx = 2.0 * cos(ball_angle * (M_PI / 180.0));
-		ball_dy = 2.0 * sin(ball_angle * (M_PI / 180.0));
-		if (hasHitPadd && isInPaddle)
-			the_ball.move(ball_dx / 300.0, ball_dy / 300.0);
-		else if (isInPaddle && !hasHitPadd)
-			isInPaddle = false;
-		if (hasHitWall && isInWall)
-			the_ball.move(ball_dx / 300.0, ball_dy / 300.0);
-		else if (isInWall && !hasHitWall)
-			isInWall = false;
-		if (!hasInteracted && !hasHitPadd && !hasHitWall && !isInPaddle && !isInWall)
-			the_ball.move(ball_dx / 300.0, ball_dy / 300.0);
-		if (hasHitPadd && hasHitWall)
-		{
-			lives--;
-			the_ball.reset();
-			ball_angle = 0.0;
-			while (ball_angle < 30.0 || ball_angle > 150.0 || (ball_angle > 80 && ball_angle < 100))
-				ball_angle = rand() % 360;
-			return 0;
+			for (int j = 0; j < 50; j++)
+			{
+				if (
+					(
+						the_ball.getTop(true) >= brick_array[level][j].brick_mrect.x &&
+						the_ball.getTop(true) <= brick_array[level][j].brick_mrect.x + brick_array[level][j].brick_mrect.width &&
+						the_ball.getTop(false) >= brick_array[level][j].brick_mrect.y &&
+						the_ball.getTop(false) <= brick_array[level][j].brick_mrect.y + brick_array[level][j].brick_mrect.height
+						) || (
+							the_ball.getBottom(true) >= brick_array[level][j].brick_mrect.x &&
+							the_ball.getBottom(true) <= brick_array[level][j].brick_mrect.x + brick_array[level][j].brick_mrect.width &&
+							the_ball.getBottom(false) >= brick_array[level][j].brick_mrect.y &&
+							the_ball.getBottom(false) <= brick_array[level][j].brick_mrect.y + brick_array[level][j].brick_mrect.height
+							)
+					)
+					brickHitV = true;
+				if (
+					(
+						the_ball.getLeft(true) >= brick_array[level][j].brick_mrect.x &&
+						the_ball.getLeft(true) <= brick_array[level][j].brick_mrect.x + brick_array[level][j].brick_mrect.width &&
+						the_ball.getLeft(false) >= brick_array[level][j].brick_mrect.y &&
+						the_ball.getLeft(false) <= brick_array[level][j].brick_mrect.y + brick_array[level][j].brick_mrect.height
+						) || (
+							the_ball.getRight(true) >= brick_array[level][j].brick_mrect.x &&
+							the_ball.getRight(true) <= brick_array[level][j].brick_mrect.x + brick_array[level][j].brick_mrect.width &&
+							the_ball.getRight(false) >= brick_array[level][j].brick_mrect.y &&
+							the_ball.getRight(false) <= brick_array[level][j].brick_mrect.y + brick_array[level][j].brick_mrect.height
+							)
+					)
+					brickHitH = true;
+				if (brickHitV || brickHitH)
+				{
+					if (brick_array[level][j].exists)
+					{
+						brick_array[level][j].destroy();
+						points += brick_array[level][j].point_value();
+						last_power = brick_array[level][j].random_powerup();
+						if (last_power == 1)
+							times_power_1++;
+						if (last_power == 2)
+							times_power_2++;
+						if (last_power == 3)
+							times_power_3++;
+						if (brickHitV && brickHitH)
+						{
+							ball_angle -= 180.0;
+							if (ball_angle < 0.0)
+								ball_angle += 360.0;
+						}
+						else if (brickHitV)
+							ball_angle = -ball_angle + 360.0;
+						else if (brickHitH)
+							ball_angle = -ball_angle + 180.0;
+					}
+					brickHitV = false;
+					brickHitH = false;
+				}
+			}
+			ball_dx = 2.0 * cos(ball_angle * (M_PI / 180.0));
+			ball_dy = 2.0 * sin(ball_angle * (M_PI / 180.0));
+			if (hasHitPadd && isInPaddle)
+				the_ball.move(ball_dx / 300.0, ball_dy / 300.0);
+			else if (isInPaddle && !hasHitPadd)
+				isInPaddle = false;
+			if (hasHitWall && isInWall)
+				the_ball.move(ball_dx / 300.0, ball_dy / 300.0);
+			else if (isInWall && !hasHitWall)
+				isInWall = false;
+			if (!hasInteracted && !hasHitPadd && !hasHitWall && !isInPaddle && !isInWall)
+				the_ball.move(ball_dx / 300.0, ball_dy / 300.0);
+			if (hasHitPadd && hasHitWall)
+			{
+				lives--;
+				the_ball.reset();
+				ball_angle = 0.0;
+				while (ball_angle < 30.0 || ball_angle > 150.0 || (ball_angle > 80 && ball_angle < 100))
+					ball_angle = rand() % 360;
+				return 0;
+			}
 		}
 	}
 

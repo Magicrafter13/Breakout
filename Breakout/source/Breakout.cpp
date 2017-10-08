@@ -5,9 +5,9 @@
 //init
 int debugTF = 1;
 char versiontxtt[8] = "  Beta ";
-char versiontxtn[9] = "01.03.00";
-char buildnumber[14] = "17.10.07.2133";
-char ishupeversion[9] = "00.02.03";
+char versiontxtn[9] = "01.03.01";
+char buildnumber[14] = "17.10.07.2147";
+char ishupeversion[9] = "00.02.04";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
@@ -264,6 +264,7 @@ int breakout()
 		lives--;
 		ball_is_attached = true;
 		the_ball.reset();
+		the_paddle.reset();
 		while (ball_angle < 225.0 || ball_angle > 315.0 || (ball_angle > 265 && ball_angle < 275))
 			ball_angle = rand() % 360;
 		return 0;

@@ -5,8 +5,8 @@
 //init
 int debugTF = 1;
 char versiontxtt[8] = "  Beta ";
-char versiontxtn[9] = "01.02.00";
-char buildnumber[14] = "17.10.07.2128";
+char versiontxtn[9] = "01.03.00";
+char buildnumber[14] = "17.10.07.2133";
 char ishupeversion[9] = "00.02.03";
 int vernumqik = 0;
 u32 kDown, kHeld;

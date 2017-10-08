@@ -6,8 +6,8 @@
 int debugTF = 1;
 char versiontxtt[8] = "  Beta ";
 char versiontxtn[9] = "01.02.00";
-char buildnumber[14] = "17.10.06.1004";
-char ishupeversion[9] = "00.02.02";
+char buildnumber[14] = "17.10.07.2128";
+char ishupeversion[9] = "00.02.03";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
@@ -120,7 +120,7 @@ int main(int argc, char **argv)
 		trail_new_frame_circle[7 - i].setDefaults(200.0, 120.0, (0.875 * (i + 1)), 0xC3, 0xC3, 0xC3, (32 * (i + 1)));
 
 	the_paddle.setDefaults(175, 215, 50, 10, 0xC0, 0x61, 0x0A, 0xFF);
-	the_ball.setDefaults(200.0, 120.0, 7.0, 0xC3, 0xC3, 0xC3, 0xFF, 200.3, 115.2, 202.5, 119.8, 204.9, 117.1, 0xFF, 0xFF, 0xFF, 0xFF);
+	the_ball.setDefaults(200.0, 200.0, 7.0, 0xC3, 0xC3, 0xC3, 0xFF, 200.3, 195.2, 202.5, 199.8, 204.9, 197.1, 0xFF, 0xFF, 0xFF, 0xFF);
 	int array_step = 0;
 	for (int a = 0; a < 5; a++)
 	{
@@ -247,9 +247,17 @@ int breakout()
 	if (kHeld & KEY_START)
 		return 3;
 	if (kHeld & KEY_LEFT && the_paddle.paddle_mrect.x > 1)
+	{
 		the_paddle.paddle_mrect.x -= 2;
+		if (ball_is_attached)
+			the_ball.move(-2.0, 0.0);
+	}
 	if (kHeld & KEY_RIGHT && the_paddle.paddle_mrect.x < 399 - the_paddle.paddle_mrect.width)
+	{
 		the_paddle.paddle_mrect.x += 2;
+		if (ball_is_attached)
+			the_ball.move(2.0, 0.0);
+	}
 
 	if (the_ball.getTop(false) > 240)
 	{

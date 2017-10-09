@@ -6,8 +6,8 @@
 int debugTF = 1;
 char versiontxtt[8] = "  Beta ";
 char versiontxtn[9] = "01.03.01";
-char buildnumber[14] = "17.10.07.2147";
-char ishupeversion[9] = "00.02.04";
+char buildnumber[14] = "17.10.08.1917";
+char ishupeversion[9] = "00.03.00";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
@@ -30,6 +30,7 @@ int times_power_1;
 int times_power_2;
 int times_power_3;
 bool ball_is_attached;
+int level_max = 1; //amount of levels minus 1
 
 void trail_new_frame(ball ball_object)
 {
@@ -232,6 +233,8 @@ bool isInWall = false;
 bool brickHitV = false;
 bool brickHitH = false;
 int angle;
+int bricks_hit_this_frame;
+bool change_level;
 
 int breakout()
 {
@@ -275,6 +278,8 @@ int breakout()
 		ball_is_attached = false;
 	if (!ball_is_attached)
 	{
+		bricks_hit_this_frame = 0;
+		change_level = false;
 		for (int i = 0; i < 300; i++)
 		{
 			hasInteracted = false;
@@ -372,6 +377,7 @@ int breakout()
 						brick_array[level][j].destroy();
 						points += brick_array[level][j].point_value();
 						last_power = brick_array[level][j].random_powerup();
+						bricks_hit_this_frame++;
 						if (last_power == 1)
 							times_power_1++;
 						if (last_power == 2)
@@ -414,6 +420,35 @@ int breakout()
 					ball_angle = rand() % 360;
 				return 0;
 			}
+			int bricks_available = 0;
+			for (int brick_array_pos = 0; brick_array_pos < 50; brick_array_pos++)
+			{
+				if (brick_array[level][brick_array_pos].exists)
+					bricks_available++;
+			}
+			if (bricks_available == 0)
+				change_level = true;
+		}
+		if (change_level == true)
+		{
+			if (level == level_max)
+			{
+				//you win or something
+			}
+			else {
+				level++;
+				ball_is_attached = true;
+				the_ball.reset();
+				the_paddle.reset();
+				while (ball_angle < 225.0 || ball_angle > 315.0 || (ball_angle > 265 && ball_angle < 275))
+					ball_angle = rand() % 360;
+			}
+		}
+		if (bricks_hit_this_frame > 1)
+		{
+			ball_angle += 180.0;
+			if (ball_angle > 360.0)
+				ball_angle -= 360.0;
 		}
 	}
 

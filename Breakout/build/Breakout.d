@@ -94,6 +94,7 @@ Breakout.o: \
  c:/devkitPro/libctru/include/c3d/renderqueue.h \
  c:/devkitPro/libctru/include/sfil.h c:/devkitPro/libctru/include/sftd.h \
  c:/Users/Matthew/Source/Repos/Breakout/Breakout/build/Title_png.h \
+ c:/Users/Matthew/Source/Repos/Breakout/Breakout/build/thanksbeta_png.h \
  c:/Users/Matthew/Source/Repos/Breakout/Breakout/build/ethnocen_ttf.h \
  c:/Users/Matthew/Source/Repos/Breakout/Breakout/source/shapes.hpp \
  c:/Users/Matthew/Source/Repos/Breakout/Breakout/source/draw.hpp
@@ -287,6 +288,8 @@ c:/devkitPro/libctru/include/sfil.h:
 c:/devkitPro/libctru/include/sftd.h:
 
 c:/Users/Matthew/Source/Repos/Breakout/Breakout/build/Title_png.h:
+
+c:/Users/Matthew/Source/Repos/Breakout/Breakout/build/thanksbeta_png.h:
 
 c:/Users/Matthew/Source/Repos/Breakout/Breakout/build/ethnocen_ttf.h:
 

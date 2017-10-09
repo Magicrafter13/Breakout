@@ -6,12 +6,13 @@
 int debugTF = 1;
 char versiontxtt[8] = "  Beta ";
 char versiontxtn[9] = "01.03.01";
-char buildnumber[14] = "17.10.08.1955";
+char buildnumber[14] = "17.10.08.2047";
 char ishupeversion[9] = "00.03.00";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
 int breakout();
+int thanks_for_playing_the_beta();
 int lives = 3;
 double ball_dx, ball_dy;
 double ball_angle;
@@ -33,6 +34,7 @@ bool ball_is_attached;
 int level_max = 1; //amount of levels minus 1
 int press_select_frame = 0;
 bool press_select_visible = true;
+sf2d_texture *img_thanksbeta;
 
 void trail_new_frame(ball ball_object)
 {
@@ -120,6 +122,7 @@ int main(int argc, char **argv)
 	sf2d_set_vblank_wait(1);
 	sftd_font *fnt_main;
 	sf2d_texture *img_title = sfil_load_PNG_buffer(Title_png, SF2D_PLACE_RAM);
+	img_thanksbeta = sfil_load_PNG_buffer(thanksbeta_png, SF2D_PLACE_RAM);
 	fnt_main = sftd_load_font_mem(ethnocen_ttf, ethnocen_ttf_size);
 
 	for (int i = 0; i < 8; i++)
@@ -235,6 +238,7 @@ int main(int argc, char **argv)
 	sf2d_fini();
 	sftd_fini();
 	sf2d_free_texture(img_title);
+	sf2d_free_texture(img_thanksbeta);
 
 	return 0;
 }
@@ -296,6 +300,8 @@ int breakout()
 	{
 		bricks_hit_this_frame = 0;
 		change_level = false;
+		//if (kDown & KEY_X)
+			//change_level = true;
 		for (int i = 0; i < 300; i++)
 		{
 			hasInteracted = false;
@@ -449,7 +455,10 @@ int breakout()
 		{
 			if (level == level_max)
 			{
-				//you win or something
+				int thanks_return = 0;
+				while (thanks_return == 0)
+					thanks_return = thanks_for_playing_the_beta();
+				return thanks_return;
 			}
 			else {
 				level++;
@@ -498,6 +507,38 @@ int breakout()
 	std::cout << "Ball Direction: " << ball_dx << "," << ball_dy << "\n";
 	std::cout << "Paddle Position: " << the_paddle.paddle_mrect.x << "," << the_paddle.paddle_mrect.y << "\n";
 	std::cout << "Paddle Direction: " << "Left: " << mov_left << " Right: " << mov_right << "\n";*/
+	sf2d_end_frame();
+	sf2d_swapbuffers();
+	return 0;
+}
+
+int thanks_for_playing_the_beta()
+{
+	hidScanInput();
+	kDown = hidKeysDown();
+	kHeld = hidKeysHeld();
+	if (kDown & (KEY_SELECT | KEY_A | KEY_B | KEY_X | KEY_Y | KEY_L | KEY_R | KEY_ZL | KEY_ZR))
+		return 2;
+	if (kHeld & KEY_START)
+		return 3;
+	sf2d_start_frame(GFX_TOP, GFX_LEFT);
+	sf2d_draw_texture(img_thanksbeta, 80, 20);
+	std::cout << ANSI "0;0" PEND;
+	for (int i = 0; i < 30; i++)
+		std::cout << "                                        ";
+	std::cout << ANSI "0;0" PEND;
+	std::cout << "[Press any key to return to the title.]\n";
+	std::cout << "Thanks to:\n\n";
+	std::cout << "Jared for helping me " ANSI BRIGHT ASEP YELLOW CEND "Beta" CRESET " test.\n\n";
+	std::cout << ANSI YELLOW CEND "StackOverflow" CRESET " for helping me with " ANSI BRIGHT ASEP GREEN CEND "c++" CRESET "\n\n";
+	std::cout << "The awesome " ANSI RED CEND "3ds" CRESET " " ANSI BLUE CEND "homebrew" CRESET " community for\n";
+	std::cout << "helping me with many things relating to\n";
+	std::cout << ANSI BRIGHT ASEP BLUE CEND "libctru" CRESET " and " ANSI GREEN CEND "sf2dlib." CRESET "\n\n";
+	std::cout << "Bryan for helping me with programming\n\n";
+	std::cout << "\n";
+	std::cout << "     And " ANSI MAGENTA CEND "YOU" CRESET " for playing my game!\n";
+	std::cout << "    And remember, all feedback and\n";
+	std::cout << "       suggestions are welcome!\n";
 	sf2d_end_frame();
 	sf2d_swapbuffers();
 	return 0;

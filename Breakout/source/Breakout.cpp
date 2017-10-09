@@ -6,7 +6,7 @@
 int debugTF = 1;
 char versiontxtt[8] = "  Beta ";
 char versiontxtn[9] = "01.03.01";
-char buildnumber[14] = "17.10.08.1917";
+char buildnumber[14] = "17.10.08.1955";
 char ishupeversion[9] = "00.03.00";
 int vernumqik = 0;
 u32 kDown, kHeld;
@@ -31,6 +31,8 @@ int times_power_2;
 int times_power_3;
 bool ball_is_attached;
 int level_max = 1; //amount of levels minus 1
+int press_select_frame = 0;
+bool press_select_visible = true;
 
 void trail_new_frame(ball ball_object)
 {
@@ -84,6 +86,7 @@ int main(int argc, char **argv)
 	//gfxInitDefault();
 	sf2d_init();
 	sf2d_set_3D(0);
+	sftd_init();
 	//fsInit();
 	//sdmcInit();
 	consoleInit(GFX_BOTTOM, &bottomScreen);
@@ -115,7 +118,9 @@ int main(int argc, char **argv)
 
 	sf2d_set_clear_color(RGBA8(0x95, 0x95, 0x95, 0xFF));
 	sf2d_set_vblank_wait(1);
+	sftd_font *fnt_main;
 	sf2d_texture *img_title = sfil_load_PNG_buffer(Title_png, SF2D_PLACE_RAM);
+	fnt_main = sftd_load_font_mem(ethnocen_ttf, ethnocen_ttf_size);
 
 	for (int i = 0; i < 8; i++)
 		trail_new_frame_circle[7 - i].setDefaults(200.0, 120.0, (0.875 * (i + 1)), 0xC3, 0xC3, 0xC3, (32 * (i + 1)));
@@ -194,17 +199,27 @@ int main(int argc, char **argv)
 			if (result == 3)
 				break;
 		}
-
+		press_select_frame++;
 		sf2d_start_frame(GFX_TOP, GFX_LEFT);
 		sf2d_draw_rectangle(the_paddle.paddle_mrect.x, the_paddle.paddle_mrect.y, the_paddle.paddle_mrect.width, the_paddle.paddle_mrect.height, RGBA8(0xC0, 0x61, 0x0A, 0xFF)); //Brown rectangle to be paddle
 		sf2d_draw_texture(img_title, 80, 20);
+		if (press_select_visible)
+			sftd_draw_textf(fnt_main, 100, 180, RGBA8(0x00, 0x00, 0x00, 0xFF), 11, "Press Select to play!");
 		sf2d_end_frame();
+		if (press_select_frame == 30)
+		{
+			press_select_frame = 0;
+			if (press_select_visible)
+				press_select_visible = false;
+			else
+				press_select_visible = true;
+		}
 
-		std::cout << ANSI "0;0" PEND "                                                            ";
+		/*std::cout << ANSI "0;0" PEND "                                                            ";
 		std::cout << ANSI "1;0" PEND "                                                            ";
 		std::cout << ANSI "0;0" PEND "X = " << the_paddle.paddle_mrect.x << " Y = " << the_paddle.paddle_mrect.y << " Width = " << the_paddle.paddle_mrect.width << " Height = " << the_paddle.paddle_mrect.height;
 		std::cout << ANSI "1;0" PEND "H-Mid = " << (the_paddle.paddle_mrect.x + (the_paddle.paddle_mrect.width / 2)) << "   H-Mid-Length = " << (the_paddle.paddle_mrect.width / 2);
-		std::cout << ANSI "2;0" PEND;
+		std::cout << ANSI "2;0" PEND;*/
 
 		sf2d_swapbuffers();
 
@@ -218,6 +233,7 @@ int main(int argc, char **argv)
 
 	// Exit services
 	sf2d_fini();
+	sftd_fini();
 	sf2d_free_texture(img_title);
 
 	return 0;
@@ -463,10 +479,11 @@ int breakout()
 		draw_circ(trail_new_frame_circle[i]);
 	draw_ball(the_ball);
 	std::cout << ANSI "13;0" PEND;
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 6; i++)
 		std::cout << "                                        ";
 	std::cout << ANSI "13;0" PEND;
 	std::cout << "Score: " << points << "\n";
+	std::cout << "Lives: " << lives << "\n";
 	std::cout << "Point value for brick 1: " << brick_array[level][0].point_value() << "\n";
 	std::cout << "Point Array 1 2 and 3: " << brick_point_value[0] << ", " << brick_point_value[1] << ", and" << brick_point_value[2] << "\n";
 	std::cout << "Powerup value last brick: " << last_power << "\n";

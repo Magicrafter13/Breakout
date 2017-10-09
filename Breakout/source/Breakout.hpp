@@ -16,6 +16,7 @@ using std::string;
 #include <sftd.h>
 #include <vector>
 #include "Title_png.h"
+#include "ethnocen_ttf.h"
 
 extern double ball_dx, ball_dy;
 extern bool crushBall;

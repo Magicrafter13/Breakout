@@ -1,5 +1,0 @@
-makerom -elf Breakout.elf -icon Breakout.smdh -banner Resources\banner.bin -exefslogo -rsf Breakout.rsf -f cia -o Breakout.cia -target t
-
-bannertool makesmdh -s "Breakout" -l "A 3ds Breakout Clone" -p "Matthew Rease" -i Resources\icon.png -o Breakout.smdh
-
-makebanner -i Breakout\Breakout\Resources\banner.png -ca Breakout\Breakout\Resources\hb_default.cwav -o Breakout\Breakout\Resources\banner.bin

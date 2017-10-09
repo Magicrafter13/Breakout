@@ -35,7 +35,7 @@ INCLUDES	:=	include
 				#/c/local/boost_1_64_0/boost
 #ROMFS		:=	romfs
 APP_TITLE   :=  Breakout
-APP_DESCRIPTION := Breakout Beta Release
+APP_DESCRIPTION := A 3ds Breakout Clone
 APP_AUTHOR  :=  Matthew Rease
 
 #---------------------------------------------------------------------------------
@@ -155,7 +155,9 @@ $(TARGET)-strip.elf: $(BUILD)
 
 #---------------------------------------------------------------------------------
 cia: $(TARGET)-strip.elf $(BUILD)
-	@makerom -f cia -o $(CURDIR)/$(TARGET).cia -elf $(CURDIR)/$(TARGET)-strip.elf -rsf $(CURDIR)/$(TARGET).rsf -exefslogo -target t
+	@bannertool makebanner -i $(CURDIR)/Resources/banner.png -ca $(CURDIR)/Resources/hb_default.cwav -o $(CURDIR)/Resources/banner.bin
+	@bannertool makesmdh -s $(APP_TITLE) -l $(APP_DESCRIPTION) -p $(APP_AUTHOR) -i $(CURDIR)/Resources/icon.png -o $(CURDIR)/$(TARGET).smdh
+	@makerom -f cia -o $(CURDIR)/$(TARGET).cia -elf $(CURDIR)/$(TARGET)-strip.elf -rsf $(CURDIR)/$(TARGET).rsf -exefslogo -target t -icon $(CURDIR)/$(TARGET).smdh -banner $(CURDIR)/Resources/banner.bin
 	@echo "built ... $(TARGET).cia"
 
 #---------------------------------------------------------------------------------

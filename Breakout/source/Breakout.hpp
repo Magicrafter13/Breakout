@@ -17,6 +17,7 @@ using std::string;
 #include <vector>
 #include "Title_png.h"
 #include "thanksbeta_png.h"
+#include "paddle_png.h"
 #include "ethnocen_ttf.h"
 
 extern double ball_dx, ball_dy;

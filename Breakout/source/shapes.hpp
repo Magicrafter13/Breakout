@@ -303,9 +303,11 @@ public:
 class paddle {
 public:
 	mRectangle paddle_mrect;
-	void setDefaults(double bx, double by, double bwidth, double bheight, int R, int G, int B, int A)
+	sf2d_texture *paddle_texture;
+	void setDefaults(double bx, double by, double bwidth, double bheight, int R, int G, int B, int A, sf2d_texture *paddle_texture_set)
 	{
 		paddle_mrect.setDefaults(bx, by, bwidth, bheight, R, G, B, A);
+		paddle_texture = paddle_texture_set;
 	}
 	void reset()
 	{

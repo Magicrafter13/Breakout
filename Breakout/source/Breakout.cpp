@@ -6,7 +6,7 @@
 int debugTF = 1;
 char versiontxtt[8] = "  Beta ";
 char versiontxtn[9] = "01.04.01";
-char buildnumber[14] = "17.10.09.1734";
+char buildnumber[14] = "17.10.10.0913";
 char ishupeversion[9] = "00.03.00";
 int vernumqik = 0;
 u32 kDown, kHeld;
@@ -34,7 +34,7 @@ bool ball_is_attached;
 int level_max = 1; //amount of levels minus 1
 int press_select_frame = 0;
 bool press_select_visible = true;
-sf2d_texture *img_thanksbeta;
+sf2d_texture *img_thanksbeta, *img_paddle;
 
 void trail_new_frame(ball ball_object)
 {
@@ -123,12 +123,13 @@ int main(int argc, char **argv)
 	sftd_font *fnt_main;
 	sf2d_texture *img_title = sfil_load_PNG_buffer(Title_png, SF2D_PLACE_RAM);
 	img_thanksbeta = sfil_load_PNG_buffer(thanksbeta_png, SF2D_PLACE_RAM);
+	img_paddle = sfil_load_PNG_buffer(paddle_png, SF2D_PLACE_RAM);
 	fnt_main = sftd_load_font_mem(ethnocen_ttf, ethnocen_ttf_size);
 
 	for (int i = 0; i < 8; i++)
 		trail_new_frame_circle[7 - i].setDefaults(200.0, 120.0, (0.875 * (i + 1)), 0xC3, 0xC3, 0xC3, (32 * (i + 1)));
 
-	the_paddle.setDefaults(175, 215, 50, 10, 0xC0, 0x61, 0x0A, 0xFF);
+	the_paddle.setDefaults(175, 215, 50, 10, 0xC0, 0x61, 0x0A, 0xFF, img_paddle);
 	the_ball.setDefaults(200.0, 200.0, 7.0, 0xC3, 0xC3, 0xC3, 0xFF, 200.3, 195.2, 202.5, 199.8, 204.9, 197.1, 0xFF, 0xFF, 0xFF, 0xFF);
 	int array_step = 0;
 	for (int a = 0; a < 5; a++)

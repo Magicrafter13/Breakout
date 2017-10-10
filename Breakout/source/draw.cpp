@@ -30,5 +30,5 @@ void draw_ball(ball ball_to_draw)
 
 void draw_paddle(paddle paddle_to_draw)
 {
-	draw_rect(paddle_to_draw.paddle_mrect);
+	sf2d_draw_texture(paddle_to_draw.paddle_texture, paddle_to_draw.paddle_mrect.x, paddle_to_draw.paddle_mrect.y);
 }

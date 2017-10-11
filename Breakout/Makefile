@@ -34,9 +34,9 @@ DATA		:=	data
 INCLUDES	:=	include
 				#/c/local/boost_1_64_0/boost
 #ROMFS		:=	romfs
-APP_TITLE   :=  Breakout
-APP_DESCRIPTION := A 3ds Breakout Clone
-APP_AUTHOR  :=  Matthew Rease
+APP_TITLE   :=  "Breakout"
+APP_DESCRIPTION := "A 3ds Breakout Clone"
+APP_AUTHOR  :=  "Matthew Rease"
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -141,6 +141,7 @@ all: $(BUILD)
 
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@
+	@bannertool makesmdh -s $(APP_TITLE) -l $(APP_DESCRIPTION) -p $(APP_AUTHOR) -i $(CURDIR)/Resources/icon.png -o $(CURDIR)/$(TARGET).smdh
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
 #---------------------------------------------------------------------------------

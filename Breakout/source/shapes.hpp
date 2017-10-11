@@ -7,11 +7,28 @@ class mRectangle {
 	double default_height;
 	u32 default_color;
 public:
+	/*current x coordinate*/
 	double x;
+	/*current y coordinate*/
 	double y;
+	/*current width*/
 	double width;
+	/*current height*/
 	double height;
+	/*32-bit unsigned integer representing color (in RGBA8 Format)*/
 	u32 color;
+	/*
+	i_x: X
+	i_y: Y
+	i_width: Width
+	i_height: Height
+	R: [R]GB Value
+	G: R[G]B Value
+	B: RG[B] value
+	A: RGB Alpha Value (Transparency)
+
+	Sets the Rectangles default X,Y position, Width, Height, and RGBA8 color
+	*/
 	void setDefaults(double i_x, double i_y, double i_width, double i_height, int R, int G, int B, int A)
 	{
 		x = i_x;
@@ -25,6 +42,9 @@ public:
 		color = RGBA8(R, G, B, A);
 		default_color = RGBA8(R, G, B, A);
 	}
+	/*
+	Resets the rectangles position, size, and color to their defaults
+	*/
 	void reset()
 	{
 		x = default_x;
@@ -33,15 +53,35 @@ public:
 		height = default_height;
 		color = default_color;
 	}
+	/*
+	R: [R]GB Value
+	G: R[G]B Value
+	B: RG[B] Value
+	A: RGB Alpha Value (Transparency)
+
+	Sets the rectangles color using RGBA8
+	*/
 	void setColor(int R, int G, int B, int A)
 	{
 		color = RGBA8(R, G, B, A);
 	}
+	/*
+	sx: New X value
+	sy: New Y value
+	
+	Sets the rectangles position
+	*/
 	void setPosition(double sx, double sy)
 	{
 		x = sx;
 		y = sy;
 	}
+	/*
+	swidth: New Width value
+	sheight: New Height value
+	
+	Sets the rectangles size
+	*/
 	void setSize(double swidth, double sheight)
 	{
 		width = swidth;
@@ -49,10 +89,15 @@ public:
 	}
 };
 
+/*RGB Red channel by brick type*/
 extern int brick_color_R[5];
+/*RGB Green channel by brick type*/
 extern int brick_color_G[5];
+/*RGB Blue channel by brick type*/
 extern int brick_color_B[5];
+/*RGB Alpha channel by brick type*/
 extern int brick_color_A[5];
+/*point value by brick type*/
 extern int brick_point_value[5];
 
 class brick {
@@ -104,8 +149,23 @@ private:
 		return 0;
 	}
 public:
+	sf2d_texture *brick_texture;
+	bool uses_texture;
+	/*wether or not the brick is currently in play*/
 	bool exists;
+	/*Rectangle to be used for brick (ie hit detection, think of it as a mask)*/
 	mRectangle brick_mrect;
+	/*
+	bx: Default X
+	by: Default Y
+	bwidth: Default Width
+	bheight: Default Height
+	palette: Default palette
+	is_used: If false, brick.exist will be false by default
+	brick_type: value to be used to determine point value and powerup chance
+	
+	Sets the default X,Y Coordinate, Width, Height, Palette, Existance, and Brick Type of the Brick
+	*/
 	void setDefaults(double bx, double by, double bwidth, double bheight, int palette, bool is_used, int brick_type)
 	{
 		brick_mrect.setDefaults(bx, by, bwidth, bheight, brick_color_R[palette], brick_color_G[palette], brick_color_B[palette], brick_color_A[palette]);
@@ -115,11 +175,41 @@ public:
 		else
 			exists = false;
 		internal_brick_type = brick_type;
+		uses_texture = false;
 	}
+	/*
+	bx: Default X
+	by: Default Y
+	bwidth: Default Width
+	bheight: Default Height
+	btexture: sf2d texture to be used as sprite
+	is_used: If false, brick.exist will be false by default
+	brick_type: value to be used to determine point value and powerup chance
+
+	Sets the default X,Y Coordinate, Width, Height, Sprite, Existance, and Brick Type of the Brick
+	*/
+	void setDefaults(double bx, double by, double bwidth, double bheight, sf2d_texture *btexture, bool is_used, int brick_type)
+	{
+		brick_mrect.setDefaults(bx, by, bwidth, bheight, 0x00, 0x00, 0x00, 0x00);
+		internal_is_used = is_used;
+		if (internal_is_used)
+			exists = true;
+		else
+			exists = false;
+		internal_brick_type = brick_type;
+		uses_texture = true;
+		brick_texture = btexture;
+	}
+	/*
+	Sets the exists value to false thus removing it from play
+	*/
 	void destroy()
 	{
 		exists = false;
 	}
+	/*
+	Resets the brick values to their defaults
+	*/
 	void reset()
 	{
 		if (internal_is_used)
@@ -128,10 +218,16 @@ public:
 			exists = false;
 		brick_mrect.reset();
 	}
+	/*
+	Integer: Returns the point value given by the brick
+	*/
 	int point_value()
 	{
 		return brick_point_value[internal_brick_type];
 	}
+	/*
+	Integer: Returns 0 for no powerup or higher number for powerup drop
+	*/
 	int random_powerup()
 	{
 		return get_powerup();
@@ -152,6 +248,16 @@ public:
 	double y;
 	double rad;
 	u32 color;
+	/*
+	Sets the circles default values for:
+	i_x: X coord
+	i_y: Y coord
+	i_rad: radius
+	R: Red Channel
+	G: Green Channel
+	B: Blue Channel
+	A: Alpha Channel
+	*/
 	void setDefaults(double i_x, double i_y, double i_rad, int R, int G, int B, int A)
 	{
 		x = i_x;

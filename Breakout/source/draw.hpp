@@ -1,38 +1,32 @@
 #pragma once
 //#include "shapes.hpp"
 
-/**
- * brief: draws a rectangle (using sf2dlib)
- * param: mRectangle: the rectangle you want drawn (has to be of mRectangle class)
- */
-void draw_rect(mRectangle Rectangle_to_draw);
+/*
+Draws a rectangle
+*/
+void draw_object(mRectangle Rectangle_to_draw);
 
-/**
- * brief: draws a brick (which is just an mRectangle with a bool that returns true or false for it's existance
- * param: brick: the brick to be drawn (has to be of brick class)
- */
-void draw_brick(brick brick_to_draw);
+/*
+Draws a brick
+*/
+void draw_object(brick brick_to_draw);
 
-/**
- * brief: draws a circle (using sf2dlib)
- * param: mCircle: the circle you want drawn (has to be of mCircle class)
- */
-void draw_circ(mCircle circle_to_draw);
+/*
+Draws a circle
+*/
+void draw_object(mCircle circle_to_draw);
 
-/**
- * brief: draws a ball (which is just an mCircle with a bool that returns true or false for it's existance
- * param: ball: the ball to be drawn (has to be of brick class)
- */
-void draw_ball(ball ball_to_draw);
+/*
+Draws a triangle
+*/
+void draw_object(mTriangle tri_to_draw);
 
-/**
- * brief: draws a triangle (using sf2dlib)
- * param: mTriangle: the triangle you want drawn (has to be of mTriangle class)
- */
-void draw_triangle(mTriangle tri_to_draw);
+/*
+Draws a ball
+*/
+void draw_object(ball ball_to_draw);
 
-/**
- * brief: draws a (the) paddle ... I don't need to explain these anymore. Just read the other things in draw.hpp
- * param: paddle _paddle
- */
-void draw_paddle(paddle paddle_to_draw);
+/*
+Draws a paddle
+*/
+void draw_object(paddle paddle_to_draw);

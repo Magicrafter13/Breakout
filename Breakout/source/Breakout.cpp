@@ -6,7 +6,7 @@
 int debugTF = 1;
 char versiontxtt[8] = "  Beta ";
 char versiontxtn[9] = "01.04.01";
-char buildnumber[14] = "17.10.10.1520";
+char buildnumber[14] = "17.10.10.1829";
 char ishupeversion[9] = "00.03.00";
 int vernumqik = 0;
 u32 kDown, kHeld;
@@ -34,7 +34,7 @@ bool ball_is_attached;
 int level_max = 1; //amount of levels minus 1
 int press_select_frame = 0;
 bool press_select_visible = true;
-sf2d_texture *img_thanksbeta, *img_paddle;
+sf2d_texture *img_thanksbeta, *img_paddle, *img_brick00;
 
 void trail_new_frame(ball ball_object)
 {
@@ -100,22 +100,6 @@ int main(int argc, char **argv)
 	consoleSetWindow(&killBox, 0, 28, 40, 2);
 	consoleSetWindow(&debugBox, 18, 4, 9, 12);
 
-	consoleSelect(&killBox);
-	std::cout << ANSI B_RED CEND;
-	for (int i = 0; i < 80; i++)
-		std::cout << " ";
-
-	consoleSelect(&versionWin);
-	std::cout << "     Tap red area any time to exit";
-	std::cout << "Breakout Version: " ANSI RED CEND << versiontxtt << CRESET " " ANSI YELLOW CEND << versiontxtn;
-	std::cout << ANSI B_RED ASEP GREEN CEND "              Build: " << buildnumber;
-	std::cout << ANSI B_RED ASEP GREEN CEND "   ISHUPE Engine Version: " << ishupeversion;
-
-	/*consoleSelect(&topScreen);
-	std::cout << ANSI "29;07" PEND "by Matthew Rease\n";*/
-
-	consoleSelect(&bottomScreen);
-
 	hidTouchRead(&touch);
 
 	sf2d_set_clear_color(RGBA8(0x95, 0x95, 0x95, 0xFF));
@@ -123,7 +107,10 @@ int main(int argc, char **argv)
 	sftd_font *fnt_main;
 	sf2d_texture *img_title = sfil_load_PNG_buffer(Title_png, SF2D_PLACE_RAM);
 	img_thanksbeta = sfil_load_PNG_buffer(thanksbeta_png, SF2D_PLACE_RAM);
+
 	img_paddle = sfil_load_PNG_buffer(paddle_png, SF2D_PLACE_RAM);
+	img_brick00 = sfil_load_PNG_buffer(brick00_png, SF2D_PLACE_RAM);
+
 	fnt_main = sftd_load_font_mem(ethnocen_ttf, ethnocen_ttf_size);
 
 	for (int i = 0; i < 8; i++)
@@ -136,8 +123,11 @@ int main(int argc, char **argv)
 	{
 		for (int b = 0; b < 10; b++)
 		{
-			brick_array[0][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, a, true, (4 - a));
-			brick_array[0][array_step].exists = true;
+			if (a == 4)
+				brick_array[0][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, img_brick00, true, (4 - a));
+			else
+				brick_array[0][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, a, true, (4 - a));
+			//brick_array[0][array_step].exists = true;
 			array_step++;
 		}
 	}
@@ -157,12 +147,8 @@ int main(int argc, char **argv)
 			array_step++;
 		}
 	}
-	std::cout << ANSI "20;0" PEND "Array Step : " << array_step << "\n";
-	std::cout << "Brick 11 Y: " << brick_array[0][10].brick_mrect.y << " Brick 22 X: " << brick_array[0][21].brick_mrect.x << "\n";
-	std::cout << "RGB Data Brick 50: " << brick_array[0][49].brick_mrect.color << "\n";
-	//BRICK01.setDefaults(2, 2, 36, 16, 0xFF, 0xFF, 0x00, 0xFF);
 
-	std::cout << ANSI "2;0" PEND "Press Select to begin.";
+	int bottom_screen_text = 0;
 
 	// Main loop
 	while (aptMainLoop())
@@ -200,12 +186,43 @@ int main(int argc, char **argv)
 				if (result != 0)
 					break;
 			}
+			bottom_screen_text = 0;
 			if (result == 3)
 				break;
 		}
+		if (bottom_screen_text == 0)
+		{
+			consoleSelect(&killBox);
+			consoleClear();
+			consoleSelect(&versionWin);
+			consoleClear();
+			consoleSelect(&bottomScreen);
+			consoleClear();
+
+			consoleSelect(&killBox);
+			std::cout << ANSI B_RED CEND;
+			for (int i = 0; i < 80; i++)
+				std::cout << " ";
+
+			consoleSelect(&versionWin);
+			std::cout << CRESET "     Tap red area any time to exit";
+			std::cout << "Breakout Version: " ANSI RED CEND << versiontxtt << CRESET " " ANSI YELLOW CEND << versiontxtn;
+			std::cout << ANSI B_RED ASEP GREEN CEND "              Build: " << buildnumber;
+			std::cout << ANSI B_RED ASEP GREEN CEND "   ISHUPE Engine Version: " << ishupeversion;
+
+			consoleSelect(&bottomScreen);
+			std::cout << ANSI "20;0" PEND "Array Step : " << array_step << "\n";
+			std::cout << "Brick 11 Y: " << brick_array[0][10].brick_mrect.y << " Brick 22 X: " << brick_array[0][21].brick_mrect.x << "\n";
+			std::cout << "RGB Data Brick 50: " << brick_array[0][49].brick_mrect.color << "\n";
+			//BRICK01.setDefaults(2, 2, 36, 16, 0xFF, 0xFF, 0x00, 0xFF);
+
+			std::cout << ANSI "2;0" PEND "Press Select to begin.";
+			bottom_screen_text = 1;
+		}
 		press_select_frame++;
 		sf2d_start_frame(GFX_TOP, GFX_LEFT);
-		sf2d_draw_rectangle(the_paddle.paddle_mrect.x, the_paddle.paddle_mrect.y, the_paddle.paddle_mrect.width, the_paddle.paddle_mrect.height, RGBA8(0xC0, 0x61, 0x0A, 0xFF)); //Brown rectangle to be paddle
+		draw_object(the_paddle);
+		//sf2d_draw_rectangle(the_paddle.paddle_mrect.x, the_paddle.paddle_mrect.y, the_paddle.paddle_mrect.width, the_paddle.paddle_mrect.height, RGBA8(0xC0, 0x61, 0x0A, 0xFF)); //Brown rectangle to be paddle
 		sf2d_draw_texture(img_title, 80, 20);
 		if (press_select_visible)
 			sftd_draw_textf(fnt_main, 100, 180, RGBA8(0x00, 0x00, 0x00, 0xFF), 11, "Press Select to play!");
@@ -238,8 +255,12 @@ int main(int argc, char **argv)
 	// Exit services
 	sf2d_fini();
 	sftd_fini();
+
 	sf2d_free_texture(img_title);
 	sf2d_free_texture(img_thanksbeta);
+
+	sf2d_free_texture(img_brick00);
+	sf2d_free_texture(img_paddle);
 
 	return 0;
 }
@@ -256,6 +277,7 @@ bool brickHitH = false;
 int angle;
 int bricks_hit_this_frame;
 bool change_level;
+int thanks_text_display;
 
 int breakout()
 {
@@ -301,8 +323,8 @@ int breakout()
 	{
 		bricks_hit_this_frame = 0;
 		change_level = false;
-		//if (kDown & KEY_X)
-			//change_level = true;
+		if (kDown & KEY_X)
+			change_level = true;
 		for (int i = 0; i < 300; i++)
 		{
 			hasInteracted = false;
@@ -457,8 +479,10 @@ int breakout()
 			if (level == level_max)
 			{
 				int thanks_return = 0;
+				thanks_text_display = 0;
 				while (thanks_return == 0)
 					thanks_return = thanks_for_playing_the_beta();
+				thanks_text_display = 0;
 				return thanks_return;
 			}
 			else {
@@ -481,13 +505,13 @@ int breakout()
 	trail_new_frame(the_ball);
 
 	sf2d_start_frame(GFX_TOP, GFX_LEFT);
-	draw_paddle(the_paddle);
+	draw_object(the_paddle);
 	for (int i = 0; i < 50; i++)
 		if (brick_array[level][i].exists)
-			draw_brick(brick_array[level][i]);
+			draw_object(brick_array[level][i]);
 	for (int i = 7; i >= 0; i--)
-		draw_circ(trail_new_frame_circle[i]);
-	draw_ball(the_ball);
+		draw_object(trail_new_frame_circle[i]);
+	draw_object(the_ball);
 	std::cout << ANSI "13;0" PEND;
 	for (int i = 0; i < 6; i++)
 		std::cout << "                                        ";
@@ -524,22 +548,26 @@ int thanks_for_playing_the_beta()
 		return 3;
 	sf2d_start_frame(GFX_TOP, GFX_LEFT);
 	sf2d_draw_texture(img_thanksbeta, 80, 20);
-	std::cout << ANSI "0;0" PEND;
-	for (int i = 0; i < 30; i++)
-		std::cout << "                                        ";
-	std::cout << ANSI "0;0" PEND;
-	std::cout << "[Press any key to return to the title.]\n";
-	std::cout << "Thanks to:\n\n";
-	std::cout << "Jared for helping me " ANSI BRIGHT ASEP YELLOW CEND "Beta" CRESET " test.\n\n";
-	std::cout << ANSI YELLOW CEND "StackOverflow" CRESET " for helping me with " ANSI BRIGHT ASEP GREEN CEND "c++" CRESET "\n\n";
-	std::cout << "The awesome " ANSI RED CEND "3ds" CRESET " " ANSI BLUE CEND "homebrew" CRESET " community for\n";
-	std::cout << "helping me with many things relating to\n";
-	std::cout << ANSI BRIGHT ASEP BLUE CEND "libctru" CRESET " and " ANSI GREEN CEND "sf2dlib." CRESET "\n\n";
-	std::cout << "Bryan for helping me with programming\n\n";
-	std::cout << "\n";
-	std::cout << "     And " ANSI MAGENTA CEND "YOU" CRESET " for playing my game!\n";
-	std::cout << "    And remember, all feedback and\n";
-	std::cout << "       suggestions are welcome!\n";
+	if (thanks_text_display == 0)
+	{
+		std::cout << ANSI "0;0" PEND;
+		for (int i = 0; i < 30; i++)
+			std::cout << "                                        ";
+		std::cout << ANSI "0;0" PEND;
+		std::cout << "[Press any key to return to the title.]\n";
+		std::cout << "Thanks to:\n\n";
+		std::cout << "Jared for helping me " ANSI BRIGHT ASEP YELLOW CEND "Beta" CRESET " test.\n\n";
+		std::cout << ANSI YELLOW CEND "StackOverflow" CRESET " for helping me with " ANSI BRIGHT ASEP GREEN CEND "c++" CRESET "\n\n";
+		std::cout << "The awesome " ANSI RED CEND "3ds" CRESET " " ANSI BLUE CEND "homebrew" CRESET " community for\n";
+		std::cout << "helping me with many things relating to\n";
+		std::cout << ANSI BRIGHT ASEP BLUE CEND "libctru" CRESET " and " ANSI GREEN CEND "sf2dlib." CRESET "\n\n";
+		std::cout << "Bryan for helping me with programming\n\n";
+		std::cout << "\n";
+		std::cout << "     And " ANSI MAGENTA CEND "YOU" CRESET " for playing my game!\n";
+		std::cout << "    And remember, all feedback and\n";
+		std::cout << "       suggestions are welcome!\n";
+		thanks_text_display = 1;
+	}
 	sf2d_end_frame();
 	sf2d_swapbuffers();
 	return 0;

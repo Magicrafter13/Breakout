@@ -11,13 +11,19 @@ using std::string;
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <3ds.h>
+
 #include <sf2d.h>
 #include <sfil.h>
 #include <sftd.h>
+
 #include <vector>
+
 #include "Title_png.h"
 #include "thanksbeta_png.h"
+
 #include "paddle_png.h"
+#include "brick00_png.h"
+
 #include "ethnocen_ttf.h"
 
 extern double ball_dx, ball_dy;

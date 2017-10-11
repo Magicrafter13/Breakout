@@ -1,12 +1,14 @@
 #include "Breakout.hpp"
 #include "shapes.hpp"
 #include "draw.hpp"
+#include "sfx.h"
+#include "filesystem.h"
 
 //init
 int debugTF = 1;
 char versiontxtt[8] = "  Beta ";
 char versiontxtn[9] = "01.04.01";
-char buildnumber[14] = "17.10.10.1829";
+char buildnumber[14] = "17.10.10.2010";
 char ishupeversion[9] = "00.03.00";
 int vernumqik = 0;
 u32 kDown, kHeld;
@@ -35,6 +37,8 @@ int level_max = 1; //amount of levels minus 1
 int press_select_frame = 0;
 bool press_select_visible = true;
 sf2d_texture *img_thanksbeta, *img_paddle, *img_brick00;
+
+SFX_s *testsound;
 
 void trail_new_frame(ball ball_object)
 {
@@ -84,6 +88,7 @@ void closeSD()
 int main(int argc, char **argv)
 {
 	srand(time(NULL));
+	fsInit();
 	//hidInit();
 	//gfxInitDefault();
 	sf2d_init();
@@ -91,6 +96,7 @@ int main(int argc, char **argv)
 	sftd_init();
 	//fsInit();
 	//sdmcInit();
+	initSound();
 	consoleInit(GFX_BOTTOM, &bottomScreen);
 	consoleInit(GFX_BOTTOM, &versionWin);
 	consoleInit(GFX_BOTTOM, &killBox);
@@ -112,6 +118,8 @@ int main(int argc, char **argv)
 	img_brick00 = sfil_load_PNG_buffer(brick00_png, SF2D_PLACE_RAM);
 
 	fnt_main = sftd_load_font_mem(ethnocen_ttf, ethnocen_ttf_size);
+
+	testsound = createSFX("testfile.raw", SOUND_FORMAT_16BIT);
 
 	for (int i = 0; i < 8; i++)
 		trail_new_frame_circle[7 - i].setDefaults(200.0, 120.0, (0.875 * (i + 1)), 0xC3, 0xC3, 0xC3, (32 * (i + 1)));
@@ -156,6 +164,7 @@ int main(int argc, char **argv)
 		hidScanInput();
 		u32 kDown = hidKeysDown();
 		if (kDown & KEY_START) break; // break in order to return to hbmenu
+		if (kDown & KEY_X) playSFX(testsound);
 		if (kDown & KEY_SELECT)
 		{
 			lives = 3;
@@ -261,6 +270,9 @@ int main(int argc, char **argv)
 
 	sf2d_free_texture(img_brick00);
 	sf2d_free_texture(img_paddle);
+
+	exitSound();
+	fsExit();
 
 	return 0;
 }

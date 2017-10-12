@@ -1,6 +1,7 @@
 # Visual Studio
 .vs
 ARM
+Debug
 Breakout.sln
 Breakout/ARM
 Breakout/Breakout.vcxproj
@@ -16,3 +17,4 @@ Breakout/build
 *.elf
 *.smdh
 *.cxi
+/Breakout/Debug

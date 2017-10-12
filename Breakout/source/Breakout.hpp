@@ -23,6 +23,7 @@ using std::string;
 
 #include "paddle_png.h"
 #include "brick00_png.h"
+#include "brick01_png.h"
 
 #include "ethnocen_ttf.h"
 

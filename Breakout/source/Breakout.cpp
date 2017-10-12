@@ -8,7 +8,7 @@
 int debugTF = 1;
 char versiontxtt[8] = "  Beta ";
 char versiontxtn[9] = "01.04.01";
-char buildnumber[14] = "17.10.10.2010";
+char buildnumber[14] = "17.10.11.1538";
 char ishupeversion[9] = "00.03.00";
 int vernumqik = 0;
 u32 kDown, kHeld;
@@ -36,7 +36,7 @@ bool ball_is_attached;
 int level_max = 1; //amount of levels minus 1
 int press_select_frame = 0;
 bool press_select_visible = true;
-sf2d_texture *img_thanksbeta, *img_paddle, *img_brick00;
+sf2d_texture *img_thanksbeta, *img_paddle, *img_brick00, *img_brick01;
 
 SFX_s *testsound;
 
@@ -116,10 +116,12 @@ int main(int argc, char **argv)
 
 	img_paddle = sfil_load_PNG_buffer(paddle_png, SF2D_PLACE_RAM);
 	img_brick00 = sfil_load_PNG_buffer(brick00_png, SF2D_PLACE_RAM);
+	img_brick01 = sfil_load_PNG_buffer(brick01_png, SF2D_PLACE_RAM);
 
 	fnt_main = sftd_load_font_mem(ethnocen_ttf, ethnocen_ttf_size);
-
-	testsound = createSFX("testfile.raw", SOUND_FORMAT_16BIT);
+	bool quick_debug = false;
+	if ((testsound = createSFX("testfile.raw", SOUND_FORMAT_ADPCM)) == NULL)
+		quick_debug = true;
 
 	for (int i = 0; i < 8; i++)
 		trail_new_frame_circle[7 - i].setDefaults(200.0, 120.0, (0.875 * (i + 1)), 0xC3, 0xC3, 0xC3, (32 * (i + 1)));
@@ -132,7 +134,7 @@ int main(int argc, char **argv)
 		for (int b = 0; b < 10; b++)
 		{
 			if (a == 4)
-				brick_array[0][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, img_brick00, true, (4 - a));
+				brick_array[0][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, img_brick01, true, (4 - a));
 			else
 				brick_array[0][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, a, true, (4 - a));
 			//brick_array[0][array_step].exists = true;
@@ -170,6 +172,7 @@ int main(int argc, char **argv)
 			lives = 3;
 			int result = 3;
 			the_ball.reset();
+			the_paddle.reset();
 			double angle = 0.0;
 			while (angle < 225.0 || angle > 315.0 || (angle > 265 && angle < 275))
 				angle = rand() % 360;
@@ -226,6 +229,8 @@ int main(int argc, char **argv)
 			//BRICK01.setDefaults(2, 2, 36, 16, 0xFF, 0xFF, 0x00, 0xFF);
 
 			std::cout << ANSI "2;0" PEND "Press Select to begin.";
+			if (quick_debug)
+				std::cout << "createSFX returned NULL";
 			bottom_screen_text = 1;
 		}
 		press_select_frame++;
@@ -321,8 +326,6 @@ int breakout()
 	{
 		lives--;
 		ball_is_attached = true;
-		the_ball.reset();
-		the_paddle.reset();
 		while (ball_angle < 225.0 || ball_angle > 315.0 || (ball_angle > 265 && ball_angle < 275))
 			ball_angle = rand() % 360;
 		return 0;

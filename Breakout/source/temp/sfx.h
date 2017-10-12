@@ -4,7 +4,7 @@
 #ifndef SFX_H
 #define SFX_H
 
-#define NUMSFX (32)
+#define NUMSFX (1)
 
 typedef struct
 {

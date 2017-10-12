@@ -1,14 +1,14 @@
 #include "Breakout.hpp"
 #include "shapes.hpp"
 #include "draw.hpp"
-#include "sfx.h"
-#include "filesystem.h"
+//#include "sfx.h"
+//#include "filesystem.h"
 
 //init
 int debugTF = 1;
 char versiontxtt[8] = "  Beta ";
 char versiontxtn[9] = "01.04.01";
-char buildnumber[14] = "17.10.11.1538";
+char buildnumber[14] = "17.10.11.1847";
 char ishupeversion[9] = "00.03.00";
 int vernumqik = 0;
 u32 kDown, kHeld;
@@ -38,7 +38,7 @@ int press_select_frame = 0;
 bool press_select_visible = true;
 sf2d_texture *img_thanksbeta, *img_paddle, *img_brick00, *img_brick01;
 
-SFX_s *testsound;
+//SFX_s *testsound[1];
 
 void trail_new_frame(ball ball_object)
 {
@@ -96,7 +96,7 @@ int main(int argc, char **argv)
 	sftd_init();
 	//fsInit();
 	//sdmcInit();
-	initSound();
+	//initSound();
 	consoleInit(GFX_BOTTOM, &bottomScreen);
 	consoleInit(GFX_BOTTOM, &versionWin);
 	consoleInit(GFX_BOTTOM, &killBox);
@@ -120,8 +120,9 @@ int main(int argc, char **argv)
 
 	fnt_main = sftd_load_font_mem(ethnocen_ttf, ethnocen_ttf_size);
 	bool quick_debug = false;
-	if ((testsound = createSFX("testfile.raw", SOUND_FORMAT_ADPCM)) == NULL)
-		quick_debug = true;
+	//initSFX(testsound[0]);
+	//if ((testsound[0] = createSFX("Breakout_Data/testfile.raw", SOUND_FORMAT_ADPCM)) == NULL)
+		//quick_debug = true;
 
 	for (int i = 0; i < 8; i++)
 		trail_new_frame_circle[7 - i].setDefaults(200.0, 120.0, (0.875 * (i + 1)), 0xC3, 0xC3, 0xC3, (32 * (i + 1)));
@@ -166,7 +167,7 @@ int main(int argc, char **argv)
 		hidScanInput();
 		u32 kDown = hidKeysDown();
 		if (kDown & KEY_START) break; // break in order to return to hbmenu
-		if (kDown & KEY_X) playSFX(testsound);
+		//if (kDown & KEY_X) playSFX(testsound[0]);
 		if (kDown & KEY_SELECT)
 		{
 			lives = 3;
@@ -204,12 +205,12 @@ int main(int argc, char **argv)
 		}
 		if (bottom_screen_text == 0)
 		{
-			consoleSelect(&killBox);
+			/*consoleSelect(&killBox);
 			consoleClear();
 			consoleSelect(&versionWin);
 			consoleClear();
 			consoleSelect(&bottomScreen);
-			consoleClear();
+			consoleClear();*/
 
 			consoleSelect(&killBox);
 			std::cout << ANSI B_RED CEND;
@@ -229,6 +230,7 @@ int main(int argc, char **argv)
 			//BRICK01.setDefaults(2, 2, 36, 16, 0xFF, 0xFF, 0x00, 0xFF);
 
 			std::cout << ANSI "2;0" PEND "Press Select to begin.";
+			//std::cout << testsound[0]->used;
 			if (quick_debug)
 				std::cout << "createSFX returned NULL";
 			bottom_screen_text = 1;
@@ -276,7 +278,7 @@ int main(int argc, char **argv)
 	sf2d_free_texture(img_brick00);
 	sf2d_free_texture(img_paddle);
 
-	exitSound();
+	//exitSound();
 	fsExit();
 
 	return 0;
@@ -325,6 +327,8 @@ int breakout()
 	if (the_ball.getTop(false) > 240)
 	{
 		lives--;
+		the_ball.reset();
+		the_paddle.reset();
 		ball_is_attached = true;
 		while (ball_angle < 225.0 || ball_angle > 315.0 || (ball_angle > 265 && ball_angle < 275))
 			ball_angle = rand() % 360;
@@ -527,7 +531,7 @@ int breakout()
 	for (int i = 7; i >= 0; i--)
 		draw_object(trail_new_frame_circle[i]);
 	draw_object(the_ball);
-	std::cout << ANSI "13;0" PEND;
+	/*std::cout << ANSI "13;0" PEND;
 	for (int i = 0; i < 6; i++)
 		std::cout << "                                        ";
 	std::cout << ANSI "13;0" PEND;
@@ -536,7 +540,7 @@ int breakout()
 	std::cout << "Point value for brick 1: " << brick_array[level][0].point_value() << "\n";
 	std::cout << "Point Array 1 2 and 3: " << brick_point_value[0] << ", " << brick_point_value[1] << ", and" << brick_point_value[2] << "\n";
 	std::cout << "Powerup value last brick: " << last_power << "\n";
-	std::cout << "T1: " << times_power_1 << " T2: " << times_power_2 << " T3: " << times_power_3 << "\n";
+	std::cout << "T1: " << times_power_1 << " T2: " << times_power_2 << " T3: " << times_power_3 << "\n";*/
 	/*std::cout << ANSI "13;0" PEND;
 	for (int i = 0; i < 8; i++)
 	std::cout << "                                        ";

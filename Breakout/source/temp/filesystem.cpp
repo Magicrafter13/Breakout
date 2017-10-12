@@ -7,10 +7,10 @@
 #include <3ds.h>
 #include "filesystem.h"
 
-#define directoryName "Resources/"
+#define directoryName "data/SFX/"
 #define defaultPath ("sdmc:/" directoryName)
 
-static char* currentPath = NULL;
+static char* currentPath = "3ds/";
 
 /*void filesystemInit(int argc, char** argv)
 {

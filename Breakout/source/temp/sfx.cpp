@@ -2,7 +2,7 @@
 //https://github.com/smealum/portal3DS
 
 
-#include "Breakout.hpp"
+//#include "Breakout.hpp"
 #include "sfx.h"
 #include "filesystem.h"
 
@@ -43,7 +43,7 @@ void exitSound(void)
 void initSFX(SFX_s* s)
 {
 	if (!s)return;
-
+	std::cout << "initSFX worked";
 	s->data = NULL;
 	s->size = 0;
 	s->used = true;
@@ -51,6 +51,7 @@ void initSFX(SFX_s* s)
 
 void loadSFX(SFX_s* s, const char* filename, u32 format)
 {
+	std::cout << "loadSFX called";
 	if (!s)return;
 
 	initSFX(s);

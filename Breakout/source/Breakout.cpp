@@ -7,9 +7,9 @@
 //init
 int debugTF = 1;
 char versiontxtt[8] = "  Beta ";
-char versiontxtn[9] = "01.04.01";
-char buildnumber[14] = "17.10.11.1847";
-char ishupeversion[9] = "00.03.00";
+char versiontxtn[9] = "01.04.02";
+char buildnumber[14] = "17.10.11.1851";
+char ishupeversion[9] = "00.03.01";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
@@ -134,9 +134,9 @@ int main(int argc, char **argv)
 	{
 		for (int b = 0; b < 10; b++)
 		{
-			if (a == 4)
-				brick_array[0][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, img_brick01, true, (4 - a));
-			else
+			//if (a == 4)
+				//brick_array[0][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, img_brick01, true, (4 - a));
+			//else
 				brick_array[0][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, a, true, (4 - a));
 			//brick_array[0][array_step].exists = true;
 			array_step++;

@@ -33,7 +33,7 @@ SOURCES		:=	source
 DATA		:=	data
 INCLUDES	:=	include
 				#/c/local/boost_1_64_0/boost
-ROMFS		:=	romfs
+#ROMFS		:=	romfs
 APP_TITLE   :=  "Breakout"
 APP_DESCRIPTION := "A 3ds Breakout Clone"
 APP_AUTHOR  :=  "Matthew Rease"

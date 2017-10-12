@@ -36,7 +36,7 @@ bool ball_is_attached;
 int level_max = 1; //amount of levels minus 1
 int press_select_frame = 0;
 bool press_select_visible = true;
-sf2d_texture *img_thanksbeta, *img_paddle, *img_brick00, *img_brick01;
+sf2d_texture *img_thanksbeta, *img_paddle, *img_brick00, *img_brick01, *img_brick02;
 
 //SFX_s *testsound[1];
 
@@ -117,6 +117,7 @@ int main(int argc, char **argv)
 	img_paddle = sfil_load_PNG_buffer(paddle_png, SF2D_PLACE_RAM);
 	img_brick00 = sfil_load_PNG_buffer(brick00_png, SF2D_PLACE_RAM);
 	img_brick01 = sfil_load_PNG_buffer(brick01_png, SF2D_PLACE_RAM);
+	img_brick02 = sfil_load_PNG_buffer(brick02_png, SF2D_PLACE_RAM);
 
 	fnt_main = sftd_load_font_mem(ethnocen_ttf, ethnocen_ttf_size);
 	bool quick_debug = false;
@@ -137,7 +138,10 @@ int main(int argc, char **argv)
 			if (a == 4)
 				brick_array[0][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, img_brick01, true, (4 - a));
 			else
-				brick_array[0][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, a, true, (4 - a));
+				if (a == 3)
+					brick_array[0][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, img_brick02, true, (4 - a));
+				else
+					brick_array[0][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, a, true, (4 - a));
 			//brick_array[0][array_step].exists = true;
 			array_step++;
 		}
@@ -240,6 +244,7 @@ int main(int argc, char **argv)
 		draw_object(the_paddle);
 		//sf2d_draw_rectangle(the_paddle.paddle_mrect.x, the_paddle.paddle_mrect.y, the_paddle.paddle_mrect.width, the_paddle.paddle_mrect.height, RGBA8(0xC0, 0x61, 0x0A, 0xFF)); //Brown rectangle to be paddle
 		sf2d_draw_texture(img_title, 80, 20);
+		sf2d_draw_texture(img_paddle, 122, 92);
 		if (press_select_visible)
 			sftd_draw_textf(fnt_main, 100, 180, RGBA8(0x00, 0x00, 0x00, 0xFF), 11, "Press Select to play!");
 		sf2d_end_frame();

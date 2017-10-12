@@ -134,9 +134,9 @@ int main(int argc, char **argv)
 	{
 		for (int b = 0; b < 10; b++)
 		{
-			//if (a == 4)
-				//brick_array[0][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, img_brick01, true, (4 - a));
-			//else
+			if (a == 4)
+				brick_array[0][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, img_brick01, true, (4 - a));
+			else
 				brick_array[0][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, a, true, (4 - a));
 			//brick_array[0][array_step].exists = true;
 			array_step++;

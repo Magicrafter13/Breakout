@@ -99,6 +99,12 @@ extern int brick_color_B[5];
 extern int brick_color_A[5];
 /*point value by brick type*/
 extern int brick_point_value[5];
+/*textures for brick types*/
+extern sf2d_texture *brick_color_texture[5];
+/*id for textures (or null)*/
+extern int brick_texture_id[5];
+/*for arithmetic*/
+#define max_textures 5
 
 class brick {
 private:
@@ -149,7 +155,7 @@ private:
 		return 0;
 	}
 public:
-	sf2d_texture *brick_texture;
+	int texture_id;
 	bool uses_texture;
 	/*wether or not the brick is currently in play*/
 	bool exists;
@@ -175,30 +181,13 @@ public:
 		else
 			exists = false;
 		internal_brick_type = brick_type;
-		uses_texture = false;
-	}
-	/*
-	bx: Default X
-	by: Default Y
-	bwidth: Default Width
-	bheight: Default Height
-	btexture: sf2d texture to be used as sprite
-	is_used: If false, brick.exist will be false by default
-	brick_type: value to be used to determine point value and powerup chance
-
-	Sets the default X,Y Coordinate, Width, Height, Sprite, Existance, and Brick Type of the Brick
-	*/
-	void setDefaults(double bx, double by, double bwidth, double bheight, sf2d_texture *btexture, bool is_used, int brick_type)
-	{
-		brick_mrect.setDefaults(bx, by, bwidth, bheight, 0x00, 0x00, 0x00, 0x00);
-		internal_is_used = is_used;
-		if (internal_is_used)
-			exists = true;
+		if (brick_texture_id[brick_type] == max_textures)
+			uses_texture = false;
 		else
-			exists = false;
-		internal_brick_type = brick_type;
-		uses_texture = true;
-		brick_texture = btexture;
+		{
+			uses_texture = true;
+			texture_id = brick_texture_id[brick_type];
+		}
 	}
 	/*
 	Sets the exists value to false thus removing it from play

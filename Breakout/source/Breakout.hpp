@@ -34,6 +34,8 @@ using std::string;
 extern double ball_dx, ball_dy;
 extern bool crushBall;
 
+extern int level_mask[2][50];
+
 //Boost:
 /*#include <boost/filesystem.hpp>
 #include <lambda/bind.hpp>

@@ -25,6 +25,9 @@ using std::string;
 #include "brick00_png.h"
 #include "brick01_png.h"
 #include "brick02_png.h"
+#include "brick03_png.h"
+#include "brick04_png.h"
+#include "brick05_png.h"
 
 #include "ethnocen_ttf.h"
 

@@ -36,7 +36,7 @@ bool ball_is_attached;
 int level_max = 1; //amount of levels minus 1
 int press_select_frame = 0;
 bool press_select_visible = true;
-sf2d_texture *img_thanksbeta, *img_paddle, *img_brick00, *img_brick01, *img_brick02;
+sf2d_texture *img_thanksbeta, *img_paddle, *img_brick00, *img_brick01, *img_brick02, *img_brick03, *img_brick04, *img_brick05;
 
 //SFX_s *testsound[1];
 
@@ -118,6 +118,9 @@ int main(int argc, char **argv)
 	img_brick00 = sfil_load_PNG_buffer(brick00_png, SF2D_PLACE_RAM);
 	img_brick01 = sfil_load_PNG_buffer(brick01_png, SF2D_PLACE_RAM);
 	img_brick02 = sfil_load_PNG_buffer(brick02_png, SF2D_PLACE_RAM);
+	img_brick03 = sfil_load_PNG_buffer(brick03_png, SF2D_PLACE_RAM);
+	img_brick04 = sfil_load_PNG_buffer(brick04_png, SF2D_PLACE_RAM);
+	img_brick05 = sfil_load_PNG_buffer(brick05_png, SF2D_PLACE_RAM);
 
 	fnt_main = sftd_load_font_mem(ethnocen_ttf, ethnocen_ttf_size);
 	bool quick_debug = false;
@@ -141,7 +144,16 @@ int main(int argc, char **argv)
 				if (a == 3)
 					brick_array[0][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, img_brick02, true, (4 - a));
 				else
-					brick_array[0][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, a, true, (4 - a));
+					if (a == 2)
+						brick_array[0][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, img_brick03, true, (4 - a));
+					else
+						if (a == 1)
+							brick_array[0][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, img_brick04, true, (4 - a));
+						else
+							if (a == 0)
+								brick_array[0][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, img_brick05, true, (4 - a));
+							else
+								brick_array[0][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, a, true, (4 - a));
 			//brick_array[0][array_step].exists = true;
 			array_step++;
 		}
@@ -156,7 +168,22 @@ int main(int argc, char **argv)
 				brick_array[1][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, a, false, (4 - a));
 				brick_array[1][array_step].exists = false;
 			} else {
-				brick_array[1][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, a, true, (4 - a));
+				if (a == 4)
+					brick_array[1][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, img_brick01, true, (4 - a));
+				else
+					if (a == 3)
+						brick_array[1][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, img_brick02, true, (4 - a));
+					else
+						if (a == 2)
+							brick_array[1][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, img_brick03, true, (4 - a));
+						else
+							if (a == 1)
+								brick_array[1][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, img_brick04, true, (4 - a));
+							else
+								if (a == 0)
+									brick_array[1][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, img_brick05, true, (4 - a));
+								else
+									brick_array[1][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, a, true, (4 - a));
 				brick_array[1][array_step].exists = true;
 			}
 			array_step++;

@@ -18,3 +18,7 @@ Breakout/build
 *.smdh
 *.cxi
 /Breakout/Debug
+
+#Extra
+#Just the audio files before I've done any editing or conversion to them
+Breakout/OriginalSounds/

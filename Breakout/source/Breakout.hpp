@@ -20,6 +20,7 @@ using std::string;
 
 #include "Title_png.h"
 #include "thanksbeta_png.h"
+#include "waveform_png.h"
 
 #include "paddle_png.h"
 #include "brick00_png.h"
@@ -28,6 +29,7 @@ using std::string;
 #include "brick03_png.h"
 #include "brick04_png.h"
 #include "brick05_png.h"
+#include "ball00_png.h"
 
 #include "ethnocen_ttf.h"
 
@@ -53,6 +55,7 @@ extern int vernumqik;
 int credits();
 extern int debugTF;
 const char * keyBoard(char * hintTxt, int maxNumbers, bool multiLine);
+extern int extras_10_13_2017();
 
 /**
  *Global Variables Init

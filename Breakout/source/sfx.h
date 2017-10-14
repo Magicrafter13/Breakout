@@ -4,7 +4,7 @@
 #ifndef SFX_H
 #define SFX_H
 
-#define NUMSFX (1)
+#define NUMSFX (32)
 
 typedef struct
 {
@@ -20,5 +20,8 @@ void initSFX(SFX_s* s);
 void loadSFX(SFX_s* s, const char* filename, u32 format);
 SFX_s* createSFX(const char* filename, u32 format);
 void playSFX(SFX_s* s);
+void playMSC(SFX_s* s);
+void stopSFX(void);
+void stopMSC(void);
 
 #endif

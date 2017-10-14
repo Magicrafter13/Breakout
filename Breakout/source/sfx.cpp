@@ -2,7 +2,9 @@
 //https://github.com/smealum/portal3DS
 
 
-//#include "Breakout.hpp"
+#include <stdlib.h>
+#include <stdio.h>
+#include <3ds.h>
 #include "sfx.h"
 #include "filesystem.h"
 
@@ -43,7 +45,7 @@ void exitSound(void)
 void initSFX(SFX_s* s)
 {
 	if (!s)return;
-	std::cout << "initSFX worked";
+
 	s->data = NULL;
 	s->size = 0;
 	s->used = true;
@@ -51,7 +53,6 @@ void initSFX(SFX_s* s)
 
 void loadSFX(SFX_s* s, const char* filename, u32 format)
 {
-	std::cout << "loadSFX called";
 	if (!s)return;
 
 	initSFX(s);
@@ -81,9 +82,31 @@ int channel;
 void playSFX(SFX_s* s)
 {
 	if (!s || !s->used || !s->data || !soundEnabled)return;
-
+	
 	channel++;
-	channel %= 8;
+	channel %= 7;
 
 	csndPlaySound(channel + 8, s->format, 22050, 1.0, 0.0, (u32*)s->data, (u32*)s->data, s->size);
+}
+
+void playMSC(SFX_s* s)
+{
+	//	CSND_SetPlayState(15, 0);//Stop music audio playback.
+	//	csndExecCmds(0);
+	if (!s || !s->used || !s->data || !soundEnabled)return;
+	csndPlaySound(15, s->format | SOUND_REPEAT, 22050, 1.0, 0.0, (u32*)s->data, (u32*)s->data, s->size);
+}
+
+void stopSFX(void)
+{
+	int i;
+	for (i = 0; i<7; i++)
+		CSND_SetPlayState(8 + i, 0);//Stop music audio playback.
+	csndExecCmds(0);
+}
+
+void stopMSC(void)
+{
+	CSND_SetPlayState(15, 0);//Stop music audio playback.
+	csndExecCmds(0);
 }

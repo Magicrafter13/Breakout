@@ -1,42 +1,32 @@
 #include "Breakout.hpp"
 #include "shapes.hpp"
 #include "draw.hpp"
-//#include "sfx.h"
-//#include "filesystem.h"
+#include "sfx.h"
+#include "filesystem.h"
 
 //init
 int debugTF = 1;
 char versiontxtt[8] = "  Beta ";
 char versiontxtn[9] = "01.04.02";
-char buildnumber[14] = "17.10.12.1819";
+char buildnumber[14] = "17.10.13.1738";
 char ishupeversion[9] = "00.03.01";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
 int breakout();
 int thanks_for_playing_the_beta();
-int lives = 3;
-double ball_dx, ball_dy;
-double ball_angle;
+int lives = 3, points, level = 0;
+double ball_dx, ball_dy, ball_angle;
 bool crushBall = false;
-paddle the_paddle;
-int level_count = 2;
-int level = 0;
+paddle the_paddle; ball the_ball; mCircle trail_new_frame_circle[8];
+int level_count = 2; int level_max = 1; //amount of levels minus 1
 brick brick_array[2][50];
-ball the_ball;
 double trail_new_frame_x[8];
 double trail_new_frame_y[8];
-mCircle trail_new_frame_circle[8];
-int points;
-int last_power;
-int times_power_1;
-int times_power_2;
-int times_power_3;
+int last_power, times_power_1, times_power_2, times_power_3;
 bool ball_is_attached;
-int level_max = 1; //amount of levels minus 1
-int press_select_frame = 0;
-bool press_select_visible = true;
-sf2d_texture *img_thanksbeta, *img_paddle, *img_brick00, *img_brick01, *img_brick02, *img_brick03, *img_brick04, *img_brick05;
+int press_select_frame = 0; bool press_select_visible = true;
+sf2d_texture *img_thanksbeta, *img_paddle, *img_brick00, *img_brick01, *img_brick02, *img_brick03, *img_brick04, *img_brick05, *img_waveform;
 
 int level_mask[2][50] = {
 	{
@@ -55,7 +45,7 @@ int level_mask[2][50] = {
 	}
 };
 
-//SFX_s *testsound[1];
+SFX_s *testsound[1], *ball_bounce[8];
 
 void trail_new_frame(ball ball_object)
 {
@@ -104,17 +94,23 @@ void closeSD()
 
 int main(int argc, char **argv)
 {
-	srand(time(NULL));
+	Result rc = romfsInit();
 	fsInit();
-	//hidInit();
-	//gfxInitDefault();
+
+	csndInit();
+	initSound();
+	
+	srand(time(NULL));
+	
 	sf2d_init();
 	sf2d_set_3D(0);
 	sftd_init();
-	//fsInit();
-	//sdmcInit();
-	//initSound();
+	
 	consoleInit(GFX_BOTTOM, &bottomScreen);
+	if (rc)
+		printf("romfsInit: %081X\n", rc);
+	else
+		printf("romfs Init Successful\n");
 	consoleInit(GFX_BOTTOM, &versionWin);
 	consoleInit(GFX_BOTTOM, &killBox);
 	consoleInit(GFX_BOTTOM, &debugBox);
@@ -133,23 +129,27 @@ int main(int argc, char **argv)
 
 	img_paddle = sfil_load_PNG_buffer(paddle_png, SF2D_PLACE_RAM);
 	img_brick00 = sfil_load_PNG_buffer(brick00_png, SF2D_PLACE_RAM);
-	/*img_brick01 = sfil_load_PNG_buffer(brick01_png, SF2D_PLACE_RAM);
-	img_brick02 = sfil_load_PNG_buffer(brick02_png, SF2D_PLACE_RAM);
-	img_brick03 = sfil_load_PNG_buffer(brick03_png, SF2D_PLACE_RAM);
-	img_brick04 = sfil_load_PNG_buffer(brick04_png, SF2D_PLACE_RAM);
-	img_brick05 = sfil_load_PNG_buffer(brick05_png, SF2D_PLACE_RAM);*/
+
+	img_waveform = sfil_load_PNG_buffer(waveform_png, SF2D_PLACE_RAM);
 
 	fnt_main = sftd_load_font_mem(ethnocen_ttf, ethnocen_ttf_size);
 	bool quick_debug = false;
-	//initSFX(testsound[0]);
-	//if ((testsound[0] = createSFX("Breakout_Data/testfile.raw", SOUND_FORMAT_ADPCM)) == NULL)
-		//quick_debug = true;
+	testsound[0] = createSFX("romfs:/testfile.raw", SOUND_FORMAT_16BIT);
+	ball_bounce[0] = createSFX("romfs:/bounce0.raw", SOUND_FORMAT_16BIT);
+	ball_bounce[1] = createSFX("romfs:/bounce1.raw", SOUND_FORMAT_16BIT);
+	ball_bounce[2] = createSFX("romfs:/bounce2.raw", SOUND_FORMAT_16BIT);
+	ball_bounce[3] = createSFX("romfs:/bounce3.raw", SOUND_FORMAT_16BIT);
+	ball_bounce[4] = createSFX("romfs:/bounce4.raw", SOUND_FORMAT_16BIT);
+	ball_bounce[5] = createSFX("romfs:/bounce5.raw", SOUND_FORMAT_16BIT);
+	ball_bounce[6] = createSFX("romfs:/bounce6.raw", SOUND_FORMAT_16BIT);
+	ball_bounce[7] = createSFX("romfs:/bounce7.raw", SOUND_FORMAT_16BIT);
+	quick_debug = true;
 
 	for (int i = 0; i < 8; i++)
 		trail_new_frame_circle[7 - i].setDefaults(200.0, 120.0, (0.875 * (i + 1)), 0xC3, 0xC3, 0xC3, (32 * (i + 1)));
 
 	the_paddle.setDefaults(175, 215, 50, 10, 0xC0, 0x61, 0x0A, 0xFF, img_paddle);
-	the_ball.setDefaults(200.0, 200.0, 7.0, 0xC3, 0xC3, 0xC3, 0xFF, 200.3, 195.2, 202.5, 199.8, 204.9, 197.1, 0xFF, 0xFF, 0xFF, 0xFF);
+	the_ball.setDefaults(200.0, 200.0, 7.0, 1, 200.3, 195.2, 202.5, 199.8, 204.9, 197.1);
 	int array_step = 0;
 	for (int a = 0; a < 5; a++)
 	{
@@ -165,7 +165,7 @@ int main(int argc, char **argv)
 		for (int b = 0; b < 10; b++)
 		{
 			if (level_mask[1][array_step] == max_textures)
-				brick_array[1][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, a, false, NULL);
+				brick_array[1][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, a, false, 0);
 			else
 				brick_array[1][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, a, true, level_mask[0][array_step]);
 			array_step++;
@@ -180,7 +180,14 @@ int main(int argc, char **argv)
 		hidScanInput();
 		u32 kDown = hidKeysDown();
 		if (kDown & KEY_START) break; // break in order to return to hbmenu
-		//if (kDown & KEY_X) playSFX(testsound[0]);
+		if (kDown & KEY_X) {
+			int ext_return = extras_10_13_2017();
+			if (ext_return == 3)
+				break;
+			/*playSFX(testsound[0]);
+			int which_bounce = rand() % 7;
+			playSFX(ball_bounce[which_bounce]);*/
+		}
 		if (kDown & KEY_SELECT)
 		{
 			lives = 3;
@@ -218,12 +225,12 @@ int main(int argc, char **argv)
 		}
 		if (bottom_screen_text == 0)
 		{
-			/*consoleSelect(&killBox);
+			consoleSelect(&killBox);
 			consoleClear();
 			consoleSelect(&versionWin);
 			consoleClear();
 			consoleSelect(&bottomScreen);
-			consoleClear();*/
+			consoleClear();
 
 			consoleSelect(&killBox);
 			std::cout << ANSI B_RED CEND;
@@ -237,15 +244,12 @@ int main(int argc, char **argv)
 			std::cout << ANSI B_RED ASEP GREEN CEND "   ISHUPE Engine Version: " << ishupeversion;
 
 			consoleSelect(&bottomScreen);
-			std::cout << ANSI "20;0" PEND "Array Step : " << array_step << "\n";
-			std::cout << "Brick 11 Y: " << brick_array[0][10].brick_mrect.y << " Brick 22 X: " << brick_array[0][21].brick_mrect.x << "\n";
-			std::cout << "RGB Data Brick 50: " << brick_array[0][49].brick_mrect.color << "\n";
-			//BRICK01.setDefaults(2, 2, 36, 16, 0xFF, 0xFF, 0x00, 0xFF);
+			std::cout << ANSI "20;0" PEND;
 
-			std::cout << ANSI "2;0" PEND "Press Select to begin.";
+			std::cout << ANSI "2;0" PEND "Press Select to begin.\n";
+			std::cout << "Press X to see what I'm working on or have planned.\n";
 			//std::cout << testsound[0]->used;
-			if (quick_debug)
-				std::cout << "createSFX returned NULL";
+			//std::cout << "createSFX returned NULL";
 			bottom_screen_text = 1;
 		}
 		press_select_frame++;
@@ -311,7 +315,7 @@ int angle;
 int bricks_hit_this_frame;
 bool change_level;
 int thanks_text_display;
-
+bool has_hit_paddle, has_hit_wall;
 int breakout()
 {
 	hidScanInput();
@@ -350,6 +354,7 @@ int breakout()
 	}
 
 	bool hasInteracted = false;
+	has_hit_paddle = false; has_hit_wall = false;
 	if (kDown & KEY_A && ball_is_attached == true)
 		ball_is_attached = false;
 	if (!ball_is_attached)
@@ -367,12 +372,13 @@ int breakout()
 				hasHitPadd = false;
 			if (hasHitPadd && the_ball.getBottom(false) >= the_paddle.getTop(false) + 0.02)
 				hasHitPadd = false;
-
+			if (hasHitPadd) has_hit_paddle = true;
 			//Add gravity powerup (magnet but different) rotates around paddle until button pressed.
 			if (the_ball.getLeft(true) <= 0.00 || the_ball.getRight(true) >= 400.00 || the_ball.getTop(false) <= 0.00)
 				hasHitWall = true;
 			else
 				hasHitWall = false;
+			if (hasHitWall) has_hit_wall = true;
 			if (hasHitWall && !isInWall)
 			{
 				hasInteracted = true;
@@ -535,6 +541,14 @@ int breakout()
 		}
 	}
 
+	if (bricks_hit_this_frame > 0)
+	{
+		int which_bounce = rand() % 7;
+		playSFX(ball_bounce[which_bounce]);
+	}
+	if (has_hit_paddle || has_hit_wall)
+		playSFX(ball_bounce[7]);
+
 	trail_new_frame(the_ball);
 
 	sf2d_start_frame(GFX_TOP, GFX_LEFT);
@@ -542,8 +556,16 @@ int breakout()
 	for (int i = 0; i < 50; i++)
 		if (brick_array[level][i].exists)
 			draw_object(brick_array[level][i]);
-	for (int i = 7; i >= 0; i--)
-		draw_object(trail_new_frame_circle[i]);
+	if (the_ball.uses_texture)
+	{
+		for (int i = 7; i >= 0; i--)
+			//sf2d_draw_texture_scale(ball_color_texture[the_ball.texture_id], trail_new_frame_circle[i].x, trail_new_frame_circle[i].y, (7 - i) / 8.0, (7 - i) / 8.0);
+			sf2d_draw_texture_scale_blend(ball_color_texture[the_ball.texture_id], (trail_new_frame_circle[i].x - trail_new_frame_circle[i].rad) + 1.0, (trail_new_frame_circle[i].y - trail_new_frame_circle[i].rad) + 2.0, (7 - i) / 8.0, (7 - i) / 8.0, RGBA8(0xFF, 0xFF, 0xFF, 32 * (7 - i)));
+	}
+	else {
+		for (int i = 7; i >= 0; i--)
+			draw_object(trail_new_frame_circle[i]);
+	}
 	draw_object(the_ball);
 	/*std::cout << ANSI "13;0" PEND;
 	for (int i = 0; i < 6; i++)
@@ -604,4 +626,57 @@ int thanks_for_playing_the_beta()
 	sf2d_end_frame();
 	sf2d_swapbuffers();
 	return 0;
+}
+
+int extras_10_13_2017()
+{
+	consoleSelect(&bottomScreen);
+	consoleClear();
+	std::cout << ANSI "0;0" PEND;
+	for (int i = 0; i < 30; i++)
+		std::cout << "                                        ";
+	std::cout << ANSI "0;0" PEND;
+	std::cout << "The blue cracked brick was orginally\n";
+	std::cout << "going to be the design for the normal\n";
+	std::cout << "brick but I decided to instead save that";
+	std::cout << "for the future for bricks that take more";
+	std::cout << "than one hit.\n\n";
+	std::cout << "Future Gamemode: This idea came about\n";
+	std::cout << "when I'd thought about all the people I\n";
+	std::cout << "saw playing some new game on their\n";
+	std::cout << "phones. It's this game where you aim\n";
+	std::cout << "your ball, and it shoots out like 100\n";
+	std::cout << "balls. And all the bricks in the game\n";
+	std::cout << "many hits, which is determined via a\n";
+	std::cout << "number displayed on the brick.\n";
+	std::cout << "So I figure I'll add this sometime.\n\n";
+	std::cout << "These new graphics and SFX aren't\n";
+	std::cout << "necessarily permanent. This update is\n";
+	std::cout << "more to show off that actual graphics\n";
+	std::cout << "and SFX can and have been added, and\n";
+	std::cout << "they may very well be changed and\n";
+	std::cout << "improved in the future, so if you don't\n";
+	std::cout << "like what's presented to you now, then\n";
+	std::cout << "don't worry because it can easily be\n";
+	std::cout << "changed and I'm always open to\n";
+	std::cout << "suggestions!\n";
+	while (true)
+	{
+		sf2d_start_frame(GFX_TOP, GFX_LEFT);
+		sf2d_draw_texture_scale(brick_color_texture[5], 20, 20, 2.0, 2.0);
+		sf2d_draw_texture(img_paddle, 350, 110);
+		sf2d_draw_texture(img_waveform, 40, 97);
+		hidScanInput();
+		kDown = hidKeysDown();
+		kHeld = hidKeysHeld();
+		if (kDown & (KEY_SELECT | KEY_A | KEY_B | KEY_X | KEY_Y | KEY_L | KEY_R | KEY_ZL | KEY_ZR | KEY_START))
+			break;
+		sf2d_end_frame();
+		sf2d_swapbuffers();
+	}
+	if (kDown & (KEY_SELECT | KEY_A | KEY_B | KEY_X | KEY_Y | KEY_L | KEY_R | KEY_ZL | KEY_ZR))
+		return 2;
+	if (kHeld & KEY_START)
+		return 3;
+	return 4;
 }

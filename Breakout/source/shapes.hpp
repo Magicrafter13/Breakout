@@ -100,11 +100,11 @@ extern int brick_color_A[5];
 /*point value by brick type*/
 extern int brick_point_value[5];
 /*textures for brick types*/
-extern sf2d_texture *brick_color_texture[5];
+extern sf2d_texture *brick_color_texture[6];
 /*id for textures (or null)*/
 extern int brick_texture_id[5];
 /*for arithmetic*/
-#define max_textures 5
+#define max_textures 6
 
 class brick {
 private:
@@ -338,15 +338,42 @@ public:
 	}
 };
 
+/*RGB Red channel by ball type*/
+extern int ball_cir_color_R[2];
+extern int ball_tri_color_R[2];
+/*RGB Green channel by ball type*/
+extern int ball_cir_color_G[2];
+extern int ball_tri_color_G[2];
+/*RGB Blue channel by ball type*/
+extern int ball_cir_color_B[2];
+extern int ball_tri_color_B[2];
+/*RGB Alpha channel by ball type*/
+extern int ball_cir_color_A[2];
+extern int ball_tri_color_A[2];
+extern sf2d_texture *ball_color_texture[2];
+/*id for textures (or null)*/
+extern int ball_texture_id[2];
+
 class ball {
+	int internal_ball_type;
 public:
 	bool exists;
 	mCircle ball_mcirc;
 	mTriangle ball_mtri;
-	void setDefaults(double bx, double by, double brad, int R, int G, int B, int A, double tx1, double ty1, double tx2, double ty2, double tx3, double ty3, int TR, int TG, int TB, int TA)
+	bool uses_texture;
+	int texture_id;
+	void setDefaults(double bx, double by, double brad, int ball_type, double tx1, double ty1, double tx2, double ty2, double tx3, double ty3)
 	{
-		ball_mcirc.setDefaults(bx, by, brad, R, G, B, A);
-		ball_mtri.setDefaults(tx1, ty1, tx2, ty2, tx3, ty3, TR, TG, TB, TA);
+		ball_mcirc.setDefaults(bx, by, brad, ball_cir_color_R[ball_type], ball_cir_color_G[ball_type], ball_cir_color_B[ball_type], ball_cir_color_A[ball_type]);
+		ball_mtri.setDefaults(tx1, ty1, tx2, ty2, tx3, ty3, ball_tri_color_R[ball_type], ball_tri_color_G[ball_type], ball_tri_color_B[ball_type], ball_tri_color_A[ball_type]);
+		internal_ball_type = ball_type;
+		if (ball_texture_id[ball_type] == 0)
+			uses_texture = false;
+		else
+		{
+			uses_texture = true;
+			texture_id = ball_texture_id[ball_type];
+		}
 		exists = true;
 	}
 	void reset()

@@ -7,8 +7,8 @@
 //init
 int debugTF = 1;
 char versiontxtt[8] = "  Beta ";
-char versiontxtn[9] = "01.04.02";
-char buildnumber[14] = "17.10.13.1738";
+char versiontxtn[9] = "01.05.00";
+char buildnumber[14] = "17.10.13.1744";
 char ishupeversion[9] = "00.03.01";
 int vernumqik = 0;
 u32 kDown, kHeld;
@@ -316,15 +316,16 @@ int bricks_hit_this_frame;
 bool change_level;
 int thanks_text_display;
 bool has_hit_paddle, has_hit_wall;
+
 int breakout()
 {
 	hidScanInput();
 	kDown = hidKeysDown();
 	kHeld = hidKeysHeld();
-	if (kDown & KEY_R)
+	/*if (kDown & KEY_R)
 		level++;
 	if (kDown & KEY_L)
-		level--;
+		level--;*/
 	if (kDown & KEY_SELECT || lives == 0)
 		return 2;
 	if (kHeld & KEY_START)

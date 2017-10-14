@@ -5,29 +5,26 @@
 #include "filesystem.h"
 
 //init
-int debugTF = 1;
-char versiontxtt[8] = "  Beta ";
-char versiontxtn[9] = "01.05.00";
-char buildnumber[14] = "17.10.13.1744";
-char ishupeversion[9] = "00.03.01";
+char versiontxtt[8] = "  Beta ", versiontxtn[9] = "01.05.00";
+char buildnumber[14] = "17.10.13.2330", ishupeversion[9] = "00.03.01";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
 int breakout();
 int thanks_for_playing_the_beta();
-int lives = 3, points, level = 0;
-double ball_dx, ball_dy, ball_angle;
-bool crushBall = false;
-paddle the_paddle; ball the_ball; mCircle trail_new_frame_circle[8];
-int level_count = 2; int level_max = 1; //amount of levels minus 1
-brick brick_array[2][50];
-double trail_new_frame_x[8];
-double trail_new_frame_y[8];
-int last_power, times_power_1, times_power_2, times_power_3;
-bool ball_is_attached;
-int press_select_frame = 0; bool press_select_visible = true;
-sf2d_texture *img_thanksbeta, *img_paddle, *img_brick00, *img_brick01, *img_brick02, *img_brick03, *img_brick04, *img_brick05, *img_waveform;
+int extras_10_13_2017();
 
+int lives = 3, points, level = 0;
+int level_count = 2; int level_max = 1; //amount of levels minus 1
+double ball_dx, ball_dy, ball_angle, trail_new_frame_x[8], trail_new_frame_y[8]; bool crushBall = false; bool ball_is_attached;
+int last_power, times_power_1, times_power_2, times_power_3;
+int press_select_frame = 0; bool press_select_visible = true;
+
+paddle the_paddle; ball the_ball; mCircle trail_new_frame_circle[8]; brick brick_array[2][50];
+sf2d_texture *img_thanksbeta, *img_paddle, *img_brick00, *img_brick01, *img_brick02, *img_brick03, *img_brick04, *img_brick05, *img_waveform;
+SFX_s *testsound[1], *ball_bounce[8];
+
+/*integer mask for levels*/
 int level_mask[2][50] = {
 	{
 		4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
@@ -45,8 +42,7 @@ int level_mask[2][50] = {
 	}
 };
 
-SFX_s *testsound[1], *ball_bounce[8];
-
+/*set ball trail*/
 void trail_new_frame(ball ball_object)
 {
 	double current_x = ball_object.ball_mcirc.x;
@@ -62,6 +58,7 @@ void trail_new_frame(ball ball_object)
 		trail_new_frame_circle[i].setPosition(trail_new_frame_x[i], trail_new_frame_y[i]);
 }
 
+/*returns if area is being touched by stylus*/
 bool touchInBox(touchPosition touch, int x, int y, int w, int h)
 {
 	int tx = touch.px;
@@ -76,26 +73,27 @@ bool touchInBox(touchPosition touch, int x, int y, int w, int h)
 }
 
 touchPosition touch;
-bool gameRunning = true;
 
 PrintConsole topScreen, bottomScreen, versionWin, killBox, debugBox;
 
 FS_Archive sdmcArchive;
 
+/*open SD card filesystem*/
 void openSD()
 {
 	FSUSER_OpenArchive(&sdmcArchive, ARCHIVE_SDMC, fsMakePath(PATH_EMPTY, ""));
 }
 
+/*close SD card filesystem*/
 void closeSD()
 {
 	FSUSER_CloseArchive(sdmcArchive);
 }
 
+/*begin application*/
 int main(int argc, char **argv)
 {
-	Result rc = romfsInit();
-	fsInit();
+	romfsInit();
 
 	csndInit();
 	initSound();
@@ -107,10 +105,6 @@ int main(int argc, char **argv)
 	sftd_init();
 	
 	consoleInit(GFX_BOTTOM, &bottomScreen);
-	if (rc)
-		printf("romfsInit: %081X\n", rc);
-	else
-		printf("romfs Init Successful\n");
 	consoleInit(GFX_BOTTOM, &versionWin);
 	consoleInit(GFX_BOTTOM, &killBox);
 	consoleInit(GFX_BOTTOM, &debugBox);
@@ -133,7 +127,7 @@ int main(int argc, char **argv)
 	img_waveform = sfil_load_PNG_buffer(waveform_png, SF2D_PLACE_RAM);
 
 	fnt_main = sftd_load_font_mem(ethnocen_ttf, ethnocen_ttf_size);
-	bool quick_debug = false;
+
 	testsound[0] = createSFX("romfs:/testfile.raw", SOUND_FORMAT_16BIT);
 	ball_bounce[0] = createSFX("romfs:/bounce0.raw", SOUND_FORMAT_16BIT);
 	ball_bounce[1] = createSFX("romfs:/bounce1.raw", SOUND_FORMAT_16BIT);
@@ -143,7 +137,6 @@ int main(int argc, char **argv)
 	ball_bounce[5] = createSFX("romfs:/bounce5.raw", SOUND_FORMAT_16BIT);
 	ball_bounce[6] = createSFX("romfs:/bounce6.raw", SOUND_FORMAT_16BIT);
 	ball_bounce[7] = createSFX("romfs:/bounce7.raw", SOUND_FORMAT_16BIT);
-	quick_debug = true;
 
 	for (int i = 0; i < 8; i++)
 		trail_new_frame_circle[7 - i].setDefaults(200.0, 120.0, (0.875 * (i + 1)), 0xC3, 0xC3, 0xC3, (32 * (i + 1)));
@@ -151,6 +144,7 @@ int main(int argc, char **argv)
 	the_paddle.setDefaults(175, 215, 50, 10, 0xC0, 0x61, 0x0A, 0xFF, img_paddle);
 	the_ball.setDefaults(200.0, 200.0, 7.0, 1, 200.3, 195.2, 202.5, 199.8, 204.9, 197.1);
 	int array_step = 0;
+	/*brick array level 1, 5 times by 10 times (10 bricks across, 5 down)*/
 	for (int a = 0; a < 5; a++)
 	{
 		for (int b = 0; b < 10; b++)
@@ -160,6 +154,7 @@ int main(int argc, char **argv)
 		}
 	}
 	array_step = 0;
+	/*brick array level 2, 5 times by 10 times (10 bricks across, 5 down)*/
 	for (int a = 0; a < 5; a++)
 	{
 		for (int b = 0; b < 10; b++)
@@ -174,20 +169,21 @@ int main(int argc, char **argv)
 
 	int bottom_screen_text = 0;
 
+	playSFX(testsound[0]);
+
 	// Main loop
 	while (aptMainLoop())
 	{
 		hidScanInput();
 		u32 kDown = hidKeysDown();
 		if (kDown & KEY_START) break; // break in order to return to hbmenu
+		/*go to extras when X pressed*/
 		if (kDown & KEY_X) {
 			int ext_return = extras_10_13_2017();
 			if (ext_return == 3)
 				break;
-			/*playSFX(testsound[0]);
-			int which_bounce = rand() % 7;
-			playSFX(ball_bounce[which_bounce]);*/
 		}
+		/*begin game*/
 		if (kDown & KEY_SELECT)
 		{
 			lives = 3;
@@ -200,19 +196,12 @@ int main(int argc, char **argv)
 			ball_angle = angle;
 			sf2d_swapbuffers();
 			for (int i = 0; i < level_count; i++)
-			{
 				for (int j = 0; j < 50; j++)
-				{
 					brick_array[i][j].reset();
-				}
-			}
-			level = 0;
-			points = 0;
-			last_power = 0;
-			times_power_1 = 0;
-			times_power_2 = 0;
-			times_power_3 = 0;
+			level = 0; points = 0; last_power = 0;
+			times_power_1 = 0; times_power_2 = 0; times_power_3 = 0;
 			ball_is_attached = true;
+			/*main breakout loop*/
 			while (true)
 			{
 				result = breakout();
@@ -220,17 +209,14 @@ int main(int argc, char **argv)
 					break;
 			}
 			bottom_screen_text = 0;
-			if (result == 3)
-				break;
+			if (result == 3) break;
 		}
+		/*text display (run once to avoid screen tearing)*/
 		if (bottom_screen_text == 0)
 		{
-			consoleSelect(&killBox);
-			consoleClear();
-			consoleSelect(&versionWin);
-			consoleClear();
-			consoleSelect(&bottomScreen);
-			consoleClear();
+			consoleSelect(&killBox); consoleClear();
+			consoleSelect(&versionWin); consoleClear();
+			consoleSelect(&bottomScreen); consoleClear();
 
 			consoleSelect(&killBox);
 			std::cout << ANSI B_RED CEND;
@@ -248,19 +234,18 @@ int main(int argc, char **argv)
 
 			std::cout << ANSI "2;0" PEND "Press Select to begin.\n";
 			std::cout << "Press X to see what I'm working on or have planned.\n";
-			//std::cout << testsound[0]->used;
-			//std::cout << "createSFX returned NULL";
+
 			bottom_screen_text = 1;
 		}
 		press_select_frame++;
 		sf2d_start_frame(GFX_TOP, GFX_LEFT);
 		draw_object(the_paddle);
-		//sf2d_draw_rectangle(the_paddle.paddle_mrect.x, the_paddle.paddle_mrect.y, the_paddle.paddle_mrect.width, the_paddle.paddle_mrect.height, RGBA8(0xC0, 0x61, 0x0A, 0xFF)); //Brown rectangle to be paddle
 		sf2d_draw_texture(img_title, 80, 20);
 		sf2d_draw_texture(img_paddle, 122, 92);
 		if (press_select_visible)
 			sftd_draw_textf(fnt_main, 100, 180, RGBA8(0x00, 0x00, 0x00, 0xFF), 11, "Press Select to play!");
 		sf2d_end_frame();
+		/*after half a second, Press Select to play! is toggled*/
 		if (press_select_frame == 30)
 		{
 			press_select_frame = 0;
@@ -270,16 +255,11 @@ int main(int argc, char **argv)
 				press_select_visible = true;
 		}
 
-		/*std::cout << ANSI "0;0" PEND "                                                            ";
-		std::cout << ANSI "1;0" PEND "                                                            ";
-		std::cout << ANSI "0;0" PEND "X = " << the_paddle.paddle_mrect.x << " Y = " << the_paddle.paddle_mrect.y << " Width = " << the_paddle.paddle_mrect.width << " Height = " << the_paddle.paddle_mrect.height;
-		std::cout << ANSI "1;0" PEND "H-Mid = " << (the_paddle.paddle_mrect.x + (the_paddle.paddle_mrect.width / 2)) << "   H-Mid-Length = " << (the_paddle.paddle_mrect.width / 2);
-		std::cout << ANSI "2;0" PEND;*/
-
 		sf2d_swapbuffers();
 
 		hidTouchRead(&touch);
 
+		/*exit game if red box touched*/
 		if (touchInBox(touch, 0, 224, 320, 16)) {
 			std::cout << "Exiting...\n";
 			break;
@@ -296,27 +276,23 @@ int main(int argc, char **argv)
 	sf2d_free_texture(img_brick00);
 	sf2d_free_texture(img_paddle);
 
-	//exitSound();
-	fsExit();
+	exitSound();
 
 	return 0;
 }
 
-bool hitWallH = false;
-bool hitWallV = false;
-bool hasHitPadd = false;
-bool hasHitWall = false;
+bool hitWallH = false, hitWallV = false;
+bool hasHitPadd = false, hasHitWall = false;
 bool isMovingRight = false;
-bool isInPaddle = false;
-bool isInWall = false;
-bool brickHitV = false;
-bool brickHitH = false;
+bool isInPaddle = false, isInWall = false;
+bool brickHitV = false, brickHitH = false;
 int angle;
 int bricks_hit_this_frame;
 bool change_level;
 int thanks_text_display;
 bool has_hit_paddle, has_hit_wall;
 
+/*main game*/
 int breakout()
 {
 	hidScanInput();
@@ -326,44 +302,41 @@ int breakout()
 		level++;
 	if (kDown & KEY_L)
 		level--;*/
-	if (kDown & KEY_SELECT || lives == 0)
-		return 2;
-	if (kHeld & KEY_START)
-		return 3;
+	if (kDown & KEY_SELECT || lives == 0) return 2;
+	if (kHeld & KEY_START) return 3;
+	/*move paddle left (if applicable)*/
 	if (kHeld & KEY_LEFT && the_paddle.paddle_mrect.x > 1)
 	{
 		the_paddle.paddle_mrect.x -= 3;
-		if (ball_is_attached)
-			the_ball.move(-3.0, 0.0);
+		if (ball_is_attached) the_ball.move(-3.0, 0.0);
 	}
+	/*move paddle right (if applicable)*/
 	if (kHeld & KEY_RIGHT && the_paddle.paddle_mrect.x < 399 - the_paddle.paddle_mrect.width)
 	{
 		the_paddle.paddle_mrect.x += 3;
-		if (ball_is_attached)
-			the_ball.move(3.0, 0.0);
+		if (ball_is_attached) the_ball.move(3.0, 0.0);
 	}
 
+	/*lose life if outside of game field*/
 	if (the_ball.getTop(false) > 240)
 	{
 		lives--;
-		the_ball.reset();
-		the_paddle.reset();
+		the_ball.reset(); the_paddle.reset();
 		ball_is_attached = true;
-		while (ball_angle < 225.0 || ball_angle > 315.0 || (ball_angle > 265 && ball_angle < 275))
-			ball_angle = rand() % 360;
+		while (ball_angle < 225.0 || ball_angle > 315.0 || (ball_angle > 265 && ball_angle < 275)) ball_angle = rand() % 360;
 		return 0;
 	}
 
 	bool hasInteracted = false;
 	has_hit_paddle = false; has_hit_wall = false;
-	if (kDown & KEY_A && ball_is_attached == true)
-		ball_is_attached = false;
+	if (kDown & KEY_A && ball_is_attached == true) ball_is_attached = false;
+	/*run main engine code if the ball is not attached to the paddle*/
 	if (!ball_is_attached)
 	{
 		bricks_hit_this_frame = 0;
 		change_level = false;
-		if (kDown & KEY_X)
-			change_level = true;
+		//if (kDown & KEY_X) change_level = true;
+		/*main hit detection engine (runs 300 times per frame)*/
 		for (int i = 0; i < 300; i++)
 		{
 			hasInteracted = false;
@@ -371,8 +344,7 @@ int breakout()
 				hasHitPadd = true;
 			else
 				hasHitPadd = false;
-			if (hasHitPadd && the_ball.getBottom(false) >= the_paddle.getTop(false) + 0.02)
-				hasHitPadd = false;
+			if (hasHitPadd && the_ball.getBottom(false) >= the_paddle.getTop(false) + 0.02) hasHitPadd = false;
 			if (hasHitPadd) has_hit_paddle = true;
 			//Add gravity powerup (magnet but different) rotates around paddle until button pressed.
 			if (the_ball.getLeft(true) <= 0.00 || the_ball.getRight(true) >= 400.00 || the_ball.getTop(false) <= 0.00)
@@ -380,6 +352,7 @@ int breakout()
 			else
 				hasHitWall = false;
 			if (hasHitWall) has_hit_wall = true;
+			/*first time ball is detected touching wall*/
 			if (hasHitWall && !isInWall)
 			{
 				hasInteracted = true;
@@ -390,11 +363,10 @@ int breakout()
 					ball_angle = 180.0 - ball_angle;
 			}
 
-			while (ball_angle < 0.0)
-				ball_angle += 360.0;
-			while (ball_angle > 360.0)
-				ball_angle -= 360.0;
+			while (ball_angle < 0.0) ball_angle += 360.0;
+			while (ball_angle > 360.0) ball_angle -= 360.0;
 
+			/*first time ball is detected touching paddle*/
 			if (hasHitPadd && !isInPaddle)
 			{
 				hasInteracted = true;
@@ -402,29 +374,23 @@ int breakout()
 				double paddle_width_ninth = the_paddle.paddle_mrect.width / 9.0;
 				angle = 1;
 				for (double z = 1.0; z < 9.0; z += 1.0)
-				{
 					if (the_ball.getBottom(true) >= the_paddle.paddle_mrect.x + (paddle_width_ninth * z))
 						angle += 1;
+				/*change ball angle according to the area of paddle hit*/
+				switch (angle)
+				{
+					case 1: ball_angle = (360.0 - ball_angle) - 40.0;
+					case 2: ball_angle = (360.0 - ball_angle) - 30.0;
+					case 3: ball_angle = (360.0 - ball_angle) - 20.0;
+					case 4: ball_angle = (360.0 - ball_angle) - 10.0;
+					case 5: ball_angle = (360.0 - ball_angle);
+					case 6: ball_angle = (360.0 - ball_angle) + 10.0;
+					case 7: ball_angle = (360.0 - ball_angle) + 20.0;
+					case 8: ball_angle = (360.0 - ball_angle) + 30.0;
+					case 9: ball_angle = (360.0 - ball_angle) + 40.0;
 				}
-				if (angle == 1)
-					ball_angle = (360.0 - ball_angle) - 40.0;
-				if (angle == 2)
-					ball_angle = (360.0 - ball_angle) - 30.0;
-				if (angle == 3)
-					ball_angle = (360.0 - ball_angle) - 20.0;
-				if (angle == 4)
-					ball_angle = (360.0 - ball_angle) - 10.0;
-				if (angle == 5)
-					ball_angle = (360.0 - ball_angle);
-				if (angle == 6)
-					ball_angle = (360.0 - ball_angle) + 10.0;
-				if (angle == 7)
-					ball_angle = (360.0 - ball_angle) + 20.0;
-				if (angle == 8)
-					ball_angle = (360.0 - ball_angle) + 30.0;
-				if (angle == 9)
-					ball_angle = (360.0 - ball_angle) + 40.0;
 			}
+			/*large if statement to determine if a brick has been hit (run once per brick)*/
 			for (int j = 0; j < 50; j++)
 			{
 				if (
@@ -455,8 +421,10 @@ int breakout()
 							)
 					)
 					brickHitH = true;
+				/*code if brick(s) hit*/
 				if (brickHitV || brickHitH)
 				{
+					/*check if brick is actually in play*/
 					if (brick_array[level][j].exists)
 					{
 						brick_array[level][j].destroy();
@@ -469,6 +437,7 @@ int breakout()
 							times_power_2++;
 						if (last_power == 3)
 							times_power_3++;
+						/*if brick hit V and H reverse direction*/
 						if (brickHitV && brickHitH)
 						{
 							ball_angle -= 180.0;
@@ -484,8 +453,7 @@ int breakout()
 					brickHitH = false;
 				}
 			}
-			ball_dx = 2.0 * cos(ball_angle * (M_PI / 180.0));
-			ball_dy = 2.0 * sin(ball_angle * (M_PI / 180.0));
+			ball_dx = 2.0 * cos(ball_angle * (M_PI / 180.0)); ball_dy = 2.0 * sin(ball_angle * (M_PI / 180.0));
 			if (hasHitPadd && isInPaddle)
 				the_ball.move(ball_dx / 300.0, ball_dy / 300.0);
 			else if (isInPaddle && !hasHitPadd)
@@ -494,34 +462,31 @@ int breakout()
 				the_ball.move(ball_dx / 300.0, ball_dy / 300.0);
 			else if (isInWall && !hasHitWall)
 				isInWall = false;
-			if (!hasInteracted && !hasHitPadd && !hasHitWall && !isInPaddle && !isInWall)
-				the_ball.move(ball_dx / 300.0, ball_dy / 300.0);
+			if (!hasInteracted && !hasHitPadd && !hasHitWall && !isInPaddle && !isInWall) the_ball.move(ball_dx / 300.0, ball_dy / 300.0);
+			/*if paddle and wall hit in same frame, ball is "crushed" (this could cause problems later*/
 			if (hasHitPadd && hasHitWall)
 			{
 				lives--;
 				the_ball.reset();
 				ball_angle = 0.0;
-				while (ball_angle < 30.0 || ball_angle > 150.0 || (ball_angle > 80 && ball_angle < 100))
-					ball_angle = rand() % 360;
+				while (ball_angle < 30.0 || ball_angle > 150.0 || (ball_angle > 80 && ball_angle < 100)) ball_angle = rand() % 360;
 				return 0;
 			}
 			int bricks_available = 0;
 			for (int brick_array_pos = 0; brick_array_pos < 50; brick_array_pos++)
-			{
 				if (brick_array[level][brick_array_pos].exists)
 					bricks_available++;
-			}
 			if (bricks_available == 0)
 				change_level = true;
 		}
+		/*either increase level, or go to win screen*/
 		if (change_level == true)
 		{
 			if (level == level_max)
 			{
 				int thanks_return = 0;
 				thanks_text_display = 0;
-				while (thanks_return == 0)
-					thanks_return = thanks_for_playing_the_beta();
+				while (thanks_return == 0) thanks_return = thanks_for_playing_the_beta();
 				thanks_text_display = 0;
 				return thanks_return;
 			}
@@ -530,10 +495,10 @@ int breakout()
 				ball_is_attached = true;
 				the_ball.reset();
 				the_paddle.reset();
-				while (ball_angle < 225.0 || ball_angle > 315.0 || (ball_angle > 265 && ball_angle < 275))
-					ball_angle = rand() % 360;
+				while (ball_angle < 225.0 || ball_angle > 315.0 || (ball_angle > 265 && ball_angle < 275)) ball_angle = rand() % 360;
 			}
 		}
+		/*to avoid a glitch, if more than one brick is hit on the same frame the direction is reversed*/
 		if (bricks_hit_this_frame > 1)
 		{
 			ball_angle += 180.0;
@@ -542,13 +507,13 @@ int breakout()
 		}
 	}
 
+	/*plays random SFX if a brick has been hit*/
 	if (bricks_hit_this_frame > 0)
 	{
 		int which_bounce = rand() % 7;
 		playSFX(ball_bounce[which_bounce]);
 	}
-	if (has_hit_paddle || has_hit_wall)
-		playSFX(ball_bounce[7]);
+	if (has_hit_paddle || has_hit_wall) playSFX(ball_bounce[7]);
 
 	trail_new_frame(the_ball);
 
@@ -558,52 +523,33 @@ int breakout()
 		if (brick_array[level][i].exists)
 			draw_object(brick_array[level][i]);
 	if (the_ball.uses_texture)
-	{
 		for (int i = 7; i >= 0; i--)
-			//sf2d_draw_texture_scale(ball_color_texture[the_ball.texture_id], trail_new_frame_circle[i].x, trail_new_frame_circle[i].y, (7 - i) / 8.0, (7 - i) / 8.0);
 			sf2d_draw_texture_scale_blend(ball_color_texture[the_ball.texture_id], (trail_new_frame_circle[i].x - trail_new_frame_circle[i].rad) + 1.0, (trail_new_frame_circle[i].y - trail_new_frame_circle[i].rad) + 2.0, (7 - i) / 8.0, (7 - i) / 8.0, RGBA8(0xFF, 0xFF, 0xFF, 32 * (7 - i)));
-	}
-	else {
+	else
 		for (int i = 7; i >= 0; i--)
 			draw_object(trail_new_frame_circle[i]);
-	}
 	draw_object(the_ball);
-	/*std::cout << ANSI "13;0" PEND;
-	for (int i = 0; i < 6; i++)
+	std::cout << ANSI "13;0" PEND;
+	for (int i = 0; i < 2; i++)
 		std::cout << "                                        ";
 	std::cout << ANSI "13;0" PEND;
 	std::cout << "Score: " << points << "\n";
 	std::cout << "Lives: " << lives << "\n";
-	std::cout << "Point value for brick 1: " << brick_array[level][0].point_value() << "\n";
-	std::cout << "Point Array 1 2 and 3: " << brick_point_value[0] << ", " << brick_point_value[1] << ", and" << brick_point_value[2] << "\n";
-	std::cout << "Powerup value last brick: " << last_power << "\n";
-	std::cout << "T1: " << times_power_1 << " T2: " << times_power_2 << " T3: " << times_power_3 << "\n";*/
-	/*std::cout << ANSI "13;0" PEND;
-	for (int i = 0; i < 8; i++)
-	std::cout << "                                        ";
-	std::cout << ANSI "13;0" PEND;
-	std::cout << "Ball hit: Top: " << hasHitPadd << " Bottom: -\n";
-	std::cout << "Ball hit: Left: - Right: -\n";
-	std::cout << "Ball Position: " << the_ball.ball_mcirc.x << "," << the_ball.ball_mcirc.y << "\n";
-	std::cout << "Ball Direction: " << ball_dx << "," << ball_dy << "\n";
-	std::cout << "Paddle Position: " << the_paddle.paddle_mrect.x << "," << the_paddle.paddle_mrect.y << "\n";
-	std::cout << "Paddle Direction: " << "Left: " << mov_left << " Right: " << mov_right << "\n";*/
 	sf2d_end_frame();
 	sf2d_swapbuffers();
 	return 0;
 }
 
+/*win screen for the beta*/
 int thanks_for_playing_the_beta()
 {
 	hidScanInput();
-	kDown = hidKeysDown();
-	kHeld = hidKeysHeld();
-	if (kDown & (KEY_SELECT | KEY_A | KEY_B | KEY_X | KEY_Y | KEY_L | KEY_R | KEY_ZL | KEY_ZR))
-		return 2;
-	if (kHeld & KEY_START)
-		return 3;
+	kDown = hidKeysDown(); kHeld = hidKeysHeld();
+	if (kDown & (KEY_SELECT | KEY_A | KEY_B | KEY_X | KEY_Y | KEY_L | KEY_R | KEY_ZL | KEY_ZR)) return 2;
+	if (kHeld & KEY_START) return 3;
 	sf2d_start_frame(GFX_TOP, GFX_LEFT);
 	sf2d_draw_texture(img_thanksbeta, 80, 20);
+	/*run text display once (to avoid screen tear)*/
 	if (thanks_text_display == 0)
 	{
 		std::cout << ANSI "0;0" PEND;
@@ -618,6 +564,8 @@ int thanks_for_playing_the_beta()
 		std::cout << "helping me with many things relating to\n";
 		std::cout << ANSI BRIGHT ASEP BLUE CEND "libctru" CRESET " and " ANSI GREEN CEND "sf2dlib." CRESET "\n\n";
 		std::cout << "Bryan for helping me with programming\n\n";
+		std::cout << ANSI BRIGHT ASEP MAGENTA CEND "GBAtemp" CRESET " community for helping me with so";
+		std::cout << "much! You guys are so helpful.\n\n";
 		std::cout << "\n";
 		std::cout << "     And " ANSI MAGENTA CEND "YOU" CRESET " for playing my game!\n";
 		std::cout << "    And remember, all feedback and\n";
@@ -629,6 +577,7 @@ int thanks_for_playing_the_beta()
 	return 0;
 }
 
+/*extras: created 10/13/2017*/
 int extras_10_13_2017()
 {
 	consoleSelect(&bottomScreen);
@@ -661,6 +610,7 @@ int extras_10_13_2017()
 	std::cout << "don't worry because it can easily be\n";
 	std::cout << "changed and I'm always open to\n";
 	std::cout << "suggestions!\n";
+	/*main loop with sf2d drawing*/
 	while (true)
 	{
 		sf2d_start_frame(GFX_TOP, GFX_LEFT);
@@ -669,15 +619,11 @@ int extras_10_13_2017()
 		sf2d_draw_texture(img_waveform, 40, 97);
 		hidScanInput();
 		kDown = hidKeysDown();
-		kHeld = hidKeysHeld();
-		if (kDown & (KEY_SELECT | KEY_A | KEY_B | KEY_X | KEY_Y | KEY_L | KEY_R | KEY_ZL | KEY_ZR | KEY_START))
-			break;
+		if (kDown & (KEY_SELECT | KEY_A | KEY_B | KEY_X | KEY_Y | KEY_L | KEY_R | KEY_ZL | KEY_ZR | KEY_START)) break;
 		sf2d_end_frame();
 		sf2d_swapbuffers();
 	}
-	if (kDown & (KEY_SELECT | KEY_A | KEY_B | KEY_X | KEY_Y | KEY_L | KEY_R | KEY_ZL | KEY_ZR))
-		return 2;
-	if (kHeld & KEY_START)
-		return 3;
+	if (kDown & (KEY_SELECT | KEY_A | KEY_B | KEY_X | KEY_Y | KEY_L | KEY_R | KEY_ZL | KEY_ZR)) return 2;
+	if (kDown & KEY_START) return 3;
 	return 4;
 }

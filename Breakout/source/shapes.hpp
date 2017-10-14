@@ -340,16 +340,21 @@ public:
 
 /*RGB Red channel by ball type*/
 extern int ball_cir_color_R[2];
+/*RGB Red channel by ball type*/
 extern int ball_tri_color_R[2];
 /*RGB Green channel by ball type*/
 extern int ball_cir_color_G[2];
+/*RGB Green channel by ball type*/
 extern int ball_tri_color_G[2];
 /*RGB Blue channel by ball type*/
 extern int ball_cir_color_B[2];
+/*RGB Blue channel by ball type*/
 extern int ball_tri_color_B[2];
 /*RGB Alpha channel by ball type*/
 extern int ball_cir_color_A[2];
+/*RGB Alpha channel by ball type*/
 extern int ball_tri_color_A[2];
+/*texture db*/
 extern sf2d_texture *ball_color_texture[2];
 /*id for textures (or null)*/
 extern int ball_texture_id[2];

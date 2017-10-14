@@ -18,6 +18,8 @@ using std::string;
 
 #include <vector>
 
+extern PrintConsole topScreen, bottomScreen, versionWin, killBox, debugBox;
+
 #include "Title_png.h"
 #include "thanksbeta_png.h"
 #include "waveform_png.h"
@@ -33,35 +35,11 @@ using std::string;
 
 #include "ethnocen_ttf.h"
 
-extern double ball_dx, ball_dy;
-extern bool crushBall;
-
-extern int level_mask[2][50];
-
-//Boost:
-/*#include <boost/filesystem.hpp>
-#include <lambda/bind.hpp>
-using namespace boost;*/
-
-//Decided not to use this because it's f***ing impossible to setup boost.
-
-extern PrintConsole topScreen, bottomScreen, versionWin, killBox, debugBox;
-
 extern char versiontxtt[8];
 extern char versiontxtn[9];
 extern char buildnumber[14];
 extern char ishupeversion[9];
 extern int vernumqik;
-int credits();
-extern int debugTF;
-const char * keyBoard(char * hintTxt, int maxNumbers, bool multiLine);
-extern int extras_10_13_2017();
-
-/**
- *Global Variables Init
- *(Lives Object Positions etc)
- */
-extern int lives;
 
 #define ANSI "\x1b["
 #define RED "31"

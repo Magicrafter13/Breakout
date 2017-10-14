@@ -1,5 +1,4 @@
 #pragma once
-//#include "shapes.hpp"
 
 /*
 Draws a rectangle
@@ -7,7 +6,7 @@ Draws a rectangle
 void draw_object(mRectangle Rectangle_to_draw);
 
 /*
-Draws a brick
+Draws a brick (Uses texture if one specified)
 */
 void draw_object(brick brick_to_draw);
 
@@ -22,7 +21,7 @@ Draws a triangle
 void draw_object(mTriangle tri_to_draw);
 
 /*
-Draws a ball
+Draws a ball (Uses texture if one specified)
 */
 void draw_object(ball ball_to_draw);
 

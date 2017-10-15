@@ -5,9 +5,7 @@ A simple Breakout clone for the 3DS [Uses sf2dlib, citro3d, and of course ctruli
 
 # Screenshots
 
-![Screenshot1](/BreakoutLeft.png)
-
-![Screenshot2](/BreakoutRight.png)
+![Screenshot1](/BreakoutLeft.png) ![Screenshot2](/BreakoutRight.png)
 
 
 ### Play

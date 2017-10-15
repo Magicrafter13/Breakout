@@ -6,7 +6,7 @@
 
 //init
 char versiontxtt[8] = "  Beta ", versiontxtn[9] = "01.05.00";
-char buildnumber[14] = "17.10.13.2330", ishupeversion[9] = "00.03.01";
+char buildnumber[14] = "17.10.15.1213", ishupeversion[9] = "00.03.01";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
@@ -377,18 +377,24 @@ int breakout()
 					if (the_ball.getBottom(true) >= the_paddle.paddle_mrect.x + (paddle_width_ninth * z))
 						angle += 1;
 				/*change ball angle according to the area of paddle hit*/
-				switch (angle)
-				{
-					case 1: ball_angle = (360.0 - ball_angle) - 40.0;
-					case 2: ball_angle = (360.0 - ball_angle) - 30.0;
-					case 3: ball_angle = (360.0 - ball_angle) - 20.0;
-					case 4: ball_angle = (360.0 - ball_angle) - 10.0;
-					case 5: ball_angle = (360.0 - ball_angle);
-					case 6: ball_angle = (360.0 - ball_angle) + 10.0;
-					case 7: ball_angle = (360.0 - ball_angle) + 20.0;
-					case 8: ball_angle = (360.0 - ball_angle) + 30.0;
-					case 9: ball_angle = (360.0 - ball_angle) + 40.0;
-				}
+				if (angle == 1)
+					ball_angle = (360.0 - ball_angle) - 40.0;
+				if (angle == 2)
+					ball_angle = (360.0 - ball_angle) - 30.0;
+				if (angle == 3)
+					ball_angle = (360.0 - ball_angle) - 20.0;
+				if (angle == 4)
+					ball_angle = (360.0 - ball_angle) - 10.0;
+				if (angle == 5)
+					ball_angle = (360.0 - ball_angle);
+				if (angle == 6)
+					ball_angle = (360.0 - ball_angle) + 10.0;
+				if (angle == 7)
+					ball_angle = (360.0 - ball_angle) + 20.0;
+				if (angle == 8)
+					ball_angle = (360.0 - ball_angle) + 30.0;
+				if (angle == 9)
+					ball_angle = (360.0 - ball_angle) + 40.0;
 			}
 			/*large if statement to determine if a brick has been hit (run once per brick)*/
 			for (int j = 0; j < 50; j++)

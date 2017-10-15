@@ -3,20 +3,22 @@ A simple Breakout clone for the 3DS [Uses sf2dlib, citro3d, and of course ctruli
 
 -Written by Magicrafter13 [Matthew Rease].
 
-#Screenshots
+# Screenshots
 ![Screenshot1](http://oldforgeinn.ddns.net/Images/Breakout/BreakoutLeft.png)
+Format: ![Alt Text](url)
 ![Screenshot2](http://oldforgeinn.ddns.net/Images/Breakout/BreakoutRight.png)
+Format: ![Alt Text](url)
 
 ### Play
 To play this, just download a precompiled binary (3dsx, cia, or elf) from the releases tab.
 
-##Controls
+## Controls
 * __D-Pad__ or Joystick to move Left and Right
 * __A Button__ to launch ball
 * __Select__ to start game (or return to title)
 * __Start__ to exit
 
-##"Nightlies"
+## "Nightlies"
 Available on my website. [Click Here!](http://oldforgeinn.ddns.net/Games/?game=Breakout)
 
 ### Edit / self-compile
@@ -27,4 +29,4 @@ ctrulib (If you don't have this, you are either new to 3ds homebrew or you're ju
 
 libpng (portlibs)
 
-libjpeg (portlibs
+libjpeg (portlibs)

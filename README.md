@@ -4,10 +4,11 @@ A simple Breakout clone for the 3DS [Uses sf2dlib, citro3d, and of course ctruli
 -Written by Magicrafter13 [Matthew Rease].
 
 # Screenshots
+
 ![Screenshot1](http://oldforgeinn.ddns.net/Images/Breakout/BreakoutLeft.png)
-Format: ![Alt Text](url)
+
 ![Screenshot2](http://oldforgeinn.ddns.net/Images/Breakout/BreakoutRight.png)
-Format: ![Alt Text](url)
+
 
 ### Play
 To play this, just download a precompiled binary (3dsx, cia, or elf) from the releases tab.

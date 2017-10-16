@@ -32,10 +32,6 @@ extern PrintConsole topScreen, bottomScreen, versionWin, killBox, debugBox;
 #include "brick04_png.h"
 #include "brick05_png.h"
 #include "ball00_png.h"
-#include "brick06_png.h"
-#include "brick07_png.h"
-#include "brick08_png.h"
-#include "brick09_png.h"
 
 #include "ethnocen_ttf.h"
 

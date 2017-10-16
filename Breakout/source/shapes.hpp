@@ -89,6 +89,9 @@ public:
 	}
 };
 
+extern sf2d_texture *game_textures[10];
+extern int brick_texture_by_type[11];
+extern int brick_palette_by_type[11];
 /*RGB Red channel by brick type*/
 extern int brick_color_R[5];
 /*RGB Green channel by brick type*/
@@ -98,11 +101,7 @@ extern int brick_color_B[5];
 /*RGB Alpha channel by brick type*/
 extern int brick_color_A[5];
 /*point value by brick type*/
-extern int brick_point_value[5];
-/*textures for brick types*/
-extern sf2d_texture *brick_color_texture[6];
-/*id for textures (or null)*/
-extern int brick_texture_id[5];
+extern int brick_point_value[11];
 /*for arithmetic*/
 #define max_textures 6
 
@@ -155,7 +154,7 @@ private:
 		return 0;
 	}
 public:
-	int texture_id;
+	sf2d_texture *public_texture;
 	bool uses_texture;
 	/*wether or not the brick is currently in play*/
 	bool exists;
@@ -172,21 +171,21 @@ public:
 	
 	Sets the default X,Y Coordinate, Width, Height, Palette, Existance, and Brick Type of the Brick
 	*/
-	void setDefaults(double bx, double by, double bwidth, double bheight, int palette, bool is_used, int brick_type)
+	void setDefaults(double bx, double by, double bwidth, double bheight, bool is_used, int brick_type)
 	{
-		brick_mrect.setDefaults(bx, by, bwidth, bheight, brick_color_R[palette], brick_color_G[palette], brick_color_B[palette], brick_color_A[palette]);
+		brick_mrect.setDefaults(bx, by, bwidth, bheight, brick_color_R[brick_palette_by_type[brick_type]], brick_color_G[brick_palette_by_type[brick_type]], brick_color_B[brick_palette_by_type[brick_type]], brick_color_A[brick_palette_by_type[brick_type]]);
 		internal_is_used = is_used;
 		if (internal_is_used)
 			exists = true;
 		else
 			exists = false;
 		internal_brick_type = brick_type;
-		if (brick_texture_id[brick_type] == max_textures)
+		if (brick_type == 0)
 			uses_texture = false;
 		else
 		{
 			uses_texture = true;
-			texture_id = brick_texture_id[brick_type];
+			public_texture = game_textures[brick_texture_by_type[brick_type]];
 		}
 	}
 	/*

@@ -10,7 +10,7 @@ void draw_object(mRectangle Rectangle_to_draw)
 void draw_object(brick brick_to_draw)
 {
 	if (brick_to_draw.uses_texture)
-		sf2d_draw_texture(brick_color_texture[brick_to_draw.texture_id], brick_to_draw.brick_mrect.x, brick_to_draw.brick_mrect.y);
+		sf2d_draw_texture(brick_to_draw.public_texture, brick_to_draw.brick_mrect.x, brick_to_draw.brick_mrect.y);
 	else
 		draw_object(brick_to_draw.brick_mrect);
 }

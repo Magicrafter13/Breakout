@@ -89,8 +89,9 @@ public:
 	}
 };
 
-extern sf2d_texture *game_textures[10];
+extern sf2d_texture *game_textures[19];
 extern int brick_texture_by_type[11];
+extern int brick_second_texture_by_type[11];
 extern int brick_palette_by_type[11];
 /*RGB Red channel by brick type*/
 extern int brick_color_R[5];
@@ -107,8 +108,26 @@ extern int brick_point_value[11];
 
 class brick {
 private:
-	bool internal_is_used;
 	int internal_brick_type;
+	void set_hits() {
+		switch (internal_brick_type) {
+		case 0: hits_left = 0;
+			break;
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+		case 5: hits_left = 1;
+			break;
+		case 6:
+		case 7:
+		case 8:
+		case 9:
+		case 10: hits_left = 2;
+			break;
+		}
+	}
+	bool internal_is_used;
 	int get_powerup()
 	{
 		switch (internal_brick_type)
@@ -155,6 +174,7 @@ private:
 	}
 public:
 	sf2d_texture *public_texture;
+	int hits_left;
 	bool uses_texture;
 	/*wether or not the brick is currently in play*/
 	bool exists;
@@ -187,13 +207,20 @@ public:
 			uses_texture = true;
 			public_texture = game_textures[brick_texture_by_type[brick_type]];
 		}
+		set_hits();
 	}
 	/*
 	Sets the exists value to false thus removing it from play
 	*/
 	void destroy()
 	{
-		exists = false;
+		if (hits_left <= 1)
+			exists = false;
+		else {
+			hits_left--;
+			if (internal_brick_type >= 6 && internal_brick_type <= 10)
+				public_texture = game_textures[brick_second_texture_by_type[internal_brick_type]];
+		}
 	}
 	/*
 	Resets the brick values to their defaults
@@ -205,6 +232,8 @@ public:
 		else
 			exists = false;
 		brick_mrect.reset();
+		public_texture = game_textures[brick_texture_by_type[internal_brick_type]];
+		set_hits();
 	}
 	/*
 	Integer: Returns the point value given by the brick

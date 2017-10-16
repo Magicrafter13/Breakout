@@ -125,13 +125,13 @@ int main(int argc, char **argv)
 	sf2d_set_clear_color(RGBA8(0x95, 0x95, 0x95, 0xFF));
 	sf2d_set_vblank_wait(1);
 	sftd_font *fnt_main;
-	sf2d_texture *img_title = sfil_load_PNG_buffer(Title_png, SF2D_PLACE_RAM);
-	img_thanksbeta = sfil_load_PNG_buffer(thanksbeta_png, SF2D_PLACE_RAM);
+	sf2d_texture *img_title = game_textures[15];
+	img_thanksbeta = game_textures[16];
 
-	img_paddle = sfil_load_PNG_buffer(paddle_png, SF2D_PLACE_RAM);
-	img_brick00 = sfil_load_PNG_buffer(brick00_png, SF2D_PLACE_RAM);
+	img_paddle = game_textures[17];
+	img_brick00 = game_textures[0];
 
-	img_waveform = sfil_load_PNG_buffer(waveform_png, SF2D_PLACE_RAM);
+	img_waveform = game_textures[18];
 
 	fnt_main = sftd_load_font_mem(ethnocen_ttf, ethnocen_ttf_size);
 
@@ -150,39 +150,19 @@ int main(int argc, char **argv)
 
 	the_paddle.setDefaults(175, 215, 50, 10, 0xC0, 0x61, 0x0A, 0xFF, img_paddle);
 	the_ball.setDefaults(200.0, 200.0, 7.0, 1, 200.3, 195.2, 202.5, 199.8, 204.9, 197.1);
-	int array_step = 0;
-	/*brick array level 1, 5 times by 10 times (10 bricks across, 5 down)*/
-	for (int a = 0; a < 5; a++)
+	for (int q = 0; q < level_count; q++)
 	{
-		for (int b = 0; b < 10; b++)
+		int array_step = 0;
+		for (int a = 0; a < 5; a++)
 		{
-			brick_array[0][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, true, level_mask[0][array_step]);
-			array_step++;
-		}
-	}
-	array_step = 0;
-	/*brick array level 2, 5 times by 10 times (10 bricks across, 5 down)*/
-	for (int a = 0; a < 5; a++)
-	{
-		for (int b = 0; b < 10; b++)
-		{
-			if (level_mask[1][array_step] == 0)
-				brick_array[1][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, false, 0);
-			else
-				brick_array[1][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, true, level_mask[1][array_step]);
-			array_step++;
-		}
-	}
-	array_step = 0;
-	for (int a = 0; a < 5; a++)
-	{
-		for (int b = 0; b < 10; b++)
-		{
-			if (level_mask[2][array_step] == 0)
-				brick_array[2][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, false, 0);
-			else
-				brick_array[2][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, true, level_mask[2][array_step]);
-			array_step++;
+			for (int b = 0; b < 10; b++)
+			{
+				if (level_mask[q][array_step] == 0)
+					brick_array[q][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, false, 0);
+				else
+					brick_array[q][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, true, level_mask[q][array_step]);
+				array_step++;
+			}
 		}
 	}
 
@@ -453,15 +433,17 @@ int breakout()
 					if (brick_array[level][j].exists)
 					{
 						brick_array[level][j].destroy();
-						points += brick_array[level][j].point_value();
-						last_power = brick_array[level][j].random_powerup();
+						if (!brick_array[level][j].exists) {
+							points += brick_array[level][j].point_value();
+							last_power = brick_array[level][j].random_powerup();
+							if (last_power == 1)
+								times_power_1++;
+							if (last_power == 2)
+								times_power_2++;
+							if (last_power == 3)
+								times_power_3++;
+						}
 						bricks_hit_this_frame++;
-						if (last_power == 1)
-							times_power_1++;
-						if (last_power == 2)
-							times_power_2++;
-						if (last_power == 3)
-							times_power_3++;
 						/*if brick hit V and H reverse direction*/
 						if (brickHitV && brickHitH)
 						{

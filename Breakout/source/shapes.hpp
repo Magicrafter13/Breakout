@@ -89,22 +89,23 @@ public:
 	}
 };
 
+#define brick_types 11
+
 /*RGB Red channel by brick type*/
-extern int brick_color_R[5];
+extern int brick_color_R[brick_types];
 /*RGB Green channel by brick type*/
-extern int brick_color_G[5];
+extern int brick_color_G[brick_types];
 /*RGB Blue channel by brick type*/
-extern int brick_color_B[5];
+extern int brick_color_B[brick_types];
 /*RGB Alpha channel by brick type*/
-extern int brick_color_A[5];
+extern int brick_color_A[brick_types];
 /*point value by brick type*/
-extern int brick_point_value[5];
+extern int brick_point_value[brick_types];
 /*textures for brick types*/
-extern sf2d_texture *brick_color_texture[6];
+extern sf2d_texture *brick_color_texture[brick_types];
 /*id for textures (or null)*/
-extern int brick_texture_id[5];
+extern int brick_texture_id[brick_types];
 /*for arithmetic*/
-#define max_textures 6
 
 class brick {
 private:
@@ -181,7 +182,7 @@ public:
 		else
 			exists = false;
 		internal_brick_type = brick_type;
-		if (brick_texture_id[brick_type] == max_textures)
+		if (brick_texture_id[brick_type] == brick_types)
 			uses_texture = false;
 		else
 		{

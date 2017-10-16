@@ -20,12 +20,12 @@ double ball_dx, ball_dy, ball_angle, trail_new_frame_x[8], trail_new_frame_y[8];
 int last_power, times_power_1, times_power_2, times_power_3;
 int press_select_frame = 0; bool press_select_visible = true;
 
-paddle the_paddle; ball the_ball; mCircle trail_new_frame_circle[8]; brick brick_array[2][50];
+paddle the_paddle; ball the_ball; mCircle trail_new_frame_circle[8]; brick brick_array[3][50];
 sf2d_texture *img_thanksbeta, *img_paddle, *img_brick00, *img_brick01, *img_brick02, *img_brick03, *img_brick04, *img_brick05, *img_waveform;
 SFX_s *testsound[1], *ball_bounce[8];
 
 /*integer mask for levels*/
-int level_mask[2][50] = {
+int level_mask[3][50] = {
 	{
 		4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
 		3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
@@ -34,11 +34,18 @@ int level_mask[2][50] = {
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 	},
 	{
-		4, 4, max_textures, max_textures, max_textures, max_textures, max_textures, max_textures, max_textures, max_textures,
-		3, 3, 3, 3, max_textures, max_textures, max_textures, max_textures, max_textures, max_textures,
-		2, 2, 2, 2, 2, 2, max_textures, max_textures, max_textures, max_textures,
-		1, 1, 1, 1, 1, 1, 1, 1, max_textures, max_textures,
+		4, 4, brick_types, brick_types, brick_types, brick_types, brick_types, brick_types, brick_types, brick_types,
+		3, 3, 3, 3, brick_types, brick_types, brick_types, brick_types, brick_types, brick_types,
+		2, 2, 2, 2, 2, 2, brick_types, brick_types, brick_types, brick_types,
+		1, 1, 1, 1, 1, 1, 1, 1, brick_types, brick_types,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	},
+	{
+		brick_types, brick_types, 0, 0, 1, 1, 0, 0, brick_types, brick_types,
+		          0,           0, 1, 1, 2, 2, 1, 1,           0,           0,
+				  1,           1, 2, 2, 8, 8, 2, 2,           1,           1,
+				  0,           0, 1, 1, 2, 2, 1, 1,           0,           0,
+		brick_types, brick_types, 0, 0, 1, 1, 0, 0, brick_types, brick_types,
 	}
 };
 
@@ -159,11 +166,22 @@ int main(int argc, char **argv)
 	{
 		for (int b = 0; b < 10; b++)
 		{
-			if (level_mask[1][array_step] == max_textures)
+			if (level_mask[1][array_step] == brick_types)
 				brick_array[1][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, a, false, 0);
 			else
-				brick_array[1][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, a, true, level_mask[0][array_step]);
+				brick_array[1][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, a, true, level_mask[1][array_step]);
 			array_step++;
+		}
+	}
+	/*brick array level 3, 5 times by 10 times (10 bricks across, 5 down)*/
+	for (int a = 0; a < 5; a++)
+	{
+		for (int b = 0; b < 10; b++)
+		{
+			if (level_mask[2][array_step] == brick_types)
+				brick_array[2][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, a, false, 0);
+			else
+				brick_array[2][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, a, true, level_mask[2][array_step]);
 		}
 	}
 
@@ -298,10 +316,10 @@ int breakout()
 	hidScanInput();
 	kDown = hidKeysDown();
 	kHeld = hidKeysHeld();
-	/*if (kDown & KEY_R)
+	if (kDown & KEY_R)
 		level++;
 	if (kDown & KEY_L)
-		level--;*/
+		level--;
 	if (kDown & KEY_SELECT || lives == 0) return 2;
 	if (kHeld & KEY_START) return 3;
 	/*move paddle left (if applicable)*/

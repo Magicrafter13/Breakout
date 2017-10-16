@@ -25,7 +25,7 @@ sf2d_texture *img_thanksbeta, *img_paddle, *img_brick00, *img_brick01, *img_bric
 SFX_s *testsound[1], *ball_bounce[8];
 
 /*integer mask for levels*/
-int level_mask[2][50] = {
+int level_mask[3][50] = {
 	{
 		4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
 		3, 3, 3, 3, 3, 3, 3, 3, 3, 3,

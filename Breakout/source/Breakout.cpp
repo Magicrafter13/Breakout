@@ -5,8 +5,8 @@
 #include "filesystem.h"
 
 //init
-char versiontxtt[8] = "  Beta ", versiontxtn[9] = "01.05.00";
-char buildnumber[14] = "17.10.15.1213", ishupeversion[9] = "00.03.01";
+char versiontxtt[8] = "  Beta ", versiontxtn[9] = "01.06.00";
+char buildnumber[14] = "17.10.16.2033", ishupeversion[9] = "00.04.00";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
@@ -310,10 +310,10 @@ int breakout()
 	hidScanInput();
 	kDown = hidKeysDown();
 	kHeld = hidKeysHeld();
-	if (kDown & KEY_R)
+	/*if (kDown & KEY_R)
 		level++;
 	if (kDown & KEY_L)
-		level--;
+		level--;*/
 	if (kDown & KEY_SELECT || lives == 0) return 2;
 	if (kHeld & KEY_START) return 3;
 	/*move paddle left (if applicable)*/

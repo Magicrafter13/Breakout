@@ -13,19 +13,20 @@ u32 kDown, kHeld;
 int breakout();
 int thanks_for_playing_the_beta();
 int extras_10_13_2017();
+int level_designer();
 
 int lives = 3, points, level = 0;
-int level_count = 3; int level_max = 2; //amount of levels minus 1
+int level_count = def_level_count;
 double ball_dx, ball_dy, ball_angle, trail_new_frame_x[8], trail_new_frame_y[8]; bool crushBall = false; bool ball_is_attached;
 int last_power, times_power_1, times_power_2, times_power_3;
 int press_select_frame = 0; bool press_select_visible = true;
 
-paddle the_paddle; ball the_ball; mCircle trail_new_frame_circle[8]; brick brick_array[3][50];
+paddle the_paddle; ball the_ball; mCircle trail_new_frame_circle[8]; brick brick_array[def_level_count][50];
 sf2d_texture *img_thanksbeta, *img_paddle, *img_brick00, *img_brick01, *img_brick02, *img_brick03, *img_brick04, *img_brick05, *img_waveform;
 SFX_s *testsound[1], *ball_bounce[8];
 
 /*integer mask for levels*/
-int level_mask[3][50] = {
+int level_mask[def_level_count][50] = {
 	{
 		5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
 		4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
@@ -46,6 +47,13 @@ int level_mask[3][50] = {
 		2, 2, 3, 3, 9, 9, 3, 3, 2, 2,
 		1, 1, 2, 2, 3, 3, 2, 2, 1, 1,
 		0, 0, 1, 1, 2, 2, 1, 1, 0, 0
+	},
+	{
+		 5,  0,  3,  2,  0,  0,  2,  3,  0,  5,
+		 4,  8,  2,  1, 10, 10,  1,  2,  8,  4,
+		 0,  2,  0,  0,  9,  9,  0,  0,  2,  0,
+		 4,  8,  2,  1, 10, 10,  1,  2,  8,  4,
+		 5,  0,  3,  2,  0,  0,  2,  3,  0,  5
 	}
 };
 
@@ -184,6 +192,10 @@ int main(int argc, char **argv)
 			int ext_return = extras_10_13_2017();
 			if (ext_return == 3)
 				break;
+		}
+		/*level designer*/
+		if (kDown & KEY_Y) {
+			level_designer();
 		}
 		/*begin game*/
 		if (kDown & KEY_SELECT)
@@ -492,7 +504,7 @@ int breakout()
 		/*either increase level, or go to win screen*/
 		if (change_level == true)
 		{
-			if (level == level_max)
+			if (level == level_count - 1)
 			{
 				int thanks_return = 0;
 				thanks_text_display = 0;
@@ -636,4 +648,67 @@ int extras_10_13_2017()
 	if (kDown & (KEY_SELECT | KEY_A | KEY_B | KEY_X | KEY_Y | KEY_L | KEY_R | KEY_ZL | KEY_ZR)) return 2;
 	if (kDown & KEY_START) return 3;
 	return 4;
+}
+
+int level_designer() {
+	int designed_level[50] = {
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	};
+	int current_spot = 0;
+	while (true) {
+		sf2d_start_frame(GFX_TOP, GFX_LEFT);
+		int array_step = 0;
+		for (int a = 0; a < 5; a++)
+		{
+			for (int b = 0; b < 10; b++)
+			{
+				if (!designed_level[array_step] == 0)
+					sf2d_draw_texture(game_textures[brick_texture_by_type[designed_level[array_step]]], (40 * b) + 2, (20 * a) + 2);
+				if (array_step == current_spot)
+					sf2d_draw_texture(game_textures[19], (40 * b) + 20, (20 * a) + 8);
+				array_step++;
+			}
+		}
+		sf2d_end_frame();
+		hidScanInput();
+		kDown = hidKeysDown();
+		if (kDown & KEY_UP && current_spot >= 10)
+			current_spot -= 10;
+		if (kDown & KEY_DOWN && current_spot <= 39)
+			current_spot += 10;
+		if (kDown & KEY_LEFT && current_spot > 0)
+			current_spot--;
+		if (kDown & KEY_RIGHT && current_spot < 49)
+			current_spot++;
+		if (kDown & KEY_R) {
+			if (designed_level[current_spot] == 10)
+				designed_level[current_spot] = 0;
+			else
+				designed_level[current_spot]++;
+		}
+		if (kDown & KEY_L) {
+			if (designed_level[current_spot] == 0)
+				designed_level[current_spot] = 10;
+			else
+				designed_level[current_spot]--;
+		}
+		if (kDown & (KEY_START | KEY_B))
+			break;
+		std::cout << ANSI "0;0" PEND;
+		for (int i = 0; i < 30; i++)
+			std::cout << "                              ";
+		std::cout << ANSI "0;0" PEND;
+		std::cout << "Levellayout:\n";
+		std::cout << designed_level[0] << ", " << designed_level[1] << ", " << designed_level[2] << ", " << designed_level[3] << ", " << designed_level[4] << ", " << designed_level[5] << ", " << designed_level[6] << ", " << designed_level[7] << ", " << designed_level[8] << ", " << designed_level[9] << "\n";
+		std::cout << designed_level[10] << ", " << designed_level[11] << ", " << designed_level[12] << ", " << designed_level[13] << ", " << designed_level[14] << ", " << designed_level[15] << ", " << designed_level[16] << ", " << designed_level[17] << ", " << designed_level[18] << ", " << designed_level[19] << "\n";
+		std::cout << designed_level[20] << ", " << designed_level[21] << ", " << designed_level[22] << ", " << designed_level[23] << ", " << designed_level[24] << ", " << designed_level[25] << ", " << designed_level[26] << ", " << designed_level[27] << ", " << designed_level[28] << ", " << designed_level[29] << "\n";
+		std::cout << designed_level[30] << ", " << designed_level[31] << ", " << designed_level[32] << ", " << designed_level[33] << ", " << designed_level[34] << ", " << designed_level[35] << ", " << designed_level[36] << ", " << designed_level[37] << ", " << designed_level[38] << ", " << designed_level[39] << "\n";
+		std::cout << designed_level[40] << ", " << designed_level[41] << ", " << designed_level[42] << ", " << designed_level[43] << ", " << designed_level[44] << ", " << designed_level[45] << ", " << designed_level[46] << ", " << designed_level[47] << ", " << designed_level[48] << ", " << designed_level[49] << "\n";
+		sf2d_swapbuffers();
+	}
+	return 0;
 }

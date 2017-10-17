@@ -24,15 +24,15 @@ sf2d_texture *game_textures[texture_count] = {
 	sfil_load_PNG_buffer(ball00_png, SF2D_PLACE_RAM)
 };
 
-int brick_texture_by_type[11] = {
+int brick_texture_by_type[brick_types] = {
 	0, 1, 2, 3, 4, 5, 10, 11, 12, 13, 14
 };
 
-int brick_second_texture_by_type[11] = {
+int brick_second_texture_by_type[brick_types] = {
 	0, 0, 0, 0, 0, 0, 0, 6, 7, 8, 9
 };
 
-int brick_palette_by_type[11] = {
+int brick_palette_by_type[brick_types] = {
 	0, 4, 3, 2, 1, 0, 4, 3, 2, 1, 0
 };
 
@@ -48,7 +48,7 @@ int brick_color_B[5] = {
 int brick_color_A[5] = {
 	0xFA, 0xFA, 0xFA, 0xFA, 0xFA
 }; //250 instead of 255. I want to the bricks to fade out by 25 each frame (lasting 10 frames)
-int brick_point_value[11] = {
+int brick_point_value[brick_types] = {
 	0, 0, 10, 15, 20, 25, 0, 20, 30, 40, 50
 };
 

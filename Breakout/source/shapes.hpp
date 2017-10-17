@@ -90,9 +90,9 @@ public:
 };
 
 extern sf2d_texture *game_textures[texture_count];
-extern int brick_texture_by_type[11];
-extern int brick_second_texture_by_type[11];
-extern int brick_palette_by_type[11];
+extern int brick_texture_by_type[brick_types];
+extern int brick_second_texture_by_type[brick_types];
+extern int brick_palette_by_type[brick_types];
 /*RGB Red channel by brick type*/
 extern int brick_color_R[5];
 /*RGB Green channel by brick type*/
@@ -102,7 +102,7 @@ extern int brick_color_B[5];
 /*RGB Alpha channel by brick type*/
 extern int brick_color_A[5];
 /*point value by brick type*/
-extern int brick_point_value[11];
+extern int brick_point_value[brick_types];
 
 class brick {
 private:

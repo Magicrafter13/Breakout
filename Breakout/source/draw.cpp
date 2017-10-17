@@ -29,7 +29,7 @@ void draw_object(ball ball_to_draw)
 {
 	if (ball_to_draw.uses_texture)
 	{
-		sf2d_draw_texture(ball_color_texture[ball_to_draw.texture_id], ball_to_draw.getLeft(true), ball_to_draw.getTop(false));
+		sf2d_draw_texture(game_textures[ball_to_draw.texture_id], ball_to_draw.getLeft(true), ball_to_draw.getTop(false));
 	}
 	else {
 		draw_object(ball_to_draw.ball_mcirc);

@@ -1,7 +1,7 @@
 #include "Breakout.hpp"
 #include "shapes.hpp"
 
-sf2d_texture *game_textures[19] = {
+sf2d_texture *game_textures[texture_count] = {
 	sfil_load_PNG_buffer(brick00_png, SF2D_PLACE_RAM),
 	sfil_load_PNG_buffer(brick01_png, SF2D_PLACE_RAM),
 	sfil_load_PNG_buffer(brick02_png, SF2D_PLACE_RAM),
@@ -20,7 +20,8 @@ sf2d_texture *game_textures[19] = {
 	sfil_load_PNG_buffer(Title_png, SF2D_PLACE_RAM),
 	sfil_load_PNG_buffer(thanksbeta_png, SF2D_PLACE_RAM),
 	sfil_load_PNG_buffer(paddle_png, SF2D_PLACE_RAM),
-	sfil_load_PNG_buffer(waveform_png, SF2D_PLACE_RAM)
+	sfil_load_PNG_buffer(waveform_png, SF2D_PLACE_RAM),
+	sfil_load_PNG_buffer(ball00_png, SF2D_PLACE_RAM)
 };
 
 int brick_texture_by_type[11] = {
@@ -75,9 +76,6 @@ int ball_cir_color_A[2] = {
 int ball_tri_color_A[2] = {
 	0xFF, 0x00
 };
-sf2d_texture *ball_color_texture[2] = {
-	0, sfil_load_PNG_buffer(ball00_png, SF2D_PLACE_RAM)
-};
 int ball_texture_id[2] = {
-	0, 1
+	0, 19
 };

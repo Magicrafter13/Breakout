@@ -20,6 +20,8 @@ using std::string;
 
 extern PrintConsole topScreen, bottomScreen, versionWin, killBox, debugBox;
 
+#define texture_count 20
+
 #include "Title_png.h"
 #include "thanksbeta_png.h"
 #include "waveform_png.h"
@@ -49,6 +51,8 @@ extern char versiontxtn[9];
 extern char buildnumber[14];
 extern char ishupeversion[9];
 extern int vernumqik;
+
+extern sftd_font *game_fonts[1];
 
 #define ANSI "\x1b["
 #define RED "31"

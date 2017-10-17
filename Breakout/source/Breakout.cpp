@@ -124,7 +124,10 @@ int main(int argc, char **argv)
 
 	sf2d_set_clear_color(RGBA8(0x95, 0x95, 0x95, 0xFF));
 	sf2d_set_vblank_wait(1);
-	sftd_font *fnt_main;
+	//sftd_font *fnt_main;
+	sftd_font *game_fonts[1] = {
+		sftd_load_font_mem(ethnocen_ttf, ethnocen_ttf_size)
+	};
 	sf2d_texture *img_title = game_textures[15];
 	img_thanksbeta = game_textures[16];
 
@@ -133,7 +136,7 @@ int main(int argc, char **argv)
 
 	img_waveform = game_textures[18];
 
-	fnt_main = sftd_load_font_mem(ethnocen_ttf, ethnocen_ttf_size);
+	//fnt_main = game_fonts[0];
 
 	testsound[0] = createSFX("romfs:/testfile.raw", SOUND_FORMAT_16BIT);
 	ball_bounce[0] = createSFX("romfs:/bounce0.raw", SOUND_FORMAT_16BIT);
@@ -242,7 +245,7 @@ int main(int argc, char **argv)
 		sf2d_draw_texture(img_title, 80, 20);
 		sf2d_draw_texture(img_paddle, 122, 92);
 		if (press_select_visible)
-			sftd_draw_textf(fnt_main, 100, 180, RGBA8(0x00, 0x00, 0x00, 0xFF), 11, "Press Select to play!");
+			sftd_draw_textf(game_fonts[0], 100, 180, RGBA8(0x00, 0x00, 0x00, 0xFF), 11, "Press Select to play!");
 		sf2d_end_frame();
 		/*after half a second, Press Select to play! is toggled*/
 		if (press_select_frame == 30)
@@ -266,14 +269,12 @@ int main(int argc, char **argv)
 	}
 
 	// Exit services
-	sf2d_fini();
 	sftd_fini();
 
-	sf2d_free_texture(img_title);
-	sf2d_free_texture(img_thanksbeta);
+	for (int i = 0; i < texture_count; i++)
+		sf2d_free_texture(game_textures[i]);
 
-	sf2d_free_texture(img_brick00);
-	sf2d_free_texture(img_paddle);
+	sf2d_fini();
 
 	exitSound();
 
@@ -376,24 +377,26 @@ int breakout()
 					if (the_ball.getBottom(true) >= the_paddle.paddle_mrect.x + (paddle_width_ninth * z))
 						angle += 1;
 				/*change ball angle according to the area of paddle hit*/
-				if (angle == 1)
-					ball_angle = (360.0 - ball_angle) - 40.0;
-				if (angle == 2)
-					ball_angle = (360.0 - ball_angle) - 30.0;
-				if (angle == 3)
-					ball_angle = (360.0 - ball_angle) - 20.0;
-				if (angle == 4)
-					ball_angle = (360.0 - ball_angle) - 10.0;
-				if (angle == 5)
-					ball_angle = (360.0 - ball_angle);
-				if (angle == 6)
-					ball_angle = (360.0 - ball_angle) + 10.0;
-				if (angle == 7)
-					ball_angle = (360.0 - ball_angle) + 20.0;
-				if (angle == 8)
-					ball_angle = (360.0 - ball_angle) + 30.0;
-				if (angle == 9)
-					ball_angle = (360.0 - ball_angle) + 40.0;
+				switch (angle) {
+				case 1: ball_angle = (360.0 - ball_angle) - 40.0;
+					break;
+				case 2: ball_angle = (360.0 - ball_angle) - 30.0;
+					break;
+				case 3: ball_angle = (360.0 - ball_angle) - 20.0;
+					break;
+				case 4: ball_angle = (360.0 - ball_angle) - 10.0;
+					break;
+				case 5: ball_angle = (360.0 - ball_angle);
+					break;
+				case 6: ball_angle = (360.0 - ball_angle) + 10.0;
+					break;
+				case 7: ball_angle = (360.0 - ball_angle) + 20.0;
+					break;
+				case 8: ball_angle = (360.0 - ball_angle) + 30.0;
+					break;
+				case 9: ball_angle = (360.0 - ball_angle) + 40.0;
+					break;
+				}
 			}
 			/*large if statement to determine if a brick has been hit (run once per brick)*/
 			for (int j = 0; j < 50; j++)
@@ -531,7 +534,7 @@ int breakout()
 			draw_object(brick_array[level][i]);
 	if (the_ball.uses_texture)
 		for (int i = 7; i >= 0; i--)
-			sf2d_draw_texture_scale_blend(ball_color_texture[the_ball.texture_id], (trail_new_frame_circle[i].x - trail_new_frame_circle[i].rad) + 1.0, (trail_new_frame_circle[i].y - trail_new_frame_circle[i].rad) + 2.0, (7 - i) / 8.0, (7 - i) / 8.0, RGBA8(0xFF, 0xFF, 0xFF, 32 * (7 - i)));
+			sf2d_draw_texture_scale_blend(game_textures[the_ball.texture_id], (trail_new_frame_circle[i].x - trail_new_frame_circle[i].rad) + 1.0, (trail_new_frame_circle[i].y - trail_new_frame_circle[i].rad) + 2.0, (7 - i) / 8.0, (7 - i) / 8.0, RGBA8(0xFF, 0xFF, 0xFF, 32 * (7 - i)));
 	else
 		for (int i = 7; i >= 0; i--)
 			draw_object(trail_new_frame_circle[i]);

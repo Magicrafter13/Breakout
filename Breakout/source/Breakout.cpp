@@ -6,7 +6,7 @@
 
 //init
 char versiontxtt[8] = "  Beta ", versiontxtn[9] = "01.06.00";
-char buildnumber[14] = "17.10.17.1021", ishupeversion[9] = "00.04.00";
+char buildnumber[14] = "17.10.17.1509", ishupeversion[9] = "00.04.00";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
@@ -725,6 +725,7 @@ int level_designer() {
 		std::cout << designed_level[30] << ", " << designed_level[31] << ", " << designed_level[32] << ", " << designed_level[33] << ", " << designed_level[34] << ", " << designed_level[35] << ", " << designed_level[36] << ", " << designed_level[37] << ", " << designed_level[38] << ", " << designed_level[39] << "\n";
 		std::cout << designed_level[40] << ", " << designed_level[41] << ", " << designed_level[42] << ", " << designed_level[43] << ", " << designed_level[44] << ", " << designed_level[45] << ", " << designed_level[46] << ", " << designed_level[47] << ", " << designed_level[48] << ", " << designed_level[49] << "\n";
 		std::cout << "                  Press X to save level.";
+		std::cout << "    Press B or Start to return to title.";
 		sf2d_swapbuffers();
 	}
 	return 0;

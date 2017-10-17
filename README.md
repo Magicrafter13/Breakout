@@ -12,10 +12,18 @@ A simple Breakout clone for the 3DS [Uses sf2dlib, citro3d, and of course ctruli
 To play this, just download a precompiled binary (3dsx, cia, or elf) from the releases tab.
 
 ## Controls
+#### In - Game ####
 * __D-Pad__ or Joystick to move Left and Right
 * __A Button__ to launch ball
 * __Select__ to start game (or return to title)
+* __Y__ to open Level editor
 * __Start__ to exit
+
+#### In Level Editor ####
+* __D-Pad__ or __Joystick__ to move cursor
+* __L__ and __R__ to switch brick type
+* __X__ to save level layout
+* __B__ or __Start__ to return to title
 
 ## "Nightlies"
 Available on my website. [Click Here!](http://oldforgeinn.ddns.net/Games/?game=Breakout#download)

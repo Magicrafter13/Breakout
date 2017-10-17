@@ -6,14 +6,18 @@
 
 //init
 char versiontxtt[8] = "  Beta ", versiontxtn[9] = "01.06.00";
-char buildnumber[14] = "17.10.16.2033", ishupeversion[9] = "00.04.00";
+char buildnumber[14] = "17.10.17.1021", ishupeversion[9] = "00.04.00";
 int vernumqik = 0;
 u32 kDown, kHeld;
+
+FILE *saved_level;
+int designed_level[50];
 
 int breakout();
 int thanks_for_playing_the_beta();
 int extras_10_13_2017();
 int level_designer();
+int save_level();
 
 int lives = 3, points, level = 0;
 int level_count = def_level_count;
@@ -109,6 +113,20 @@ void closeSD()
 int main(int argc, char **argv)
 {
 	romfsInit();
+
+	if (FILE *file = fopen("sdmc:/3ds/breakout_level.bsl", "r")) {
+		saved_level = fopen("sdmc:/3ds/breakout_level.bsl", "r");
+		fclose(file);
+	}
+	else {
+		fclose(file);
+		saved_level = fopen("sdmc:/3ds/breakout_level.bsl", "w");
+		fputs("0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n", saved_level);
+		fclose(saved_level);
+		saved_level = fopen("sdmc:/3ds/breakout_level.bsl", "r");
+	}
+	for (int i = 0; i < 50; i++)
+		fscanf(saved_level, "%d\n", &designed_level[i]);
 
 	csndInit();
 	initSound();
@@ -248,6 +266,7 @@ int main(int argc, char **argv)
 
 			std::cout << ANSI "2;0" PEND "Press Select to begin.\n";
 			std::cout << "Press X to see what I'm working on or have planned.\n";
+			std::cout << "Press Y to open level editor.\n";
 
 			bottom_screen_text = 1;
 		}
@@ -281,6 +300,8 @@ int main(int argc, char **argv)
 	}
 
 	// Exit services
+	fclose(saved_level);
+
 	sftd_fini();
 
 	for (int i = 0; i < texture_count; i++)
@@ -651,13 +672,6 @@ int extras_10_13_2017()
 }
 
 int level_designer() {
-	int designed_level[50] = {
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-	};
 	int current_spot = 0;
 	while (true) {
 		sf2d_start_frame(GFX_TOP, GFX_LEFT);
@@ -698,6 +712,8 @@ int level_designer() {
 		}
 		if (kDown & (KEY_START | KEY_B))
 			break;
+		if (kDown & KEY_X)
+			save_level();
 		std::cout << ANSI "0;0" PEND;
 		for (int i = 0; i < 30; i++)
 			std::cout << "                              ";
@@ -708,7 +724,32 @@ int level_designer() {
 		std::cout << designed_level[20] << ", " << designed_level[21] << ", " << designed_level[22] << ", " << designed_level[23] << ", " << designed_level[24] << ", " << designed_level[25] << ", " << designed_level[26] << ", " << designed_level[27] << ", " << designed_level[28] << ", " << designed_level[29] << "\n";
 		std::cout << designed_level[30] << ", " << designed_level[31] << ", " << designed_level[32] << ", " << designed_level[33] << ", " << designed_level[34] << ", " << designed_level[35] << ", " << designed_level[36] << ", " << designed_level[37] << ", " << designed_level[38] << ", " << designed_level[39] << "\n";
 		std::cout << designed_level[40] << ", " << designed_level[41] << ", " << designed_level[42] << ", " << designed_level[43] << ", " << designed_level[44] << ", " << designed_level[45] << ", " << designed_level[46] << ", " << designed_level[47] << ", " << designed_level[48] << ", " << designed_level[49] << "\n";
+		std::cout << "                  Press X to save level.";
 		sf2d_swapbuffers();
+	}
+	return 0;
+}
+
+int save_level() {
+	std::cout << "Are you sure you want to save this?\n";
+	std::cout << "A to save B to return";
+	while (true)
+	{
+		hidScanInput();
+		kDown = hidKeysDown();
+		if (kDown & KEY_B)
+			break;
+		if (kDown & KEY_A)
+		{
+			fclose(saved_level);
+			remove("sdmc:/3ds/breakout_level.bsl");
+			saved_level = fopen("sdmc:/3ds/breakout_level.bsl", "w");
+			for (int i = 0; i < 50; i++)
+				fprintf(saved_level, "%d\n", designed_level[i]);
+			fclose(saved_level);
+			saved_level = fopen("sdmc:/3ds/breakout_level.bsl", "r");
+			break;
+		}
 	}
 	return 0;
 }

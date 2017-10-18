@@ -5,8 +5,8 @@
 #include "filesystem.h"
 
 //init
-char versiontxtt[8] = "  Beta ", versiontxtn[9] = "01.06.00";
-char buildnumber[14] = "17.10.17.1756", ishupeversion[9] = "00.04.00";
+char versiontxtt[8] = "  Beta ", versiontxtn[9] = "01.06.01";
+char buildnumber[14] = "17.10.17.1758", ishupeversion[9] = "00.04.01";
 int vernumqik = 0;
 u32 kDown, kHeld;
 

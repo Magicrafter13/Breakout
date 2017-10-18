@@ -6,7 +6,7 @@
 
 //init
 char versiontxtt[8] = "  Beta ", versiontxtn[9] = "01.06.01";
-char buildnumber[14] = "17.10.17.1758", ishupeversion[9] = "00.04.01";
+char buildnumber[14] = "17.10.18.1649", ishupeversion[9] = "00.04.01";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
@@ -26,7 +26,7 @@ int last_power, times_power_1, times_power_2, times_power_3;
 int press_select_frame = 0; bool press_select_visible = true;
 
 paddle the_paddle; ball the_ball; mCircle trail_new_frame_circle[8]; brick brick_array[def_level_count][50];
-sf2d_texture *img_thanksbeta, *img_paddle, *img_brick00, *img_brick01, *img_brick02, *img_brick03, *img_brick04, *img_brick05, *img_waveform;
+//sf2d_texture *img_thanksbeta, *img_paddle, *img_brick00, *img_brick01, *img_brick02, *img_brick03, *img_brick04, *img_brick05, *img_waveform;
 SFX_s *testsound[1], *ball_bounce[8];
 
 /*integer mask for levels*/
@@ -100,7 +100,7 @@ bool touchInBox(touchPosition touch, int x, int y, int w, int h)
 
 touchPosition touch;
 
-PrintConsole topScreen, bottomScreen, versionWin, killBox, debugBox;
+PrintConsole bottomScreen, versionWin, killBox, debugBox;
 
 FS_Archive sdmcArchive;
 
@@ -138,7 +138,10 @@ void initialize_brick_array() {
 /*begin application*/
 int main(int argc, char **argv)
 {
+	pp2d_init();
+	pp2d_set_screen_color(GFX_TOP, ABGR8(255, 149, 149, 149));
 	romfsInit();
+	init_game_textures();
 
 	if (FILE *file = fopen("sdmc:/3ds/breakout_level.bsl", "r")) {
 		saved_level = fopen("sdmc:/3ds/breakout_level.bsl", "r");
@@ -159,10 +162,6 @@ int main(int argc, char **argv)
 	
 	srand(time(NULL));
 	
-	sf2d_init();
-	sf2d_set_3D(0);
-	sftd_init();
-	
 	consoleInit(GFX_BOTTOM, &bottomScreen);
 	consoleInit(GFX_BOTTOM, &versionWin);
 	consoleInit(GFX_BOTTOM, &killBox);
@@ -173,22 +172,6 @@ int main(int argc, char **argv)
 	consoleSetWindow(&debugBox, 18, 4, 9, 12);
 
 	hidTouchRead(&touch);
-
-	sf2d_set_clear_color(RGBA8(0x95, 0x95, 0x95, 0xFF));
-	sf2d_set_vblank_wait(1);
-	//sftd_font *fnt_main;
-	sftd_font *game_fonts[1] = {
-		sftd_load_font_mem(ethnocen_ttf, ethnocen_ttf_size)
-	};
-	sf2d_texture *img_title = game_textures[15];
-	img_thanksbeta = game_textures[16];
-
-	img_paddle = game_textures[17];
-	img_brick00 = game_textures[0];
-
-	img_waveform = game_textures[18];
-
-	//fnt_main = game_fonts[0];
 
 	testsound[0] = createSFX("romfs:/testfile.raw", SOUND_FORMAT_16BIT);
 	ball_bounce[0] = createSFX("romfs:/bounce0.raw", SOUND_FORMAT_16BIT);
@@ -203,7 +186,7 @@ int main(int argc, char **argv)
 	for (int i = 0; i < 8; i++)
 		trail_new_frame_circle[7 - i].setDefaults(200.0, 120.0, (0.875 * (i + 1)), 0xC3, 0xC3, 0xC3, (32 * (i + 1)));
 
-	the_paddle.setDefaults(175, 215, 50, 10, 0xC0, 0x61, 0x0A, 0xFF, img_paddle);
+	the_paddle.setDefaults(175, 215, 50, 10, 0xC0, 0x61, 0x0A, 0xFF, 19);
 	the_ball.setDefaults(200.0, 200.0, 7.0, 1, 200.3, 195.2, 202.5, 199.8, 204.9, 197.1);
 	
 	initialize_brick_array();
@@ -239,7 +222,6 @@ int main(int argc, char **argv)
 			while (angle < 225.0 || angle > 315.0 || (angle > 265 && angle < 275))
 				angle = rand() % 360;
 			ball_angle = angle;
-			sf2d_swapbuffers();
 			for (int i = 0; i < level_count; i++)
 				for (int j = 0; j < 50; j++)
 					brick_array[i][j].reset();
@@ -284,13 +266,14 @@ int main(int argc, char **argv)
 			bottom_screen_text = 1;
 		}
 		press_select_frame++;
-		sf2d_start_frame(GFX_TOP, GFX_LEFT);
+		pp2d_begin_draw(GFX_TOP, GFX_LEFT);
 		draw_object(the_paddle);
-		sf2d_draw_texture(img_title, 80, 20);
-		sf2d_draw_texture(img_paddle, 122, 92);
+		pp2d_draw_texture(15, 80, 20);
+		pp2d_draw_texture(19, 122, 92);
 		if (press_select_visible)
-			sftd_draw_textf(game_fonts[0], 100, 180, RGBA8(0x00, 0x00, 0x00, 0xFF), 11, "Press Select to play!");
-		sf2d_end_frame();
+			pp2d_draw_texture(27, 100, 180);
+		pp2d_end_draw();
+
 		/*after half a second, Press Select to play! is toggled*/
 		if (press_select_frame == 30)
 		{
@@ -300,8 +283,6 @@ int main(int argc, char **argv)
 			else
 				press_select_visible = true;
 		}
-
-		sf2d_swapbuffers();
 
 		hidTouchRead(&touch);
 
@@ -315,12 +296,7 @@ int main(int argc, char **argv)
 	// Exit services
 	fclose(saved_level);
 
-	sftd_fini();
-
-	for (int i = 0; i < texture_count; i++)
-		sf2d_free_texture(game_textures[i]);
-
-	sf2d_fini();
+	pp2d_exit();
 
 	exitSound();
 
@@ -573,17 +549,17 @@ int breakout()
 
 	trail_new_frame(the_ball);
 
-	sf2d_start_frame(GFX_TOP, GFX_LEFT);
+	pp2d_begin_draw(GFX_TOP, GFX_LEFT);
 	draw_object(the_paddle);
 	for (int i = 0; i < 50; i++)
 		if (brick_array[level][i].exists)
 			draw_object(brick_array[level][i]);
 	if (the_ball.uses_texture)
+		for (int i = 7; i > 0; i--)
+			pp2d_draw_texture_scale(27 - i, (trail_new_frame_circle[i].x - trail_new_frame_circle[i].rad) + 1.0, (trail_new_frame_circle[i].y - trail_new_frame_circle[i].rad) + 2.0, (7 - i) / 8.0, (7 - i) / 8.0); //pp2d_draw_texture_scale_blend(game_textures[the_ball.texture_id], (trail_new_frame_circle[i].x - trail_new_frame_circle[i].rad) + 1.0, (trail_new_frame_circle[i].y - trail_new_frame_circle[i].rad) + 2.0, (7 - i) / 8.0, (7 - i) / 8.0, RGBA8(0xFF, 0xFF, 0xFF, 32 * (7 - i)));
+	/*else
 		for (int i = 7; i >= 0; i--)
-			sf2d_draw_texture_scale_blend(game_textures[the_ball.texture_id], (trail_new_frame_circle[i].x - trail_new_frame_circle[i].rad) + 1.0, (trail_new_frame_circle[i].y - trail_new_frame_circle[i].rad) + 2.0, (7 - i) / 8.0, (7 - i) / 8.0, RGBA8(0xFF, 0xFF, 0xFF, 32 * (7 - i)));
-	else
-		for (int i = 7; i >= 0; i--)
-			draw_object(trail_new_frame_circle[i]);
+			draw_object(trail_new_frame_circle[i]);*/
 	draw_object(the_ball);
 	std::cout << ANSI "13;0" PEND;
 	for (int i = 0; i < 2; i++)
@@ -591,8 +567,7 @@ int breakout()
 	std::cout << ANSI "13;0" PEND;
 	std::cout << "Score: " << points << "\n";
 	std::cout << "Lives: " << lives << "\n";
-	sf2d_end_frame();
-	sf2d_swapbuffers();
+	pp2d_end_draw();
 	return 0;
 }
 
@@ -603,8 +578,8 @@ int thanks_for_playing_the_beta()
 	kDown = hidKeysDown(); kHeld = hidKeysHeld();
 	if (kDown & (KEY_SELECT | KEY_A | KEY_B | KEY_X | KEY_Y | KEY_L | KEY_R | KEY_ZL | KEY_ZR)) return 2;
 	if (kHeld & KEY_START) return 3;
-	sf2d_start_frame(GFX_TOP, GFX_LEFT);
-	sf2d_draw_texture(img_thanksbeta, 80, 20);
+	pp2d_begin_draw(GFX_TOP, GFX_LEFT);
+	pp2d_draw_texture(16, 80, 20);
 	/*run text display once (to avoid screen tear)*/
 	if (thanks_text_display == 0)
 	{
@@ -628,8 +603,7 @@ int thanks_for_playing_the_beta()
 		std::cout << "       suggestions are welcome!\n";
 		thanks_text_display = 1;
 	}
-	sf2d_end_frame();
-	sf2d_swapbuffers();
+	pp2d_end_draw();
 	return 0;
 }
 
@@ -669,15 +643,14 @@ int extras_10_13_2017()
 	/*main loop with sf2d drawing*/
 	while (true)
 	{
-		sf2d_start_frame(GFX_TOP, GFX_LEFT);
-		sf2d_draw_texture_scale(game_textures[1], 20, 20, 2.0, 2.0);
-		sf2d_draw_texture(img_paddle, 350, 110);
-		sf2d_draw_texture(img_waveform, 40, 97);
+		pp2d_begin_draw(GFX_TOP, GFX_LEFT);
+		pp2d_draw_texture_scale(0, 20, 20, 2.0, 2.0);
+		pp2d_draw_texture(19, 350, 110);
+		pp2d_draw_texture(17, 40, 97);
 		hidScanInput();
 		kDown = hidKeysDown();
 		if (kDown & (KEY_SELECT | KEY_A | KEY_B | KEY_X | KEY_Y | KEY_L | KEY_R | KEY_ZL | KEY_ZR | KEY_START)) break;
-		sf2d_end_frame();
-		sf2d_swapbuffers();
+		pp2d_end_draw();
 	}
 	if (kDown & (KEY_SELECT | KEY_A | KEY_B | KEY_X | KEY_Y | KEY_L | KEY_R | KEY_ZL | KEY_ZR)) return 2;
 	if (kDown & KEY_START) return 3;
@@ -687,20 +660,20 @@ int extras_10_13_2017()
 int level_designer() {
 	int current_spot = 0;
 	while (true) {
-		sf2d_start_frame(GFX_TOP, GFX_LEFT);
+		pp2d_begin_draw(GFX_TOP, GFX_LEFT);
 		int array_step = 0;
 		for (int a = 0; a < 5; a++)
 		{
 			for (int b = 0; b < 10; b++)
 			{
 				if (!designed_level[array_step] == 0)
-					sf2d_draw_texture(game_textures[brick_texture_by_type[designed_level[array_step]]], (40 * b) + 2, (20 * a) + 2);
+					pp2d_draw_texture(brick_texture_by_type[designed_level[array_step]], (40 * b) + 2, (20 * a) + 2);
 				if (array_step == current_spot)
-					sf2d_draw_texture(game_textures[19], (40 * b) + 20, (20 * a) + 8);
+					pp2d_draw_texture(18, (40 * b) + 20, (20 * a) + 8);
 				array_step++;
 			}
 		}
-		sf2d_end_frame();
+		pp2d_end_draw();
 		hidScanInput();
 		kDown = hidKeysDown();
 		if (kDown & KEY_UP && current_spot >= 10)
@@ -740,7 +713,6 @@ int level_designer() {
 			while (angle < 225.0 || angle > 315.0 || (angle > 265 && angle < 275))
 				angle = rand() % 360;
 			ball_angle = angle;
-			sf2d_swapbuffers();
 			for (int i = 0; i < level_count; i++)
 				for (int j = 0; j < 50; j++)
 					brick_array[i][j].reset();
@@ -769,7 +741,6 @@ int level_designer() {
 		std::cout << "                  Press X to save level.";
 		std::cout << "    Press B or Start to return to title.";
 		std::cout << "        Press Select to play your level!";
-		sf2d_swapbuffers();
 	}
 	return 0;
 }

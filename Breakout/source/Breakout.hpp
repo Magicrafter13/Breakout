@@ -11,42 +11,18 @@ using std::string;
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <3ds.h>
-
-#include <sf2d.h>
-#include <sfil.h>
-#include <sftd.h>
+#include <citro3d.h>
+#include "pp2d.h"
 
 #include <vector>
 
-extern PrintConsole topScreen, bottomScreen, versionWin, killBox, debugBox;
+extern PrintConsole bottomScreen, versionWin, killBox, debugBox;
 
-#define texture_count 20
+#define texture_count 27
 #define brick_types 11
 #define def_level_count 5
 
-#include "Title_png.h"
-#include "thanksbeta_png.h"
-#include "waveform_png.h"
-
-#include "paddle_png.h"
-#include "brick00_png.h"
-#include "brick01_png.h"
-#include "brick02_png.h"
-#include "brick03_png.h"
-#include "brick04_png.h"
-#include "brick05_png.h"
-#include "brick06_png.h"
-#include "brick07_png.h"
-#include "brick08_png.h"
-#include "brick09_png.h"
-#include "brick10_png.h"
-#include "brick11_png.h"
-#include "brick12_png.h"
-#include "brick13_png.h"
-#include "brick14_png.h"
-#include "ball00_png.h"
-
-#include "ethnocen_ttf.h"
+//"ethnocen
 
 extern char versiontxtt[8];
 extern char versiontxtn[9];
@@ -54,7 +30,7 @@ extern char buildnumber[14];
 extern char ishupeversion[9];
 extern int vernumqik;
 
-extern sftd_font *game_fonts[1];
+//extern sftd_font *game_fonts[1];
 
 #define ANSI "\x1b["
 #define RED "31"

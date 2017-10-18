@@ -39,8 +39,8 @@ public:
 		default_width = i_width;
 		height = i_height;
 		default_height = i_height;
-		color = RGBA8(R, G, B, A);
-		default_color = RGBA8(R, G, B, A);
+		color = ABGR8(A, B, G, R);
+		default_color = ABGR8(A, B, G, R);
 	}
 	/*
 	Resets the rectangles position, size, and color to their defaults
@@ -89,7 +89,7 @@ public:
 	}
 };
 
-extern sf2d_texture *game_textures[texture_count];
+extern void init_game_textures();
 extern int brick_texture_by_type[brick_types];
 extern int brick_second_texture_by_type[brick_types];
 extern int brick_palette_by_type[brick_types];
@@ -171,7 +171,7 @@ private:
 		return 0;
 	}
 public:
-	sf2d_texture *public_texture;
+	int texture_id;
 	int hits_left;
 	bool uses_texture;
 	/*wether or not the brick is currently in play*/
@@ -203,7 +203,7 @@ public:
 		else
 		{
 			uses_texture = true;
-			public_texture = game_textures[brick_texture_by_type[brick_type]];
+			texture_id = brick_texture_by_type[brick_type];
 		}
 		set_hits();
 	}
@@ -217,7 +217,7 @@ public:
 		else {
 			hits_left--;
 			if (internal_brick_type >= 6 && internal_brick_type <= 10)
-				public_texture = game_textures[brick_second_texture_by_type[internal_brick_type]];
+				texture_id = brick_second_texture_by_type[internal_brick_type];
 		}
 	}
 	/*
@@ -230,7 +230,7 @@ public:
 		else
 			exists = false;
 		brick_mrect.reset();
-		public_texture = game_textures[brick_texture_by_type[internal_brick_type]];
+		texture_id = brick_texture_by_type[internal_brick_type];
 		set_hits();
 	}
 	/*
@@ -453,12 +453,12 @@ public:
 
 class paddle {
 public:
+	int texture_id;
 	mRectangle paddle_mrect;
-	sf2d_texture *paddle_texture;
-	void setDefaults(double bx, double by, double bwidth, double bheight, int R, int G, int B, int A, sf2d_texture *paddle_texture_set)
+	void setDefaults(double bx, double by, double bwidth, double bheight, int R, int G, int B, int A, int paddle_texture_id)
 	{
 		paddle_mrect.setDefaults(bx, by, bwidth, bheight, R, G, B, A);
-		paddle_texture = paddle_texture_set;
+		texture_id = paddle_texture_id;
 	}
 	void reset()
 	{

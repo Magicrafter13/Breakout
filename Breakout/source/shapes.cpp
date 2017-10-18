@@ -1,27 +1,35 @@
 #include "Breakout.hpp"
 #include "shapes.hpp"
 
-sf2d_texture *game_textures[texture_count] = {
-	sfil_load_PNG_buffer(brick00_png, SF2D_PLACE_RAM),
-	sfil_load_PNG_buffer(brick01_png, SF2D_PLACE_RAM),
-	sfil_load_PNG_buffer(brick02_png, SF2D_PLACE_RAM),
-	sfil_load_PNG_buffer(brick03_png, SF2D_PLACE_RAM),
-	sfil_load_PNG_buffer(brick04_png, SF2D_PLACE_RAM),
-	sfil_load_PNG_buffer(brick05_png, SF2D_PLACE_RAM),
-	sfil_load_PNG_buffer(brick06_png, SF2D_PLACE_RAM),
-	sfil_load_PNG_buffer(brick07_png, SF2D_PLACE_RAM),
-	sfil_load_PNG_buffer(brick08_png, SF2D_PLACE_RAM),
-	sfil_load_PNG_buffer(brick09_png, SF2D_PLACE_RAM),
-	sfil_load_PNG_buffer(brick10_png, SF2D_PLACE_RAM),
-	sfil_load_PNG_buffer(brick11_png, SF2D_PLACE_RAM),
-	sfil_load_PNG_buffer(brick12_png, SF2D_PLACE_RAM),
-	sfil_load_PNG_buffer(brick13_png, SF2D_PLACE_RAM),
-	sfil_load_PNG_buffer(brick14_png, SF2D_PLACE_RAM),
-	sfil_load_PNG_buffer(Title_png, SF2D_PLACE_RAM),
-	sfil_load_PNG_buffer(thanksbeta_png, SF2D_PLACE_RAM),
-	sfil_load_PNG_buffer(paddle_png, SF2D_PLACE_RAM),
-	sfil_load_PNG_buffer(waveform_png, SF2D_PLACE_RAM),
-	sfil_load_PNG_buffer(ball00_png, SF2D_PLACE_RAM)
+void init_game_textures() {
+	pp2d_load_texture_png(0, "romfs:/sprites/brick/brick00.png");
+	pp2d_load_texture_png(1, "romfs:/sprites/brick/brick01.png");
+	pp2d_load_texture_png(2, "romfs:/sprites/brick/brick02.png");
+	pp2d_load_texture_png(3, "romfs:/sprites/brick/brick03.png");
+	pp2d_load_texture_png(4, "romfs:/sprites/brick/brick04.png");
+	pp2d_load_texture_png(5, "romfs:/sprites/brick/brick05.png");
+	pp2d_load_texture_png(6, "romfs:/sprites/brick/brick06.png");
+	pp2d_load_texture_png(7, "romfs:/sprites/brick/brick07.png");
+	pp2d_load_texture_png(8, "romfs:/sprites/brick/brick08.png");
+	pp2d_load_texture_png(9, "romfs:/sprites/brick/brick09.png");
+	pp2d_load_texture_png(10, "romfs:/sprites/brick/brick10.png");
+	pp2d_load_texture_png(11, "romfs:/sprites/brick/brick11.png");
+	pp2d_load_texture_png(12, "romfs:/sprites/brick/brick12.png");
+	pp2d_load_texture_png(13, "romfs:/sprites/brick/brick13.png");
+	pp2d_load_texture_png(14, "romfs:/sprites/brick/brick14.png");
+	pp2d_load_texture_png(15, "romfs:/sprites/background/Title.png");
+	pp2d_load_texture_png(16, "romfs:/sprites/background/thanksbeta.png");
+	pp2d_load_texture_png(17, "romfs:/sprites/background/waveform.png");
+	pp2d_load_texture_png(18, "romfs:/sprites/ball00.png");
+	pp2d_load_texture_png(19, "romfs:/sprites/paddle.png");
+	pp2d_load_texture_png(20, "romfs:/sprites/ball01.png");
+	pp2d_load_texture_png(21, "romfs:/sprites/ball02.png");
+	pp2d_load_texture_png(22, "romfs:/sprites/ball03.png");
+	pp2d_load_texture_png(23, "romfs:/sprites/ball04.png");
+	pp2d_load_texture_png(24, "romfs:/sprites/ball05.png");
+	pp2d_load_texture_png(25, "romfs:/sprites/ball06.png");
+	pp2d_load_texture_png(26, "romfs:/sprites/ball07.png");
+	pp2d_load_texture_png(27, "romfs:/sprites/background/press_select.png");
 };
 
 int brick_texture_by_type[brick_types] = {
@@ -77,5 +85,5 @@ int ball_tri_color_A[2] = {
 	0xFF, 0x00
 };
 int ball_texture_id[2] = {
-	0, 19
+	0, 18
 };

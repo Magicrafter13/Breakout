@@ -6,7 +6,7 @@
 
 //init
 char versiontxtt[8] = "  Beta ", versiontxtn[9] = "01.06.00";
-char buildnumber[14] = "17.10.17.1509", ishupeversion[9] = "00.04.00";
+char buildnumber[14] = "17.10.17.1756", ishupeversion[9] = "00.04.00";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
@@ -31,6 +31,13 @@ SFX_s *testsound[1], *ball_bounce[8];
 
 /*integer mask for levels*/
 int level_mask[def_level_count][50] = {
+	{
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	},
 	{
 		5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
 		4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
@@ -109,6 +116,25 @@ void closeSD()
 	FSUSER_CloseArchive(sdmcArchive);
 }
 
+/*create level layout or something*/
+void initialize_brick_array() {
+	for (int q = 0; q < level_count; q++)
+	{
+		int array_step = 0;
+		for (int a = 0; a < 5; a++)
+		{
+			for (int b = 0; b < 10; b++)
+			{
+				if (level_mask[q][array_step] == 0)
+					brick_array[q][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, false, 0);
+				else
+					brick_array[q][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, true, level_mask[q][array_step]);
+				array_step++;
+			}
+		}
+	}
+}
+
 /*begin application*/
 int main(int argc, char **argv)
 {
@@ -179,21 +205,8 @@ int main(int argc, char **argv)
 
 	the_paddle.setDefaults(175, 215, 50, 10, 0xC0, 0x61, 0x0A, 0xFF, img_paddle);
 	the_ball.setDefaults(200.0, 200.0, 7.0, 1, 200.3, 195.2, 202.5, 199.8, 204.9, 197.1);
-	for (int q = 0; q < level_count; q++)
-	{
-		int array_step = 0;
-		for (int a = 0; a < 5; a++)
-		{
-			for (int b = 0; b < 10; b++)
-			{
-				if (level_mask[q][array_step] == 0)
-					brick_array[q][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, false, 0);
-				else
-					brick_array[q][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, true, level_mask[q][array_step]);
-				array_step++;
-			}
-		}
-	}
+	
+	initialize_brick_array();
 
 	int bottom_screen_text = 0;
 
@@ -230,7 +243,7 @@ int main(int argc, char **argv)
 			for (int i = 0; i < level_count; i++)
 				for (int j = 0; j < 50; j++)
 					brick_array[i][j].reset();
-			level = 0; points = 0; last_power = 0;
+			level = 1; points = 0; last_power = 0;
 			times_power_1 = 0; times_power_2 = 0; times_power_3 = 0;
 			ball_is_attached = true;
 			/*main breakout loop*/
@@ -714,6 +727,35 @@ int level_designer() {
 			break;
 		if (kDown & KEY_X)
 			save_level();
+		if (kDown & KEY_SELECT)
+		{
+			for (int i = 0; i < 50; i++)
+				level_mask[0][i] = designed_level[i];
+			initialize_brick_array();
+			lives = 3;
+			int result = 3;
+			the_ball.reset();
+			the_paddle.reset();
+			double angle = 0.0;
+			while (angle < 225.0 || angle > 315.0 || (angle > 265 && angle < 275))
+				angle = rand() % 360;
+			ball_angle = angle;
+			sf2d_swapbuffers();
+			for (int i = 0; i < level_count; i++)
+				for (int j = 0; j < 50; j++)
+					brick_array[i][j].reset();
+			level = 0; points = 0; last_power = 0;
+			times_power_1 = 0; times_power_2 = 0; times_power_3 = 0;
+			ball_is_attached = true;
+			/*main breakout loop*/
+			while (true)
+			{
+				result = breakout();
+				if (result != 0)
+					break;
+			}
+			if (result == 3) break;
+		}
 		std::cout << ANSI "0;0" PEND;
 		for (int i = 0; i < 30; i++)
 			std::cout << "                              ";
@@ -726,6 +768,7 @@ int level_designer() {
 		std::cout << designed_level[40] << ", " << designed_level[41] << ", " << designed_level[42] << ", " << designed_level[43] << ", " << designed_level[44] << ", " << designed_level[45] << ", " << designed_level[46] << ", " << designed_level[47] << ", " << designed_level[48] << ", " << designed_level[49] << "\n";
 		std::cout << "                  Press X to save level.";
 		std::cout << "    Press B or Start to return to title.";
+		std::cout << "        Press Select to play your level!";
 		sf2d_swapbuffers();
 	}
 	return 0;

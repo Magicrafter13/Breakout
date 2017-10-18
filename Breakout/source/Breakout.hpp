@@ -22,7 +22,7 @@ extern PrintConsole topScreen, bottomScreen, versionWin, killBox, debugBox;
 
 #define texture_count 20
 #define brick_types 11
-#define def_level_count 4
+#define def_level_count 5
 
 #include "Title_png.h"
 #include "thanksbeta_png.h"

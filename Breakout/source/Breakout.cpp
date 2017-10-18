@@ -564,7 +564,7 @@ int breakout()
 	}
 
 	/*plays random SFX if a brick has been hit*/
-	if (bricks_hit_this_frame > 0)
+	if (bricks_hit_this_frame > 0 && !ball_is_attached)
 	{
 		int which_bounce = rand() % 7;
 		playSFX(ball_bounce[which_bounce]);

@@ -22,15 +22,9 @@ extern PrintConsole bottomScreen, versionWin, killBox, debugBox;
 #define brick_types 11
 #define def_level_count 5
 
-//"ethnocen
-
-extern char versiontxtt[8];
-extern char versiontxtn[9];
-extern char buildnumber[14];
-extern char ishupeversion[9];
+extern char versiontxtt[8], versiontxtn[9];
+extern char buildnumber[14], ishupeversion[9];
 extern int vernumqik;
-
-//extern sftd_font *game_fonts[1];
 
 #define ANSI "\x1b["
 #define RED "31"

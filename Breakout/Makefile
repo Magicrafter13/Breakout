@@ -32,7 +32,6 @@ BUILD		:=	build
 SOURCES		:=	source
 DATA		:=	data
 INCLUDES	:=	include
-				#/c/local/boost_1_64_0/boost
 ROMFS		:=	romfs
 APP_TITLE   :=  "Breakout"
 APP_DESCRIPTION := "A 3ds Breakout Clone"
@@ -55,7 +54,7 @@ ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map) -DBOOST_SYSTEM_NO_DEPRECATED
 LDADD = -lboost_system -lssl -lboost_filesystem -lpthread -lboost_thread -llog4cpp
 
-LIBS	:= -lsftd -lfreetype -lsfil -lpng -ljpeg -lz -lsf2d -lcitro3d -lctru -lm
+LIBS	:= -lz -lcitro3d -lctru -lm
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing

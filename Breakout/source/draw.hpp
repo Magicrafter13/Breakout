@@ -1,12 +1,12 @@
 #pragma once
 
 /*
-Draws a brick (Uses texture if one specified)
+Draws a brick
 */
 void draw_object(brick brick_to_draw);
 
 /*
-Draws a ball (Uses texture if one specified)
+Draws a ball
 */
 void draw_object(ball ball_to_draw);
 

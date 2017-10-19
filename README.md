@@ -1,5 +1,5 @@
 # Breakout
-A simple Breakout clone for the 3DS [Uses sf2dlib, citro3d, and of course ctrulib.]
+A simple Breakout clone for the 3DS [Uses pp2d, citro3d, and of course ctrulib.]
 
 -Written by Magicrafter13 [Matthew Rease].
 
@@ -30,10 +30,6 @@ Available on my website. [Click Here!](http://oldforgeinn.ddns.net/Games/?game=B
 
 # Edit / self-compile
 You will need the following libraries to compile this:
-sf2dlib (and sfil, and sftd)
-ctrulib (If you don't have this, you are either new to 3ds homebrew or you're just crazy.
+ [pp2d](https://github.com/BernardoGiordano/pp2d)
+ [ctrulib](https://github.com/Smealum/ctrulib) (If you don't have this, you are either new to 3ds homebrew or you're just crazy.
     If you've set up homebrew environment, you have this.)
-
-libpng (portlibs)
-
-libjpeg (portlibs)

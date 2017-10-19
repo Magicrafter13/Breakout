@@ -6,7 +6,7 @@
 
 //init
 char versiontxtt[8] = "  Beta ", versiontxtn[9] = "01.06.01";
-char buildnumber[14] = "17.10.18.1649", ishupeversion[9] = "00.04.01";
+char buildnumber[14] = "17.10.18.1801", ishupeversion[9] = "00.04.01";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
@@ -26,7 +26,6 @@ int last_power, times_power_1, times_power_2, times_power_3;
 int press_select_frame = 0; bool press_select_visible = true;
 
 paddle the_paddle; ball the_ball; mCircle trail_new_frame_circle[8]; brick brick_array[def_level_count][50];
-//sf2d_texture *img_thanksbeta, *img_paddle, *img_brick00, *img_brick01, *img_brick02, *img_brick03, *img_brick04, *img_brick05, *img_waveform;
 SFX_s *testsound[1], *ball_bounce[8];
 
 /*integer mask for levels*/
@@ -116,6 +115,51 @@ void closeSD()
 	FSUSER_CloseArchive(sdmcArchive);
 }
 
+/*initialize textures*/
+void init_game_textures() {
+	pp2d_load_texture_png(0, "romfs:/sprites/brick/brick00.png");
+	pp2d_load_texture_png(1, "romfs:/sprites/brick/brick01.png");
+	pp2d_load_texture_png(2, "romfs:/sprites/brick/brick02.png");
+	pp2d_load_texture_png(3, "romfs:/sprites/brick/brick03.png");
+	pp2d_load_texture_png(4, "romfs:/sprites/brick/brick04.png");
+	pp2d_load_texture_png(5, "romfs:/sprites/brick/brick05.png");
+	pp2d_load_texture_png(6, "romfs:/sprites/brick/brick06.png");
+	pp2d_load_texture_png(7, "romfs:/sprites/brick/brick07.png");
+	pp2d_load_texture_png(8, "romfs:/sprites/brick/brick08.png");
+	pp2d_load_texture_png(9, "romfs:/sprites/brick/brick09.png");
+	pp2d_load_texture_png(10, "romfs:/sprites/brick/brick10.png");
+	pp2d_load_texture_png(11, "romfs:/sprites/brick/brick11.png");
+	pp2d_load_texture_png(12, "romfs:/sprites/brick/brick12.png");
+	pp2d_load_texture_png(13, "romfs:/sprites/brick/brick13.png");
+	pp2d_load_texture_png(14, "romfs:/sprites/brick/brick14.png");
+	pp2d_load_texture_png(15, "romfs:/sprites/background/Title.png");
+	pp2d_load_texture_png(16, "romfs:/sprites/background/thanksbeta.png");
+	pp2d_load_texture_png(17, "romfs:/sprites/background/waveform.png");
+	pp2d_load_texture_png(18, "romfs:/sprites/ball00.png");
+	pp2d_load_texture_png(19, "romfs:/sprites/paddle.png");
+	pp2d_load_texture_png(20, "romfs:/sprites/ball01.png");
+	pp2d_load_texture_png(21, "romfs:/sprites/ball02.png");
+	pp2d_load_texture_png(22, "romfs:/sprites/ball03.png");
+	pp2d_load_texture_png(23, "romfs:/sprites/ball04.png");
+	pp2d_load_texture_png(24, "romfs:/sprites/ball05.png");
+	pp2d_load_texture_png(25, "romfs:/sprites/ball06.png");
+	pp2d_load_texture_png(26, "romfs:/sprites/ball07.png");
+	pp2d_load_texture_png(27, "romfs:/sprites/background/press_select.png");
+};
+
+/*initialize audio*/
+void initialize_audio() {
+	testsound[0] = createSFX("romfs:/testfile.raw", SOUND_FORMAT_16BIT);
+	ball_bounce[0] = createSFX("romfs:/bounce0.raw", SOUND_FORMAT_16BIT);
+	ball_bounce[1] = createSFX("romfs:/bounce1.raw", SOUND_FORMAT_16BIT);
+	ball_bounce[2] = createSFX("romfs:/bounce2.raw", SOUND_FORMAT_16BIT);
+	ball_bounce[3] = createSFX("romfs:/bounce3.raw", SOUND_FORMAT_16BIT);
+	ball_bounce[4] = createSFX("romfs:/bounce4.raw", SOUND_FORMAT_16BIT);
+	ball_bounce[5] = createSFX("romfs:/bounce5.raw", SOUND_FORMAT_16BIT);
+	ball_bounce[6] = createSFX("romfs:/bounce6.raw", SOUND_FORMAT_16BIT);
+	ball_bounce[7] = createSFX("romfs:/bounce7.raw", SOUND_FORMAT_16BIT);
+}
+
 /*create level layout or something*/
 void initialize_brick_array() {
 	for (int q = 0; q < level_count; q++)
@@ -173,21 +217,13 @@ int main(int argc, char **argv)
 
 	hidTouchRead(&touch);
 
-	testsound[0] = createSFX("romfs:/testfile.raw", SOUND_FORMAT_16BIT);
-	ball_bounce[0] = createSFX("romfs:/bounce0.raw", SOUND_FORMAT_16BIT);
-	ball_bounce[1] = createSFX("romfs:/bounce1.raw", SOUND_FORMAT_16BIT);
-	ball_bounce[2] = createSFX("romfs:/bounce2.raw", SOUND_FORMAT_16BIT);
-	ball_bounce[3] = createSFX("romfs:/bounce3.raw", SOUND_FORMAT_16BIT);
-	ball_bounce[4] = createSFX("romfs:/bounce4.raw", SOUND_FORMAT_16BIT);
-	ball_bounce[5] = createSFX("romfs:/bounce5.raw", SOUND_FORMAT_16BIT);
-	ball_bounce[6] = createSFX("romfs:/bounce6.raw", SOUND_FORMAT_16BIT);
-	ball_bounce[7] = createSFX("romfs:/bounce7.raw", SOUND_FORMAT_16BIT);
+	initialize_audio();
 
 	for (int i = 0; i < 8; i++)
-		trail_new_frame_circle[7 - i].setDefaults(200.0, 120.0, (0.875 * (i + 1)), 0xC3, 0xC3, 0xC3, (32 * (i + 1)));
+		trail_new_frame_circle[7 - i].setDefaults(200.0, 120.0, (0.875 * (i + 1)));
 
-	the_paddle.setDefaults(175, 215, 50, 10, 0xC0, 0x61, 0x0A, 0xFF, 19);
-	the_ball.setDefaults(200.0, 200.0, 7.0, 1, 200.3, 195.2, 202.5, 199.8, 204.9, 197.1);
+	the_paddle.setDefaults(175, 215, 50, 10, 19);
+	the_ball.setDefaults(200.0, 200.0, 7.0, 1);
 	
 	initialize_brick_array();
 
@@ -266,6 +302,7 @@ int main(int argc, char **argv)
 			bottom_screen_text = 1;
 		}
 		press_select_frame++;
+
 		pp2d_begin_draw(GFX_TOP, GFX_LEFT);
 		draw_object(the_paddle);
 		pp2d_draw_texture(15, 80, 20);
@@ -554,12 +591,8 @@ int breakout()
 	for (int i = 0; i < 50; i++)
 		if (brick_array[level][i].exists)
 			draw_object(brick_array[level][i]);
-	if (the_ball.uses_texture)
-		for (int i = 7; i > 0; i--)
-			pp2d_draw_texture_scale(27 - i, (trail_new_frame_circle[i].x - trail_new_frame_circle[i].rad) + 1.0, (trail_new_frame_circle[i].y - trail_new_frame_circle[i].rad) + 2.0, (7 - i) / 8.0, (7 - i) / 8.0); //pp2d_draw_texture_scale_blend(game_textures[the_ball.texture_id], (trail_new_frame_circle[i].x - trail_new_frame_circle[i].rad) + 1.0, (trail_new_frame_circle[i].y - trail_new_frame_circle[i].rad) + 2.0, (7 - i) / 8.0, (7 - i) / 8.0, RGBA8(0xFF, 0xFF, 0xFF, 32 * (7 - i)));
-	/*else
-		for (int i = 7; i >= 0; i--)
-			draw_object(trail_new_frame_circle[i]);*/
+	for (int i = 7; i > 0; i--)
+		pp2d_draw_texture_scale(27 - i, (trail_new_frame_circle[i].x - trail_new_frame_circle[i].rad) + 1.0, (trail_new_frame_circle[i].y - trail_new_frame_circle[i].rad) + 2.0, (7 - i) / 8.0, (7 - i) / 8.0); //RGBA8(0xFF, 0xFF, 0xFF, 32 * (7 - i))
 	draw_object(the_ball);
 	std::cout << ANSI "13;0" PEND;
 	for (int i = 0; i < 2; i++)
@@ -640,7 +673,7 @@ int extras_10_13_2017()
 	std::cout << "don't worry because it can easily be\n";
 	std::cout << "changed and I'm always open to\n";
 	std::cout << "suggestions!\n";
-	/*main loop with sf2d drawing*/
+	/*main loop with pp2d drawing*/
 	while (true)
 	{
 		pp2d_begin_draw(GFX_TOP, GFX_LEFT);
@@ -657,6 +690,7 @@ int extras_10_13_2017()
 	return 4;
 }
 
+/*level designer*/
 int level_designer() {
 	int current_spot = 0;
 	while (true) {
@@ -745,6 +779,7 @@ int level_designer() {
 	return 0;
 }
 
+/*save designed level*/
 int save_level() {
 	std::cout << "Are you sure you want to save this?\n";
 	std::cout << "A to save B to return";

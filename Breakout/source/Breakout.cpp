@@ -10,8 +10,8 @@ char buildnumber[14] = "17.10.18.1801", ishupeversion[9] = "00.04.01";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
-FILE *saved_level;
-int designed_level[50];
+FILE *saved_level[SAVE_FILES];
+int designed_level[SAVE_FILES][50];
 
 int breakout();
 int thanks_for_playing_the_beta();
@@ -179,6 +179,44 @@ void initialize_brick_array() {
 	}
 }
 
+void create_save_files(int setup_type) {
+	char *saved_level_filename[SAVE_FILES];
+	for (int i = 0; i < SAVE_FILES; i++)
+		sprintf(saved_level_filename[i], "sdmc:/3ds/breakout_level_%d", i);
+	if (setup_type == 0)
+	{
+		rename("sdmc:/3ds/breakout_level.bsl", "sdmc:/3ds/breakout_level_0.bsl");
+		for (int i = 1; i < SAVE_FILES; i++)
+		{
+			saved_level[i] = fopen(saved_level_filename[i], "w");
+			fputs("0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0\n", saved_level[i + 1]);
+			fclose(saved_level[i + 1]);
+		}
+	}
+	if (setup_type == 1)
+	{
+		for (int i = 0; i < SAVE_FILES; i++)
+		{
+			saved_level[i] = fopen(saved_level_filename[i], "w");
+			fputs("0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0\n", saved_level[i]);
+			fclose(saved_level[i]);
+		}
+	}
+}
+
+void load_save_files()
+{
+	char *saved_level_filename[SAVE_FILES];
+	for (int i = 0; i < SAVE_FILES; i++)
+		sprintf(saved_level_filename[i], "sdmc:/3ds/breakout_level_%d", i);
+	for (int i = 0; i < SAVE_FILES; i++)
+	{
+		saved_level[i] = fopen(saved_level_filename[i], "r");
+
+		fclose(saved_level[i]);
+	}
+}
+
 /*begin application*/
 int main(int argc, char **argv)
 {
@@ -188,18 +226,15 @@ int main(int argc, char **argv)
 	init_game_textures();
 
 	if (FILE *file = fopen("sdmc:/3ds/breakout_level.bsl", "r")) {
-		saved_level = fopen("sdmc:/3ds/breakout_level.bsl", "r");
 		fclose(file);
+		create_save_files(0);
 	}
-	else {
+	if (FILE *file = fopen("sdmc:/3ds/breakout_level_0.bsl", "r")) {
 		fclose(file);
-		saved_level = fopen("sdmc:/3ds/breakout_level.bsl", "w");
-		fputs("0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n", saved_level);
-		fclose(saved_level);
-		saved_level = fopen("sdmc:/3ds/breakout_level.bsl", "r");
+		create_save_files(1);
 	}
 	for (int i = 0; i < 50; i++)
-		fscanf(saved_level, "%d\n", &designed_level[i]);
+		fscanf(saved_level[0], "%d\n", &designed_level[0][i]);
 
 	csndInit();
 	initSound();

@@ -742,12 +742,19 @@ int level_designer() {
 	bool quit = false;
 	consoleSelect(&bottomScreen);
 	consoleClear();
-	std::cout << CRESET ANSI "5;15" PEND ANSI WHITE CEND;
+	std::cout << CRESET;
+	std::cout << ANSI "5;15" PEND ANSI WHITE CEND;
 	std::cout << "Save Level 1" CRESET;
-	std::cout << ANSI "7;15" PEND ANSI WHITE ASEP BRIGHT CEND;
-	std::cout << "Save Level 2" CRESET;
-	std::cout << ANSI "9;15" PEND ANSI WHITE ASEP BRIGHT CEND;
-	std::cout << "Save Level 3" CRESET;
+	for (int i = 1; i < SAVE_FILES; i++)
+	{
+		int value_a = (5 + (i * 2));
+		int value_b = (i + 1);
+		std::string part_1 = ANSI;
+		part_1 += std::to_string(value_a);
+		part_1 += ";15" PEND;
+		std::cout << part_1 << ANSI WHITE ASEP BRIGHT CEND;
+		std::cout << "Save Level " << std::to_string(value_b) << CRESET;
+	}
 	while (true)
 	{
 		hidScanInput();
@@ -758,24 +765,25 @@ int level_designer() {
 			selection++;
 		if (kDown & (KEY_UP | KEY_DOWN))
 		{
-			std::cout << ANSI "4;15" PEND CRESET ANSI "5;15" PEND;
-			if (selection == 0)
-				std::cout << ANSI WHITE CEND;
-			else
-				std::cout << ANSI WHITE ASEP BRIGHT CEND;
-			std::cout << "Save Level 1";
-			std::cout << ANSI "6;15" PEND CRESET ANSI "7;15" PEND;
-			if (selection == 1)
-				std::cout << ANSI WHITE CEND;
-			else
-				std::cout << ANSI WHITE ASEP BRIGHT CEND;
-			std::cout << "Save Level 2";
-			std::cout << ANSI "8;15" PEND CRESET ANSI "9;15" PEND;
-			if (selection == 2)
-				std::cout << ANSI WHITE CEND;
-			else
-				std::cout << ANSI WHITE ASEP BRIGHT CEND;
-			std::cout << "Save Level 3";
+			std::cout << CRESET;
+			for (int i = 0; i < SAVE_FILES; i++)
+			{
+				int value_a = ((5 + (i * 2)) - 1);
+				std::string part_1 = ANSI;
+				part_1 += std::to_string(value_a);
+				part_1 += ";15" PEND;
+				int value_b = value_a + 1;
+				std::string part_2 = ANSI;
+				part_2 += std::to_string(value_b);
+				part_2 += ";15" PEND;
+				std::cout << part_1 << CRESET << part_2;
+				if (selection == i)
+					std::cout << ANSI WHITE CEND;
+				else
+					std::cout << ANSI WHITE ASEP BRIGHT CEND;
+				int value_c = i + 1;
+				std::cout << "Save Level " << std::to_string(value_c) << CRESET;
+			}
 		}
 		if (kDown & KEY_A)
 			break;

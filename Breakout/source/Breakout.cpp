@@ -6,18 +6,19 @@
 
 //init
 char versiontxtt[8] = "  Beta ", versiontxtn[9] = "01.06.01";
-char buildnumber[14] = "17.10.18.1801", ishupeversion[9] = "00.04.01";
+char buildnumber[14] = "17.10.19.1708", ishupeversion[9] = "00.04.01";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
 FILE *saved_level[SAVE_FILES];
 int designed_level[SAVE_FILES][50];
+std::string saved_level_filename[SAVE_FILES];
 
 int breakout();
 int thanks_for_playing_the_beta();
 int extras_10_13_2017();
 int level_designer();
-int save_level();
+int save_level(int selection);
 
 int lives = 3, points, level = 0;
 int level_count = def_level_count;
@@ -180,25 +181,28 @@ void initialize_brick_array() {
 }
 
 void create_save_files(int setup_type) {
-	char *saved_level_filename[SAVE_FILES];
 	for (int i = 0; i < SAVE_FILES; i++)
-		sprintf(saved_level_filename[i], "sdmc:/3ds/breakout_level_%d", i);
+	{
+		saved_level_filename[i] = "sdmc:/3ds/breakout_level_";
+		saved_level_filename[i] += std::to_string(i);
+		saved_level_filename[i] += ".bsl";
+	}
 	if (setup_type == 0)
 	{
 		rename("sdmc:/3ds/breakout_level.bsl", "sdmc:/3ds/breakout_level_0.bsl");
 		for (int i = 1; i < SAVE_FILES; i++)
 		{
-			saved_level[i] = fopen(saved_level_filename[i], "w");
-			fputs("0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0\n", saved_level[i + 1]);
-			fclose(saved_level[i + 1]);
+			saved_level[i] = fopen(saved_level_filename[i].c_str(), "w");
+			fprintf(saved_level[i], "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ");
+			fclose(saved_level[i]);
 		}
 	}
 	if (setup_type == 1)
 	{
 		for (int i = 0; i < SAVE_FILES; i++)
 		{
-			saved_level[i] = fopen(saved_level_filename[i], "w");
-			fputs("0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0\n", saved_level[i]);
+			saved_level[i] = fopen(saved_level_filename[i].c_str(), "w");
+			fprintf(saved_level[i], "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ");
 			fclose(saved_level[i]);
 		}
 	}
@@ -206,14 +210,17 @@ void create_save_files(int setup_type) {
 
 void load_save_files()
 {
-	char *saved_level_filename[SAVE_FILES];
-	for (int i = 0; i < SAVE_FILES; i++)
-		sprintf(saved_level_filename[i], "sdmc:/3ds/breakout_level_%d", i);
 	for (int i = 0; i < SAVE_FILES; i++)
 	{
-		saved_level[i] = fopen(saved_level_filename[i], "r");
-
-		fclose(saved_level[i]);
+		saved_level_filename[i] = "sdmc:/3ds/breakout_level_";
+		saved_level_filename[i] += std::to_string(i);
+		saved_level_filename[i] += ".bsl";
+	}
+	for (int i = 0; i < SAVE_FILES; i++)
+	{
+		saved_level[i] = fopen(saved_level_filename[i].c_str(), "r");
+		for (int j = 0; j < 50; j++)
+			fscanf(saved_level[i], "%d ", &designed_level[i][j]);
 	}
 }
 
@@ -231,11 +238,12 @@ int main(int argc, char **argv)
 	}
 	if (FILE *file = fopen("sdmc:/3ds/breakout_level_0.bsl", "r")) {
 		fclose(file);
+	}
+	else {
 		create_save_files(1);
 	}
-	for (int i = 0; i < 50; i++)
-		fscanf(saved_level[0], "%d\n", &designed_level[0][i]);
-
+	load_save_files();
+	
 	csndInit();
 	initSound();
 	
@@ -277,10 +285,12 @@ int main(int argc, char **argv)
 			int ext_return = extras_10_13_2017();
 			if (ext_return == 3)
 				break;
+			bottom_screen_text = 0;
 		}
 		/*level designer*/
 		if (kDown & KEY_Y) {
 			level_designer();
+			bottom_screen_text = 0;
 		}
 		/*begin game*/
 		if (kDown & KEY_SELECT)
@@ -317,7 +327,7 @@ int main(int argc, char **argv)
 			consoleSelect(&bottomScreen); consoleClear();
 
 			consoleSelect(&killBox);
-			std::cout << ANSI B_RED CEND;
+			std::cout << CRESET ANSI B_RED CEND;
 			for (int i = 0; i < 80; i++)
 				std::cout << " ";
 
@@ -328,9 +338,9 @@ int main(int argc, char **argv)
 			std::cout << ANSI B_RED ASEP GREEN CEND "   ISHUPE Engine Version: " << ishupeversion;
 
 			consoleSelect(&bottomScreen);
-			std::cout << ANSI "20;0" PEND;
+			std::cout << CRESET ANSI "20;0" PEND;
 
-			std::cout << ANSI "2;0" PEND "Press Select to begin.\n";
+			std::cout << CRESET ANSI "2;0" PEND "Press Select to begin.\n";
 			std::cout << "Press X to see what I'm working on or have planned.\n";
 			std::cout << "Press Y to open level editor.\n";
 
@@ -366,7 +376,8 @@ int main(int argc, char **argv)
 	}
 
 	// Exit services
-	fclose(saved_level);
+	for (int i = 0; i < SAVE_FILES; i++)
+		fclose(saved_level[i]);
 
 	pp2d_exit();
 
@@ -727,7 +738,57 @@ int extras_10_13_2017()
 
 /*level designer*/
 int level_designer() {
+	int selection = 0;
+	bool quit = false;
+	consoleSelect(&bottomScreen);
+	consoleClear();
+	std::cout << CRESET ANSI "5;15" PEND ANSI WHITE CEND;
+	std::cout << "Save Level 1" CRESET;
+	std::cout << ANSI "7;15" PEND ANSI WHITE ASEP BRIGHT CEND;
+	std::cout << "Save Level 2" CRESET;
+	std::cout << ANSI "9;15" PEND ANSI WHITE ASEP BRIGHT CEND;
+	std::cout << "Save Level 3" CRESET;
+	while (true)
+	{
+		hidScanInput();
+		kDown = hidKeysDown();
+		if ((kDown & KEY_UP) && selection > 0)
+			selection--;
+		if ((kDown & KEY_DOWN) && selection < SAVE_FILES - 1)
+			selection++;
+		if (kDown & (KEY_UP | KEY_DOWN))
+		{
+			std::cout << ANSI "4;15" PEND CRESET ANSI "5;15" PEND;
+			if (selection == 0)
+				std::cout << ANSI WHITE CEND;
+			else
+				std::cout << ANSI WHITE ASEP BRIGHT CEND;
+			std::cout << "Save Level 1";
+			std::cout << ANSI "6;15" PEND CRESET ANSI "7;15" PEND;
+			if (selection == 1)
+				std::cout << ANSI WHITE CEND;
+			else
+				std::cout << ANSI WHITE ASEP BRIGHT CEND;
+			std::cout << "Save Level 2";
+			std::cout << ANSI "8;15" PEND CRESET ANSI "9;15" PEND;
+			if (selection == 2)
+				std::cout << ANSI WHITE CEND;
+			else
+				std::cout << ANSI WHITE ASEP BRIGHT CEND;
+			std::cout << "Save Level 3";
+		}
+		if (kDown & KEY_A)
+			break;
+		if (kDown & (KEY_B | KEY_START))
+		{
+			quit = true;
+			break;
+		}
+		gspWaitForVBlank();
+	}
+	if (quit) return 0;
 	int current_spot = 0;
+	bool refresh_screen = true;
 	while (true) {
 		pp2d_begin_draw(GFX_TOP, GFX_LEFT);
 		int array_step = 0;
@@ -735,8 +796,8 @@ int level_designer() {
 		{
 			for (int b = 0; b < 10; b++)
 			{
-				if (!designed_level[array_step] == 0)
-					pp2d_draw_texture(brick_texture_by_type[designed_level[array_step]], (40 * b) + 2, (20 * a) + 2);
+				if (!designed_level[selection][array_step] == 0)
+					pp2d_draw_texture(brick_texture_by_type[designed_level[selection][array_step]], (40 * b) + 2, (20 * a) + 2);
 				if (array_step == current_spot)
 					pp2d_draw_texture(18, (40 * b) + 20, (20 * a) + 8);
 				array_step++;
@@ -754,25 +815,28 @@ int level_designer() {
 		if (kDown & KEY_RIGHT && current_spot < 49)
 			current_spot++;
 		if (kDown & KEY_R) {
-			if (designed_level[current_spot] == 10)
-				designed_level[current_spot] = 0;
+			if (designed_level[selection][current_spot] == 10)
+				designed_level[selection][current_spot] = 0;
 			else
-				designed_level[current_spot]++;
+				designed_level[selection][current_spot]++;
 		}
 		if (kDown & KEY_L) {
-			if (designed_level[current_spot] == 0)
-				designed_level[current_spot] = 10;
+			if (designed_level[selection][current_spot] == 0)
+				designed_level[selection][current_spot] = 10;
 			else
-				designed_level[current_spot]--;
+				designed_level[selection][current_spot]--;
 		}
 		if (kDown & (KEY_START | KEY_B))
 			break;
 		if (kDown & KEY_X)
-			save_level();
+		{
+			save_level(selection);
+			refresh_screen = true;
+		}
 		if (kDown & KEY_SELECT)
 		{
 			for (int i = 0; i < 50; i++)
-				level_mask[0][i] = designed_level[i];
+				level_mask[0][i] = designed_level[selection][i];
 			initialize_brick_array();
 			lives = 3;
 			int result = 3;
@@ -797,25 +861,45 @@ int level_designer() {
 			}
 			if (result == 3) break;
 		}
-		std::cout << ANSI "0;0" PEND;
-		for (int i = 0; i < 30; i++)
-			std::cout << "                              ";
-		std::cout << ANSI "0;0" PEND;
-		std::cout << "Levellayout:\n";
-		std::cout << designed_level[0] << ", " << designed_level[1] << ", " << designed_level[2] << ", " << designed_level[3] << ", " << designed_level[4] << ", " << designed_level[5] << ", " << designed_level[6] << ", " << designed_level[7] << ", " << designed_level[8] << ", " << designed_level[9] << "\n";
-		std::cout << designed_level[10] << ", " << designed_level[11] << ", " << designed_level[12] << ", " << designed_level[13] << ", " << designed_level[14] << ", " << designed_level[15] << ", " << designed_level[16] << ", " << designed_level[17] << ", " << designed_level[18] << ", " << designed_level[19] << "\n";
-		std::cout << designed_level[20] << ", " << designed_level[21] << ", " << designed_level[22] << ", " << designed_level[23] << ", " << designed_level[24] << ", " << designed_level[25] << ", " << designed_level[26] << ", " << designed_level[27] << ", " << designed_level[28] << ", " << designed_level[29] << "\n";
-		std::cout << designed_level[30] << ", " << designed_level[31] << ", " << designed_level[32] << ", " << designed_level[33] << ", " << designed_level[34] << ", " << designed_level[35] << ", " << designed_level[36] << ", " << designed_level[37] << ", " << designed_level[38] << ", " << designed_level[39] << "\n";
-		std::cout << designed_level[40] << ", " << designed_level[41] << ", " << designed_level[42] << ", " << designed_level[43] << ", " << designed_level[44] << ", " << designed_level[45] << ", " << designed_level[46] << ", " << designed_level[47] << ", " << designed_level[48] << ", " << designed_level[49] << "\n";
-		std::cout << "                  Press X to save level.";
-		std::cout << "    Press B or Start to return to title.";
-		std::cout << "        Press Select to play your level!";
+		kHeld = hidKeysHeld();
+		if (kDown & (KEY_L | KEY_R))
+			refresh_screen = true;
+		if (refresh_screen)
+		{
+			consoleClear();
+			std::cout << CRESET ANSI "0;0" PEND ANSI WHITE CEND;
+			for (int i = 0; i < 30; i++)
+				std::cout << "                              ";
+			std::cout << ANSI "0;0" PEND;
+			std::cout << "Levellayout:\n";
+			for (int a = 0; a < 5; a++)
+			{
+				for (int b = 0; b < 10; b++)
+				{
+					if (designed_level[selection][b + (a * 10)] > 9)
+						std::cout << designed_level[selection][b + (a * 10)];
+					else
+						std::cout << " " << designed_level[selection][b + (a * 10)];
+					if (b < 9)
+						std::cout << ", ";
+				}
+				std::cout << "\n";
+			}
+			//std::cout << designed_level[selection][0] << ", " << designed_level[selection][1] << ", " << designed_level[selection][2] << ", " << designed_level[selection][3] << ", " << designed_level[selection][4] << ", " << designed_level[selection][5] << ", " << designed_level[selection][6] << ", " << designed_level[selection][7] << ", " << designed_level[selection][8] << ", " << designed_level[selection][9] << "\n";
+			//std::cout << designed_level[selection][10] << ", " << designed_level[selection][11] << ", " << designed_level[selection][12] << ", " << designed_level[selection][13] << ", " << designed_level[selection][14] << ", " << designed_level[selection][15] << ", " << designed_level[selection][16] << ", " << designed_level[selection][17] << ", " << designed_level[selection][18] << ", " << designed_level[selection][19] << "\n";
+			//std::cout << designed_level[selection][20] << ", " << designed_level[selection][21] << ", " << designed_level[selection][22] << ", " << designed_level[selection][23] << ", " << designed_level[selection][24] << ", " << designed_level[selection][25] << ", " << designed_level[selection][26] << ", " << designed_level[selection][27] << ", " << designed_level[selection][28] << ", " << designed_level[selection][29] << "\n";
+			//std::cout << designed_level[selection][30] << ", " << designed_level[selection][31] << ", " << designed_level[selection][32] << ", " << designed_level[selection][33] << ", " << designed_level[selection][34] << ", " << designed_level[selection][35] << ", " << designed_level[selection][36] << ", " << designed_level[selection][37] << ", " << designed_level[selection][38] << ", " << designed_level[selection][39] << "\n";
+			//std::cout << designed_level[selection][40] << ", " << designed_level[selection][41] << ", " << designed_level[selection][42] << ", " << designed_level[selection][43] << ", " << designed_level[selection][44] << ", " << designed_level[selection][45] << ", " << designed_level[selection][46] << ", " << designed_level[selection][47] << ", " << designed_level[selection][48] << ", " << designed_level[selection][49] << "\n";
+			std::cout << "                  Press X to save level.";
+			std::cout << "    Press B or Start to return to title.";
+			std::cout << "        Press Select to play your level!";
+		}
 	}
 	return 0;
 }
 
 /*save designed level*/
-int save_level() {
+int save_level(int selection) {
 	std::cout << "Are you sure you want to save this?\n";
 	std::cout << "A to save B to return";
 	while (true)
@@ -826,13 +910,13 @@ int save_level() {
 			break;
 		if (kDown & KEY_A)
 		{
-			fclose(saved_level);
-			remove("sdmc:/3ds/breakout_level.bsl");
-			saved_level = fopen("sdmc:/3ds/breakout_level.bsl", "w");
+			fclose(saved_level[selection]);
+			remove(saved_level_filename[selection].c_str());
+			saved_level[selection] = fopen(saved_level_filename[selection].c_str(), "w");
 			for (int i = 0; i < 50; i++)
-				fprintf(saved_level, "%d\n", designed_level[i]);
-			fclose(saved_level);
-			saved_level = fopen("sdmc:/3ds/breakout_level.bsl", "r");
+				fprintf(saved_level[selection], "%d\n", designed_level[selection][i]);
+			fclose(saved_level[selection]);
+			saved_level[selection] = fopen(saved_level_filename[selection].c_str(), "r");
 			break;
 		}
 	}

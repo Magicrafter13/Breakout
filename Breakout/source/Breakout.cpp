@@ -6,7 +6,7 @@
 
 //init
 char versiontxtt[8] = "  Beta ", versiontxtn[9] = "01.06.01";
-char buildnumber[14] = "17.10.19.1708", ishupeversion[9] = "00.04.01";
+char buildnumber[14] = "17.10.19.1731", ishupeversion[9] = "00.04.01";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
@@ -146,6 +146,7 @@ void init_game_textures() {
 	pp2d_load_texture_png(25, "romfs:/sprites/ball06.png");
 	pp2d_load_texture_png(26, "romfs:/sprites/ball07.png");
 	pp2d_load_texture_png(27, "romfs:/sprites/background/press_select.png");
+	pp2d_load_texture_png(28, "romfs:/sprites/powerup/life00.png");
 };
 
 /*initialize audio*/
@@ -633,6 +634,7 @@ int breakout()
 	trail_new_frame(the_ball);
 
 	pp2d_begin_draw(GFX_TOP, GFX_LEFT);
+	pp2d_draw_texture(28, 200, 120);
 	draw_object(the_paddle);
 	for (int i = 0; i < 50; i++)
 		if (brick_array[level][i].exists)

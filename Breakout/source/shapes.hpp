@@ -72,6 +72,20 @@ extern int brick_second_texture_by_type[brick_types];
 /*point value by brick type*/
 extern int brick_point_value[brick_types];
 
+class powerup {
+public:
+	int x;
+	int y;
+	mRectangle mask;
+	int texture_id;
+	void setDefaults(int set_x, int set_y, int set_width, int set_height, int set_texture) {
+		mask.setDefaults(set_x, set_y, set_width, set_height);
+		x = set_x;
+		y = set_y;
+		texture_id = set_texture;
+	}
+};
+
 class brick {
 private:
 	int internal_brick_type;
@@ -103,7 +117,7 @@ private:
 				int temp_number = rand() % 20;
 				if (temp_number <= 3)
 				{
-					temp_number = rand() % 3;
+					temp_number = rand() % 4;
 					return (temp_number + 1);
 				}
 				return 0;
@@ -112,7 +126,7 @@ private:
 				int temp_number = rand() % 20;
 				if (temp_number <= 3)
 				{
-					temp_number = rand() % 3;
+					temp_number = rand() % 4;
 					return (temp_number + 1);
 				}
 				return 0;
@@ -121,7 +135,7 @@ private:
 				int temp_number = rand() % 4;
 				if (temp_number == 1)
 				{
-					temp_number = rand() % 3;
+					temp_number = rand() % 4;
 					return (temp_number + 1);
 				}
 				return 0;
@@ -130,7 +144,7 @@ private:
 				int temp_number = rand() % 4;
 				if (temp_number == 1)
 				{
-					temp_number = rand() % 3;
+					temp_number = rand() % 4;
 					return (temp_number + 1);
 				}
 				return 0;
@@ -141,6 +155,9 @@ private:
 public:
 	int texture_id;
 	int hits_left;
+	bool has_powerup_on_screen;
+	powerup my_powerup;
+	int powerup_timer;
 	/*wether or not the brick is currently in play*/
 	bool exists;
 	/*Rectangle to be used for brick (ie hit detection, think of it as a mask)*/
@@ -167,6 +184,8 @@ public:
 		if (!(brick_type == 0))
 			texture_id = brick_texture_by_type[brick_type];
 		set_hits();
+		has_powerup_on_screen = false;
+		powerup_timer = 0;
 	}
 	/*
 	Sets the exists value to false thus removing it from play
@@ -212,6 +231,15 @@ public:
 		   returns 2 for bigger paddle
 		   returns 3 for smaller paddle
 		*/
+	}
+	/*spawns powerup*/
+	void spawn_powerup(int type) {
+		switch (type) {
+		case 4:
+			my_powerup.setDefaults(brick_mrect.x + ((brick_mrect.width - 28) / 2), brick_mrect.y + ((brick_mrect.height - 9) / 2), 28, 9, 28);
+			break;
+		}
+		has_powerup_on_screen = true;
 	}
 };
 

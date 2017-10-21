@@ -235,8 +235,11 @@ public:
 	/*spawns powerup*/
 	void spawn_powerup(int type) {
 		switch (type) {
+		case 1:
+			my_powerup.setDefaults(brick_mrect.x + ((brick_mrect.width - 28) / 2), brick_mrect.y + ((brick_mrect.height - 7) / 2), 28, 7, 29);
+			break;
 		case 4:
-			my_powerup.setDefaults(brick_mrect.x + ((brick_mrect.width - 28) / 2), brick_mrect.y + ((brick_mrect.height - 9) / 2), 28, 9, 28);
+			my_powerup.setDefaults(brick_mrect.x + ((brick_mrect.width - 28) / 2), brick_mrect.y + ((brick_mrect.height - 7) / 2), 28, 7, 28);
 			break;
 		}
 		has_powerup_on_screen = true;

@@ -147,6 +147,7 @@ void init_game_textures() {
 	pp2d_load_texture_png(26, "romfs:/sprites/ball07.png");
 	pp2d_load_texture_png(27, "romfs:/sprites/background/press_select.png");
 	pp2d_load_texture_png(28, "romfs:/sprites/powerup/life00.png");
+	pp2d_load_texture_png(29, "romfs:/sprites/powerup/laser00.png");
 };
 
 /*initialize audio*/
@@ -545,6 +546,8 @@ int breakout()
 						if (!brick_array[level][j].exists) {
 							points += brick_array[level][j].point_value();
 							last_power = brick_array[level][j].random_powerup();
+							if (last_power != 0)
+								brick_array[level][j].spawn_powerup(last_power);
 							if (last_power == 1)
 								times_power_1++;
 							if (last_power == 2)
@@ -634,6 +637,14 @@ int breakout()
 	trail_new_frame(the_ball);
 
 	pp2d_begin_draw(GFX_TOP, GFX_LEFT);
+	for (int i = 0; i < 50; i++)
+	{
+		if (brick_array[level][i].has_powerup_on_screen)
+		{
+			brick_array[level][i].my_powerup.y += 1;
+			pp2d_draw_texture(brick_array[level][i].my_powerup.texture_id, brick_array[level][i].my_powerup.x, brick_array[level][i].my_powerup.y);
+		}
+	}
 	pp2d_draw_texture(28, 200, 120);
 	draw_object(the_paddle);
 	for (int i = 0; i < 50; i++)

@@ -399,6 +399,25 @@ bool change_level;
 int thanks_text_display;
 bool has_hit_paddle, has_hit_wall;
 
+void run_powerup(int typef)
+{
+	switch (typef)
+	{
+	case 1:
+		//do something to give lasers
+		break;
+	case 2:
+		//do something to give large paddle
+		break;
+	case 3:
+		//do something to give small paddle
+		break;
+	case 4:
+		lives++;
+		break;
+	}
+}
+
 /*main game*/
 int breakout()
 {
@@ -642,6 +661,16 @@ int breakout()
 		if (brick_array[level][i].has_powerup_on_screen)
 		{
 			brick_array[level][i].my_powerup.y += 1;
+			if (brick_array[level][i].my_powerup.y >= 240)
+				brick_array[level][i].has_powerup_on_screen = false;
+			if ((brick_array[level][i].my_powerup.x <= the_paddle.getRight(true)) &&
+				((brick_array[level][i].my_powerup.x + brick_array[level][i].my_powerup.width) >= the_paddle.getLeft(true)) &&
+				(brick_array[level][i].my_powerup.y <= the_paddle.getBottom(false)) &&
+				((brick_array[level][i].my_powerup.y + brick_array[level][i].my_powerup.height) >= the_paddle.getTop(false)))
+			{
+				run_powerup(brick_array[level][i].my_powerup.my_type);
+				brick_array[level][i].has_powerup_on_screen = false;
+			}	
 			pp2d_draw_texture(brick_array[level][i].my_powerup.texture_id, brick_array[level][i].my_powerup.x, brick_array[level][i].my_powerup.y);
 		}
 	}

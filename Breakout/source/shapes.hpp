@@ -76,12 +76,18 @@ class powerup {
 public:
 	int x;
 	int y;
+	int width;
+	int height;
+	int my_type;
 	mRectangle mask;
 	int texture_id;
-	void setDefaults(int set_x, int set_y, int set_width, int set_height, int set_texture) {
+	void setDefaults(int set_x, int set_y, int set_width, int set_height, int set_texture, int type) {
 		mask.setDefaults(set_x, set_y, set_width, set_height);
 		x = set_x;
 		y = set_y;
+		width = set_width;
+		height = set_width;
+		my_type = type;
 		texture_id = set_texture;
 	}
 };
@@ -236,10 +242,10 @@ public:
 	void spawn_powerup(int type) {
 		switch (type) {
 		case 1:
-			my_powerup.setDefaults(brick_mrect.x + ((brick_mrect.width - 28) / 2), brick_mrect.y + ((brick_mrect.height - 7) / 2), 28, 7, 29);
+			my_powerup.setDefaults(brick_mrect.x + ((brick_mrect.width - 28) / 2), brick_mrect.y + ((brick_mrect.height - 7) / 2), 18, 7, 29, type);
 			break;
 		case 4:
-			my_powerup.setDefaults(brick_mrect.x + ((brick_mrect.width - 28) / 2), brick_mrect.y + ((brick_mrect.height - 7) / 2), 28, 7, 28);
+			my_powerup.setDefaults(brick_mrect.x + ((brick_mrect.width - 28) / 2), brick_mrect.y + ((brick_mrect.height - 7) / 2), 18, 7, 28, type);
 			break;
 		}
 		has_powerup_on_screen = true;

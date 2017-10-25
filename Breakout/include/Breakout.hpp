@@ -12,7 +12,7 @@ using std::string;
 #include <cmath>
 #include <3ds.h>
 #include <citro3d.h>
-#include "pp2d.h"
+#include "gfx/pp2d.h"
 
 #include <vector>
 

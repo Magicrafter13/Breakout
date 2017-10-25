@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <3ds.h>
-#include "sfx.h"
-#include "filesystem.h"
+#include "audio/sfx.h"
+#include "audio/filesystem.h"
 
 SFX_s SFX[NUMSFX];
 

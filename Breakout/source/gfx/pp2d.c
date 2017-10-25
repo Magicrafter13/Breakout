@@ -1,4 +1,4 @@
-#include "pp2d.h"
+#include "gfx/pp2d.h"
 
 static DVLB_s* vshader_dvlb;
 static shaderProgram_s program;

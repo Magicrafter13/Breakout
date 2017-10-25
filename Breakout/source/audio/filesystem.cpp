@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <3ds.h>
-#include "filesystem.h"
+#include "audio/filesystem.h"
 
 
 FILE* openFile(const char* fn, const char* mode)

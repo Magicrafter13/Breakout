@@ -1,12 +1,13 @@
 #include "Breakout.hpp"
 #include "shapes.hpp"
 #include "draw.hpp"
-#include "sfx.h"
-#include "filesystem.h"
+#include "audio/sfx.h"
+#include "audio/filesystem.h"
+#include "ishupe.hpp"
 
 //init
 char versiontxtt[8] = "  Beta ", versiontxtn[9] = "01.06.01";
-char buildnumber[14] = "17.10.19.1731", ishupeversion[9] = "00.04.01";
+char buildnumber[14] = "17.10.24.2159", ishupeversion[9] = "00.04.01";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
@@ -503,58 +504,26 @@ int breakout()
 					if (the_ball.getBottom(true) >= the_paddle.paddle_mrect.x + (paddle_width_ninth * z))
 						angle += 1;
 				/*change ball angle according to the area of paddle hit*/
+				double angle_of_change = 0.0;
 				switch (angle) {
-				case 1: ball_angle = (360.0 - ball_angle) - 40.0;
+				case 4: angle_of_change -= 10.0;
+				case 3: angle_of_change -= 10.0;
+				case 2: angle_of_change -= 10.0;
+				case 1: angle_of_change -= 10.0;
 					break;
-				case 2: ball_angle = (360.0 - ball_angle) - 30.0;
-					break;
-				case 3: ball_angle = (360.0 - ball_angle) - 20.0;
-					break;
-				case 4: ball_angle = (360.0 - ball_angle) - 10.0;
-					break;
-				case 5: ball_angle = (360.0 - ball_angle);
-					break;
-				case 6: ball_angle = (360.0 - ball_angle) + 10.0;
-					break;
-				case 7: ball_angle = (360.0 - ball_angle) + 20.0;
-					break;
-				case 8: ball_angle = (360.0 - ball_angle) + 30.0;
-					break;
-				case 9: ball_angle = (360.0 - ball_angle) + 40.0;
+				case 9: angle_of_change += 10.0;
+				case 8: angle_of_change += 10.0;
+				case 7: angle_of_change += 10.0;
+				case 6: angle_of_change += 10.0;
 					break;
 				}
+				ball_angle = (360.0 - ball_angle) + angle_of_change;
 			}
 			/*large if statement to determine if a brick has been hit (run once per brick)*/
 			for (int j = 0; j < 50; j++)
 			{
-				if (
-					(
-						the_ball.getTop(true) >= brick_array[level][j].brick_mrect.x &&
-						the_ball.getTop(true) <= brick_array[level][j].brick_mrect.x + brick_array[level][j].brick_mrect.width &&
-						the_ball.getTop(false) >= brick_array[level][j].brick_mrect.y &&
-						the_ball.getTop(false) <= brick_array[level][j].brick_mrect.y + brick_array[level][j].brick_mrect.height
-						) || (
-							the_ball.getBottom(true) >= brick_array[level][j].brick_mrect.x &&
-							the_ball.getBottom(true) <= brick_array[level][j].brick_mrect.x + brick_array[level][j].brick_mrect.width &&
-							the_ball.getBottom(false) >= brick_array[level][j].brick_mrect.y &&
-							the_ball.getBottom(false) <= brick_array[level][j].brick_mrect.y + brick_array[level][j].brick_mrect.height
-							)
-					)
-					brickHitV = true;
-				if (
-					(
-						the_ball.getLeft(true) >= brick_array[level][j].brick_mrect.x &&
-						the_ball.getLeft(true) <= brick_array[level][j].brick_mrect.x + brick_array[level][j].brick_mrect.width &&
-						the_ball.getLeft(false) >= brick_array[level][j].brick_mrect.y &&
-						the_ball.getLeft(false) <= brick_array[level][j].brick_mrect.y + brick_array[level][j].brick_mrect.height
-						) || (
-							the_ball.getRight(true) >= brick_array[level][j].brick_mrect.x &&
-							the_ball.getRight(true) <= brick_array[level][j].brick_mrect.x + brick_array[level][j].brick_mrect.width &&
-							the_ball.getRight(false) >= brick_array[level][j].brick_mrect.y &&
-							the_ball.getRight(false) <= brick_array[level][j].brick_mrect.y + brick_array[level][j].brick_mrect.height
-							)
-					)
-					brickHitH = true;
+				if (test_collision(the_ball.ball_mcirc, brick_array[level][j].brick_mrect, false)) brickHitV = true;
+				if (test_collision(the_ball.ball_mcirc, brick_array[level][j].brick_mrect, true)) brickHitH = true;
 				/*code if brick(s) hit*/
 				if (brickHitV || brickHitH)
 				{
@@ -661,20 +630,15 @@ int breakout()
 		if (brick_array[level][i].has_powerup_on_screen)
 		{
 			brick_array[level][i].my_powerup.y += 1;
-			if (brick_array[level][i].my_powerup.y >= 240)
+			if (off_screen(brick_array[level][i].my_powerup.mask))
 				brick_array[level][i].has_powerup_on_screen = false;
-			if ((brick_array[level][i].my_powerup.x <= the_paddle.getRight(true)) &&
-				((brick_array[level][i].my_powerup.x + brick_array[level][i].my_powerup.width) >= the_paddle.getLeft(true)) &&
-				(brick_array[level][i].my_powerup.y <= the_paddle.getBottom(false)) &&
-				((brick_array[level][i].my_powerup.y + brick_array[level][i].my_powerup.height) >= the_paddle.getTop(false)))
-			{
+			if (test_collision<powerup,mRectangle> (brick_array[level][i].my_powerup, the_paddle.paddle_mrect)) {
 				run_powerup(brick_array[level][i].my_powerup.my_type);
 				brick_array[level][i].has_powerup_on_screen = false;
-			}	
+			}
 			pp2d_draw_texture(brick_array[level][i].my_powerup.texture_id, brick_array[level][i].my_powerup.x, brick_array[level][i].my_powerup.y);
 		}
 	}
-	pp2d_draw_texture(28, 200, 120);
 	draw_object(the_paddle);
 	for (int i = 0; i < 50; i++)
 		if (brick_array[level][i].exists)
@@ -935,11 +899,6 @@ int level_designer() {
 				}
 				std::cout << "\n";
 			}
-			//std::cout << designed_level[selection][0] << ", " << designed_level[selection][1] << ", " << designed_level[selection][2] << ", " << designed_level[selection][3] << ", " << designed_level[selection][4] << ", " << designed_level[selection][5] << ", " << designed_level[selection][6] << ", " << designed_level[selection][7] << ", " << designed_level[selection][8] << ", " << designed_level[selection][9] << "\n";
-			//std::cout << designed_level[selection][10] << ", " << designed_level[selection][11] << ", " << designed_level[selection][12] << ", " << designed_level[selection][13] << ", " << designed_level[selection][14] << ", " << designed_level[selection][15] << ", " << designed_level[selection][16] << ", " << designed_level[selection][17] << ", " << designed_level[selection][18] << ", " << designed_level[selection][19] << "\n";
-			//std::cout << designed_level[selection][20] << ", " << designed_level[selection][21] << ", " << designed_level[selection][22] << ", " << designed_level[selection][23] << ", " << designed_level[selection][24] << ", " << designed_level[selection][25] << ", " << designed_level[selection][26] << ", " << designed_level[selection][27] << ", " << designed_level[selection][28] << ", " << designed_level[selection][29] << "\n";
-			//std::cout << designed_level[selection][30] << ", " << designed_level[selection][31] << ", " << designed_level[selection][32] << ", " << designed_level[selection][33] << ", " << designed_level[selection][34] << ", " << designed_level[selection][35] << ", " << designed_level[selection][36] << ", " << designed_level[selection][37] << ", " << designed_level[selection][38] << ", " << designed_level[selection][39] << "\n";
-			//std::cout << designed_level[selection][40] << ", " << designed_level[selection][41] << ", " << designed_level[selection][42] << ", " << designed_level[selection][43] << ", " << designed_level[selection][44] << ", " << designed_level[selection][45] << ", " << designed_level[selection][46] << ", " << designed_level[selection][47] << ", " << designed_level[selection][48] << ", " << designed_level[selection][49] << "\n";
 			std::cout << "                  Press X to save level.";
 			std::cout << "    Press B or Start to return to title.";
 			std::cout << "        Press Select to play your level!";

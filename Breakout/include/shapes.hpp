@@ -86,7 +86,7 @@ public:
 		x = set_x;
 		y = set_y;
 		width = set_width;
-		height = set_width;
+		height = set_height;
 		my_type = type;
 		texture_id = set_texture;
 	}

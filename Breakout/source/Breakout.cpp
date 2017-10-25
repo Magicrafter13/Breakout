@@ -28,7 +28,7 @@ int last_power, times_power_1, times_power_2, times_power_3;
 int press_select_frame = 0; bool press_select_visible = true;
 
 paddle the_paddle; ball the_ball; mCircle trail_new_frame_circle[8]; brick brick_array[def_level_count][50];
-std::vector<SFX_s> *testsound (1), ball_bounce (8);
+std::vector<SFX_s *> testsound (1), ball_bounce (8);
 
 /*integer mask for levels*/
 int level_mask[def_level_count][50] = {

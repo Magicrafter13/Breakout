@@ -23,8 +23,8 @@ extern PrintConsole bottomScreen, versionWin, killBox, debugBox;
 #define def_level_count 5
 #define SAVE_FILES 3
 
-extern char versiontxtt[8], versiontxtn[9];
-extern char buildnumber[14], ishupeversion[9];
+extern std::string versiontxtt, versiontxtn;
+extern std::string buildnumber, ishupeversion;
 extern int vernumqik;
 
 #define ANSI "\x1b["

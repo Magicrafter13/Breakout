@@ -7,11 +7,11 @@
 
 //init
 std::string versiontxtt = "  Beta ", versiontxtn = "01.06.01";
-std::string buildnumber = "17.10.25.0934", ishupeversion = "00.04.01";
+std::string buildnumber = "17.10.25.2213", ishupeversion = "00.04.01";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
-FILE *saved_level[SAVE_FILES];
+std::vector<FILE*> saved_level(SAVE_FILES);
 int designed_level[SAVE_FILES][50];
 std::string saved_level_filename[SAVE_FILES];
 
@@ -21,17 +21,16 @@ int extras_10_13_2017();
 int level_designer();
 int save_level(int selection);
 
-int lives = 3, points, level = 0;
-int level_count = def_level_count;
-double ball_dx, ball_dy, ball_angle, trail_new_frame_x[8], trail_new_frame_y[8]; bool crushBall = false; bool ball_is_attached;
+int lives, points, level;
+double ball_dx, ball_dy, ball_angle; std::vector<double> trail_new_frame_x(8), trail_new_frame_y(8); bool crushBall = false; bool ball_is_attached;
 int last_power, times_power_1, times_power_2, times_power_3;
 int press_select_frame = 0; bool press_select_visible = true;
 
-paddle the_paddle; ball the_ball; mCircle trail_new_frame_circle[8]; brick brick_array[def_level_count][50];
-std::vector<SFX_s *> testsound (1), ball_bounce (8);
+paddle the_paddle; ball the_ball; std::vector<mCircle> trail_new_frame_circle(8); brick brick_array[def_level_count][50];
+std::vector<SFX_s *> testsound, ball_bounce;
 
 /*integer mask for levels*/
-int level_mask[def_level_count][50] = {
+std::vector<std::vector<int>> level_mask = {
 	{
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -72,17 +71,10 @@ int level_mask[def_level_count][50] = {
 /*set ball trail*/
 void trail_new_frame(ball ball_object)
 {
-	double current_x = ball_object.ball_mcirc.x;
-	double current_y = ball_object.ball_mcirc.y;
-	for (int i = 7; i > 0; i--)
-	{
-		trail_new_frame_x[i] = trail_new_frame_x[i - 1];
-		trail_new_frame_y[i] = trail_new_frame_y[i - 1];
-	}
-	trail_new_frame_x[0] = current_x;
-	trail_new_frame_y[0] = current_y;
-	for (int i = 0; i < 8; i++)
-		trail_new_frame_circle[i].setPosition(trail_new_frame_x[i], trail_new_frame_y[i]);
+	trail_new_frame_x.insert(trail_new_frame_x.begin(), ball_object.ball_mcirc.x);
+	trail_new_frame_y.insert(trail_new_frame_y.begin(), ball_object.ball_mcirc.y);
+	trail_new_frame_x.shrink_to_fit(); trail_new_frame_y.shrink_to_fit();
+	for (int i = 0; i < 8; i++) trail_new_frame_circle[i].setPosition(trail_new_frame_x[i], trail_new_frame_y[i]);
 }
 
 /*returns if area is being touched by stylus*/
@@ -90,7 +82,7 @@ bool touchInBox(touchPosition touch, int x, int y, int w, int h)
 {
 	int tx = touch.px;
 	int ty = touch.py;
-	u32 kDown = hidKeysDown();
+	kDown = hidKeysDown();
 	if (kDown & KEY_TOUCH && tx > x && tx < x + w && ty > y && ty < y + h) {
 		return true;
 	}
@@ -154,56 +146,40 @@ void init_game_textures() {
 /*initialize audio*/
 void initialize_audio() {
 	testsound[0] = createSFX("romfs:/testfile.raw", SOUND_FORMAT_16BIT);
-	ball_bounce[0] = createSFX("romfs:/bounce0.raw", SOUND_FORMAT_16BIT);
-	ball_bounce[1] = createSFX("romfs:/bounce1.raw", SOUND_FORMAT_16BIT);
-	ball_bounce[2] = createSFX("romfs:/bounce2.raw", SOUND_FORMAT_16BIT);
-	ball_bounce[3] = createSFX("romfs:/bounce3.raw", SOUND_FORMAT_16BIT);
-	ball_bounce[4] = createSFX("romfs:/bounce4.raw", SOUND_FORMAT_16BIT);
-	ball_bounce[5] = createSFX("romfs:/bounce5.raw", SOUND_FORMAT_16BIT);
-	ball_bounce[6] = createSFX("romfs:/bounce6.raw", SOUND_FORMAT_16BIT);
-	ball_bounce[7] = createSFX("romfs:/bounce7.raw", SOUND_FORMAT_16BIT);
+	for (int i = 0; i < 8; i++) {
+		std::string filename = "romfs:/bounce" + std::to_string(i) + ".raw";
+		ball_bounce[i] = createSFX(filename.c_str(), SOUND_FORMAT_16BIT);
+	}
 }
 
 /*create level layout or something*/
 void initialize_brick_array() {
-	for (int q = 0; q < level_count; q++)
-	{
+	for (int q = 0; q < def_level_count; q++) {
 		int array_step = 0;
 		for (int a = 0; a < 5; a++)
-		{
-			for (int b = 0; b < 10; b++)
-			{
+			for (int b = 0; b < 10; b++) {
 				if (level_mask[q][array_step] == 0)
 					brick_array[q][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, false, 0);
 				else
 					brick_array[q][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, true, level_mask[q][array_step]);
 				array_step++;
 			}
-		}
 	}
 }
 
 void create_save_files(int setup_type) {
 	for (int i = 0; i < SAVE_FILES; i++)
-	{
-		saved_level_filename[i] = "sdmc:/3ds/breakout_level_";
-		saved_level_filename[i] += std::to_string(i);
-		saved_level_filename[i] += ".bsl";
-	}
-	if (setup_type == 0)
-	{
+		saved_level_filename[i] = "sdmc:/3ds/breakout_level_" + std::to_string(i) + ".bsl";
+	if (setup_type == 0) {
 		rename("sdmc:/3ds/breakout_level.bsl", "sdmc:/3ds/breakout_level_0.bsl");
-		for (int i = 1; i < SAVE_FILES; i++)
-		{
+		for (int i = 1; i < SAVE_FILES; i++) {
 			saved_level[i] = fopen(saved_level_filename[i].c_str(), "w");
 			fprintf(saved_level[i], "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ");
 			fclose(saved_level[i]);
 		}
 	}
-	if (setup_type == 1)
-	{
-		for (int i = 0; i < SAVE_FILES; i++)
-		{
+	if (setup_type == 1) {
+		for (int i = 0; i < SAVE_FILES; i++) {
 			saved_level[i] = fopen(saved_level_filename[i].c_str(), "w");
 			fprintf(saved_level[i], "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ");
 			fclose(saved_level[i]);
@@ -215,8 +191,7 @@ void load_save_files()
 {
 	for (int i = 0; i < SAVE_FILES; i++)
 		saved_level_filename[i] = "sdmc:/3ds/breakout_level_" + std::to_string(i) + ".bsl";
-	for (int i = 0; i < SAVE_FILES; i++)
-	{
+	for (int i = 0; i < SAVE_FILES; i++) {
 		saved_level[i] = fopen(saved_level_filename[i].c_str(), "r");
 		for (int j = 0; j < 50; j++)
 			fscanf(saved_level[i], "%d ", &designed_level[i][j]);
@@ -235,12 +210,11 @@ int main(int argc, char **argv)
 		fclose(file);
 		create_save_files(0);
 	}
-	if (FILE *file = fopen("sdmc:/3ds/breakout_level_0.bsl", "r")) {
+	if (FILE *file = fopen("sdmc:/3ds/breakout_level_0.bsl", "r"))
 		fclose(file);
-	}
-	else {
+	else
 		create_save_files(1);
-	}
+
 	load_save_files();
 	
 	csndInit();
@@ -248,10 +222,8 @@ int main(int argc, char **argv)
 	
 	srand(time(NULL));
 	
-	consoleInit(GFX_BOTTOM, &bottomScreen);
-	consoleInit(GFX_BOTTOM, &versionWin);
-	consoleInit(GFX_BOTTOM, &killBox);
-	consoleInit(GFX_BOTTOM, &debugBox);
+	consoleInit(GFX_BOTTOM, &bottomScreen); consoleInit(GFX_BOTTOM, &versionWin);
+	consoleInit(GFX_BOTTOM, &killBox); consoleInit(GFX_BOTTOM, &debugBox);
 
 	consoleSetWindow(&versionWin, 6, 26, 34, 4);
 	consoleSetWindow(&killBox, 0, 28, 40, 2);
@@ -261,8 +233,7 @@ int main(int argc, char **argv)
 
 	initialize_audio();
 
-	for (int i = 0; i < 8; i++)
-		trail_new_frame_circle[7 - i].setDefaults(200.0, 120.0, (0.875 * (i + 1)));
+	for (int i = 0; i < 8; i++) trail_new_frame_circle[7 - i].setDefaults(200.0, 120.0, (0.875 * (i + 1)));
 
 	the_paddle.setDefaults(175, 215, 50, 10, 19);
 	the_ball.setDefaults(200.0, 200.0, 7.0, 1);
@@ -274,10 +245,9 @@ int main(int argc, char **argv)
 	playSFX(testsound[0]);
 
 	// Main loop
-	while (aptMainLoop())
-	{
+	while (aptMainLoop()) {
 		hidScanInput();
-		u32 kDown = hidKeysDown();
+		kDown = hidKeysDown();
 		if (kDown & KEY_START) break; // break in order to return to hbmenu
 		/*go to extras when X pressed*/
 		if (kDown & KEY_X) {
@@ -292,35 +262,29 @@ int main(int argc, char **argv)
 			bottom_screen_text = 0;
 		}
 		/*begin game*/
-		if (kDown & KEY_SELECT)
-		{
+		if (kDown & KEY_SELECT) {
 			lives = 3;
 			int result = 3;
 			the_ball.reset();
 			the_paddle.reset();
-			double angle = 0.0;
-			while (angle < 225.0 || angle > 315.0 || (angle > 265 && angle < 275))
-				angle = rand() % 360;
-			ball_angle = angle;
-			for (int i = 0; i < level_count; i++)
+			ball_angle = 0.0;
+			do ball_angle = rand() % 360; while (ball_angle < 225.0 || ball_angle > 315.0 || (ball_angle > 265 && ball_angle < 275));
+			for (int i = 0; i < def_level_count; i++)
 				for (int j = 0; j < 50; j++)
 					brick_array[i][j].reset();
 			level = 1; points = 0; last_power = 0;
 			times_power_1 = 0; times_power_2 = 0; times_power_3 = 0;
 			ball_is_attached = true;
 			/*main breakout loop*/
-			while (true)
-			{
+			while (true) {
 				result = breakout();
-				if (result != 0)
-					break;
+				if (result != 0) break;
 			}
 			bottom_screen_text = 0;
 			if (result == 3) break;
 		}
 		/*text display (run once to avoid screen tearing)*/
-		if (bottom_screen_text == 0)
-		{
+		if (bottom_screen_text == 0) {
 			consoleSelect(&killBox); consoleClear();
 			consoleSelect(&versionWin); consoleClear();
 			consoleSelect(&bottomScreen); consoleClear();
@@ -351,13 +315,11 @@ int main(int argc, char **argv)
 		draw_object(the_paddle);
 		pp2d_draw_texture(15, 80, 20);
 		pp2d_draw_texture(19, 122, 92);
-		if (press_select_visible)
-			pp2d_draw_texture(27, 100, 180);
+		if (press_select_visible) pp2d_draw_texture(27, 100, 180);
 		pp2d_end_draw();
 
 		/*after half a second, Press Select to play! is toggled*/
-		if (press_select_frame == 30)
-		{
+		if (press_select_frame == 30) {
 			press_select_frame = 0;
 			if (press_select_visible)
 				press_select_visible = false;
@@ -375,8 +337,7 @@ int main(int argc, char **argv)
 	}
 
 	// Exit services
-	for (int i = 0; i < SAVE_FILES; i++)
-		fclose(saved_level[i]);
+	for (int i = 0; i < SAVE_FILES; i++) fclose(saved_level[i]);
 
 	pp2d_exit();
 
@@ -390,16 +351,14 @@ bool hasHitPadd = false, hasHitWall = false;
 bool isMovingRight = false;
 bool isInPaddle = false, isInWall = false;
 bool brickHitV = false, brickHitH = false;
-int angle;
+//int angle;
 int bricks_hit_this_frame;
 bool change_level;
 int thanks_text_display;
 bool has_hit_paddle, has_hit_wall;
 
-void run_powerup(int typef)
-{
-	switch (typef)
-	{
+void run_powerup(int typef) {
+	switch (typef) {
 	case 1:
 		//do something to give lasers
 		break;
@@ -419,8 +378,7 @@ void run_powerup(int typef)
 int breakout()
 {
 	hidScanInput();
-	kDown = hidKeysDown();
-	kHeld = hidKeysHeld();
+	kDown = hidKeysDown(); kHeld = hidKeysHeld();
 	/*if (kDown & KEY_R)
 		level++;
 	if (kDown & KEY_L)
@@ -428,25 +386,22 @@ int breakout()
 	if (kDown & KEY_SELECT || lives == 0) return 2;
 	if (kHeld & KEY_START) return 3;
 	/*move paddle left (if applicable)*/
-	if (kHeld & KEY_LEFT && the_paddle.paddle_mrect.x > 1)
-	{
+	if (kHeld & KEY_LEFT && the_paddle.paddle_mrect.x > 1) {
 		the_paddle.paddle_mrect.x -= 3;
 		if (ball_is_attached) the_ball.move(-3.0, 0.0);
 	}
 	/*move paddle right (if applicable)*/
-	if (kHeld & KEY_RIGHT && the_paddle.paddle_mrect.x < 399 - the_paddle.paddle_mrect.width)
-	{
+	if (kHeld & KEY_RIGHT && the_paddle.paddle_mrect.x < 399 - the_paddle.paddle_mrect.width) {
 		the_paddle.paddle_mrect.x += 3;
 		if (ball_is_attached) the_ball.move(3.0, 0.0);
 	}
 
 	/*lose life if outside of game field*/
-	if (the_ball.getTop(false) > 240)
-	{
+	if (the_ball.getTop(false) > 240) {
 		lives--;
 		the_ball.reset(); the_paddle.reset();
 		ball_is_attached = true;
-		while (ball_angle < 225.0 || ball_angle > 315.0 || (ball_angle > 265 && ball_angle < 275)) ball_angle = rand() % 360;
+		do ball_angle = rand() % 360; while(ball_angle < 225.0 || ball_angle > 315.0 || (ball_angle > 265 && ball_angle < 275));
 		return 0;
 	}
 
@@ -454,14 +409,11 @@ int breakout()
 	has_hit_paddle = false; has_hit_wall = false;
 	if (kDown & KEY_A && ball_is_attached == true) ball_is_attached = false;
 	/*run main engine code if the ball is not attached to the paddle*/
-	if (!ball_is_attached)
-	{
+	if (!ball_is_attached) {
 		bricks_hit_this_frame = 0;
 		change_level = false;
-		//if (kDown & KEY_X) change_level = true;
 		/*main hit detection engine (runs 300 times per frame)*/
-		for (int i = 0; i < 300; i++)
-		{
+		for (int i = 0; i < 300; i++) {
 			hasInteracted = false;
 			if (the_paddle.getTop(false) <= the_ball.getBottom(false) && (the_paddle.paddle_mrect.x <= the_ball.ball_mcirc.x && the_ball.ball_mcirc.x <= the_paddle.paddle_mrect.x + the_paddle.paddle_mrect.width /*balls x coordinate is <= paddles x coordinate + it's width*/))
 				hasHitPadd = true;
@@ -476,8 +428,7 @@ int breakout()
 				hasHitWall = false;
 			if (hasHitWall) has_hit_wall = true;
 			/*first time ball is detected touching wall*/
-			if (hasHitWall && !isInWall)
-			{
+			if (hasHitWall && !isInWall) {
 				hasInteracted = true;
 				isInWall = true;
 				if (the_ball.getTop(false) <= 0.00)
@@ -490,12 +441,11 @@ int breakout()
 			while (ball_angle > 360.0) ball_angle -= 360.0;
 
 			/*first time ball is detected touching paddle*/
-			if (hasHitPadd && !isInPaddle)
-			{
+			if (hasHitPadd && !isInPaddle) {
 				hasInteracted = true;
 				isInPaddle = true;
 				double paddle_width_ninth = the_paddle.paddle_mrect.width / 9.0;
-				angle = 1;
+				int angle = 1;
 				for (double z = 1.0; z < 9.0; z += 1.0)
 					if (the_ball.getBottom(true) >= the_paddle.paddle_mrect.x + (paddle_width_ninth * z))
 						angle += 1;
@@ -516,44 +466,34 @@ int breakout()
 				ball_angle = (360.0 - ball_angle) + angle_of_change;
 			}
 			/*large if statement to determine if a brick has been hit (run once per brick)*/
-			for (int j = 0; j < 50; j++)
-			{
+			for (int j = 0; j < 50; j++) {
 				if (test_collision(the_ball.ball_mcirc, brick_array[level][j].brick_mrect, false)) brickHitV = true;
 				if (test_collision(the_ball.ball_mcirc, brick_array[level][j].brick_mrect, true)) brickHitH = true;
 				/*code if brick(s) hit*/
-				if (brickHitV || brickHitH)
-				{
+				if (brickHitV || brickHitH) {
 					/*check if brick is actually in play*/
-					if (brick_array[level][j].exists)
-					{
+					if (brick_array[level][j].exists) {
 						brick_array[level][j].destroy();
 						if (!brick_array[level][j].exists) {
 							points += brick_array[level][j].point_value();
 							last_power = brick_array[level][j].random_powerup();
-							if (last_power != 0)
-								brick_array[level][j].spawn_powerup(last_power);
-							if (last_power == 1)
-								times_power_1++;
-							if (last_power == 2)
-								times_power_2++;
-							if (last_power == 3)
-								times_power_3++;
+							if (last_power != 0) brick_array[level][j].spawn_powerup(last_power);
+							if (last_power == 1) times_power_1++;
+							if (last_power == 2) times_power_2++;
+							if (last_power == 3) times_power_3++;
 						}
 						bricks_hit_this_frame++;
 						/*if brick hit V and H reverse direction*/
-						if (brickHitV && brickHitH)
-						{
+						if (brickHitV && brickHitH) {
 							ball_angle -= 180.0;
-							if (ball_angle < 0.0)
-								ball_angle += 360.0;
+							if (ball_angle < 0.0) ball_angle += 360.0;
 						}
 						else if (brickHitV)
 							ball_angle = -ball_angle + 360.0;
 						else if (brickHitH)
 							ball_angle = -ball_angle + 180.0;
 					}
-					brickHitV = false;
-					brickHitH = false;
+					brickHitV = false; brickHitH = false;
 				}
 			}
 			ball_dx = 2.0 * cos(ball_angle * (M_PI / 180.0)); ball_dy = 2.0 * sin(ball_angle * (M_PI / 180.0));
@@ -567,8 +507,7 @@ int breakout()
 				isInWall = false;
 			if (!hasInteracted && !hasHitPadd && !hasHitWall && !isInPaddle && !isInWall) the_ball.move(ball_dx / 300.0, ball_dy / 300.0);
 			/*if paddle and wall hit in same frame, ball is "crushed" (this could cause problems later*/
-			if (hasHitPadd && hasHitWall)
-			{
+			if (hasHitPadd && hasHitWall) {
 				lives--;
 				the_ball.reset();
 				ball_angle = 0.0;
@@ -579,18 +518,14 @@ int breakout()
 			for (int brick_array_pos = 0; brick_array_pos < 50; brick_array_pos++)
 				if (brick_array[level][brick_array_pos].exists)
 					bricks_available++;
-			if (bricks_available == 0)
-				change_level = true;
+			if (bricks_available == 0) change_level = true;
 		}
 		/*either increase level, or go to win screen*/
-		if (change_level == true)
-		{
-			if (level == level_count - 1)
-			{
-				int thanks_return = 0;
+		if (change_level == true) {
+			if (level == def_level_count - 1) {
+				int thanks_return;
 				thanks_text_display = 0;
-				while (thanks_return == 0) thanks_return = thanks_for_playing_the_beta();
-				thanks_text_display = 0;
+				do (thanks_return = thanks_for_playing_the_beta()); while (thanks_return == 0);
 				return thanks_return;
 			}
 			else {
@@ -602,8 +537,7 @@ int breakout()
 			}
 		}
 		/*to avoid a glitch, if more than one brick is hit on the same frame the direction is reversed*/
-		if (bricks_hit_this_frame > 1)
-		{
+		if (bricks_hit_this_frame > 1) {
 			ball_angle += 180.0;
 			if (ball_angle > 360.0)
 				ball_angle -= 360.0;
@@ -611,8 +545,7 @@ int breakout()
 	}
 
 	/*plays random SFX if a brick has been hit*/
-	if (bricks_hit_this_frame > 0 && !ball_is_attached)
-	{
+	if (bricks_hit_this_frame > 0 && !ball_is_attached) {
 		int which_bounce = rand() % 7;
 		playSFX(ball_bounce[which_bounce]);
 	}
@@ -622,19 +555,15 @@ int breakout()
 
 	pp2d_begin_draw(GFX_TOP, GFX_LEFT);
 	for (int i = 0; i < 50; i++)
-	{
-		if (brick_array[level][i].has_powerup_on_screen)
-		{
+		if (brick_array[level][i].has_powerup_on_screen) {
 			brick_array[level][i].my_powerup.y += 1;
-			if (off_screen(brick_array[level][i].my_powerup.mask))
-				brick_array[level][i].has_powerup_on_screen = false;
+			if (off_screen(brick_array[level][i].my_powerup.mask)) brick_array[level][i].has_powerup_on_screen = false;
 			if (test_collision<powerup,mRectangle> (brick_array[level][i].my_powerup, the_paddle.paddle_mrect)) {
 				run_powerup(brick_array[level][i].my_powerup.my_type);
 				brick_array[level][i].has_powerup_on_screen = false;
 			}
 			pp2d_draw_texture(brick_array[level][i].my_powerup.texture_id, brick_array[level][i].my_powerup.x, brick_array[level][i].my_powerup.y);
 		}
-	}
 	draw_object(the_paddle);
 	for (int i = 0; i < 50; i++)
 		if (brick_array[level][i].exists)
@@ -643,18 +572,15 @@ int breakout()
 		pp2d_draw_texture_scale(27 - i, (trail_new_frame_circle[i].x - trail_new_frame_circle[i].rad) + 1.0, (trail_new_frame_circle[i].y - trail_new_frame_circle[i].rad) + 2.0, (7 - i) / 8.0, (7 - i) / 8.0); //RGBA8(0xFF, 0xFF, 0xFF, 32 * (7 - i))
 	draw_object(the_ball);
 	std::cout << ANSI "13;0" PEND;
-	for (int i = 0; i < 2; i++)
-		std::cout << "                                        ";
+	for (int i = 0; i < 2; i++) std::cout << "                                        ";
 	std::cout << ANSI "13;0" PEND;
-	std::cout << "Score: " << points << "\n";
-	std::cout << "Lives: " << lives << "\n";
+	std::cout << "Score: " << points << "\n"; std::cout << "Lives: " << lives << "\n";
 	pp2d_end_draw();
 	return 0;
 }
 
 /*win screen for the beta*/
-int thanks_for_playing_the_beta()
-{
+int thanks_for_playing_the_beta() {
 	hidScanInput();
 	kDown = hidKeysDown(); kHeld = hidKeysHeld();
 	if (kDown & (KEY_SELECT | KEY_A | KEY_B | KEY_X | KEY_Y | KEY_L | KEY_R | KEY_ZL | KEY_ZR)) return 2;
@@ -662,11 +588,9 @@ int thanks_for_playing_the_beta()
 	pp2d_begin_draw(GFX_TOP, GFX_LEFT);
 	pp2d_draw_texture(16, 80, 20);
 	/*run text display once (to avoid screen tear)*/
-	if (thanks_text_display == 0)
-	{
+	if (thanks_text_display == 0) {
 		std::cout << ANSI "0;0" PEND;
-		for (int i = 0; i < 30; i++)
-			std::cout << "                                        ";
+		for (int i = 0; i < 30; i++) std::cout << "                                        ";
 		std::cout << ANSI "0;0" PEND;
 		std::cout << "[Press any key to return to the title.]\n";
 		std::cout << "Thanks to:\n\n";
@@ -694,8 +618,7 @@ int extras_10_13_2017()
 	consoleSelect(&bottomScreen);
 	consoleClear();
 	std::cout << ANSI "0;0" PEND;
-	for (int i = 0; i < 30; i++)
-		std::cout << "                                        ";
+	for (int i = 0; i < 30; i++) std::cout << "                                        ";
 	std::cout << ANSI "0;0" PEND;
 	std::cout << "The blue cracked brick was orginally\n";
 	std::cout << "going to be the design for the normal\n";
@@ -747,37 +670,25 @@ int level_designer() {
 	std::cout << CRESET;
 	std::cout << ANSI "5;15" PEND ANSI WHITE CEND;
 	std::cout << "Save Level 1" CRESET;
-	for (int i = 1; i < SAVE_FILES; i++)
-	{
+	for (int i = 1; i < SAVE_FILES; i++) {
 		int value_a = (5 + (i * 2));
 		int value_b = (i + 1);
-		std::string part_1 = ANSI;
-		part_1 += std::to_string(value_a);
-		part_1 += ";15" PEND;
+		std::string part_1 = ANSI + std::to_string(value_a) + ";15" PEND;
 		std::cout << part_1 << ANSI WHITE ASEP BRIGHT CEND;
 		std::cout << "Save Level " << std::to_string(value_b) << CRESET;
 	}
-	while (true)
-	{
+	while (true) {
 		hidScanInput();
 		kDown = hidKeysDown();
-		if ((kDown & KEY_UP) && selection > 0)
-			selection--;
-		if ((kDown & KEY_DOWN) && selection < SAVE_FILES - 1)
-			selection++;
-		if (kDown & (KEY_UP | KEY_DOWN))
-		{
+		if ((kDown & KEY_UP) && selection > 0) selection--;
+		if ((kDown & KEY_DOWN) && selection < SAVE_FILES - 1) selection++;
+		if (kDown & (KEY_UP | KEY_DOWN)) {
 			std::cout << CRESET;
-			for (int i = 0; i < SAVE_FILES; i++)
-			{
+			for (int i = 0; i < SAVE_FILES; i++) {
 				int value_a = ((5 + (i * 2)) - 1);
-				std::string part_1 = ANSI;
-				part_1 += std::to_string(value_a);
-				part_1 += ";15" PEND;
+				std::string part_1 = ANSI + std::to_string(value_a) + ";15" PEND;
 				int value_b = value_a + 1;
-				std::string part_2 = ANSI;
-				part_2 += std::to_string(value_b);
-				part_2 += ";15" PEND;
+				std::string part_2 = ANSI + std::to_string(value_b) + ";15" PEND;
 				std::cout << part_1 << CRESET << part_2;
 				if (selection == i)
 					std::cout << ANSI WHITE CEND;
@@ -787,10 +698,8 @@ int level_designer() {
 				std::cout << "Save Level " << std::to_string(value_c) << CRESET;
 			}
 		}
-		if (kDown & KEY_A)
-			break;
-		if (kDown & (KEY_B | KEY_START))
-		{
+		if (kDown & KEY_A) break;
+		if (kDown & (KEY_B | KEY_START)) {
 			quit = true;
 			break;
 		}
@@ -803,27 +712,19 @@ int level_designer() {
 		pp2d_begin_draw(GFX_TOP, GFX_LEFT);
 		int array_step = 0;
 		for (int a = 0; a < 5; a++)
-		{
 			for (int b = 0; b < 10; b++)
 			{
-				if (!designed_level[selection][array_step] == 0)
-					pp2d_draw_texture(brick_texture_by_type[designed_level[selection][array_step]], (40 * b) + 2, (20 * a) + 2);
-				if (array_step == current_spot)
-					pp2d_draw_texture(18, (40 * b) + 20, (20 * a) + 8);
+				if (!designed_level[selection][array_step] == 0) pp2d_draw_texture(brick_texture_by_type[designed_level[selection][array_step]], (40 * b) + 2, (20 * a) + 2);
+				if (array_step == current_spot) pp2d_draw_texture(18, (40 * b) + 20, (20 * a) + 8);
 				array_step++;
 			}
-		}
 		pp2d_end_draw();
 		hidScanInput();
 		kDown = hidKeysDown();
-		if (kDown & KEY_UP && current_spot >= 10)
-			current_spot -= 10;
-		if (kDown & KEY_DOWN && current_spot <= 39)
-			current_spot += 10;
-		if (kDown & KEY_LEFT && current_spot > 0)
-			current_spot--;
-		if (kDown & KEY_RIGHT && current_spot < 49)
-			current_spot++;
+		if (kDown & KEY_UP && current_spot >= 10) current_spot -= 10;
+		if (kDown & KEY_DOWN && current_spot <= 39) current_spot += 10;
+		if (kDown & KEY_LEFT && current_spot > 0) current_spot--;
+		if (kDown & KEY_RIGHT && current_spot < 49) current_spot++;
 		if (kDown & KEY_R) {
 			if (designed_level[selection][current_spot] == 10)
 				designed_level[selection][current_spot] = 0;
@@ -836,15 +737,12 @@ int level_designer() {
 			else
 				designed_level[selection][current_spot]--;
 		}
-		if (kDown & (KEY_START | KEY_B))
-			break;
-		if (kDown & KEY_X)
-		{
+		if (kDown & (KEY_START | KEY_B)) break;
+		if (kDown & KEY_X) {
 			save_level(selection);
 			refresh_screen = true;
 		}
-		if (kDown & KEY_Y)
-		{
+		if (kDown & KEY_Y) {
 			//randomize level
 			std::cout << "Are you sure?\nPress A to randomize level\nPress B to cancel\n";
 			while (true) {
@@ -856,75 +754,59 @@ int level_designer() {
 					{
 						int chance_block_type = rand() % 3;
 						int chance_type_more = rand() % 5;
-						if (chance_block_type == 0)
-							designed_level[selection][i] = 0;
-						if (chance_block_type == 1)
-							designed_level[selection][i] = chance_type_more + 1;
-						if (chance_block_type == 2)
-							designed_level[selection][i] = chance_type_more + 6;
+						if (chance_block_type == 0) designed_level[selection][i] = 0;
+						if (chance_block_type == 1) designed_level[selection][i] = chance_type_more + 1;
+						if (chance_block_type == 2) designed_level[selection][i] = chance_type_more + 6;
 					}
 					break;
 				}
-				if (kDown & KEY_B)
-					break;
+				if (kDown & KEY_B) break;
 				gspWaitForVBlank();
 			}
 		}
-		if (kDown & KEY_SELECT)
-		{
-			for (int i = 0; i < 50; i++)
-				level_mask[0][i] = designed_level[selection][i];
+		if (kDown & KEY_SELECT) {
+			for (int i = 0; i < 50; i++) level_mask[0][i] = designed_level[selection][i];
 			initialize_brick_array();
 			lives = 3;
 			int result = 3;
 			the_ball.reset();
 			the_paddle.reset();
-			double angle = 0.0;
-			while (angle < 225.0 || angle > 315.0 || (angle > 265 && angle < 275))
-				angle = rand() % 360;
-			ball_angle = angle;
-			for (int i = 0; i < level_count; i++)
+			ball_angle = 0.0;
+			do ball_angle = rand() % 360; while (ball_angle < 225.0 || ball_angle > 315.0 || (ball_angle > 265 && ball_angle < 275));
+			for (int i = 0; i < def_level_count; i++)
 				for (int j = 0; j < 50; j++)
 					brick_array[i][j].reset();
 			level = 0; points = 0; last_power = 0;
 			times_power_1 = 0; times_power_2 = 0; times_power_3 = 0;
 			ball_is_attached = true;
 			/*main breakout loop*/
-			while (true)
-			{
+			while (true) {
 				result = breakout();
-				if (result != 0)
-					break;
+				if (result != 0) break;
 			}
 			if (result == 3) break;
 		}
-		kHeld = hidKeysHeld();
-		if (kDown & (KEY_L | KEY_R))
-			refresh_screen = true;
-		if (refresh_screen)
-		{
+		if (kDown & (KEY_L | KEY_R)) refresh_screen = true;
+		if (refresh_screen) {
 			consoleClear();
 			std::cout << CRESET ANSI "0;0" PEND ANSI WHITE CEND;
-			for (int i = 0; i < 30; i++)
-				std::cout << "                              ";
+			for (int i = 0; i < 30; i++) std::cout << "                              ";
 			std::cout << ANSI "0;0" PEND;
 			std::cout << "Levellayout:\n";
-			for (int a = 0; a < 5; a++)
-			{
-				for (int b = 0; b < 10; b++)
-				{
+			for (int a = 0; a < 5; a++) {
+				for (int b = 0; b < 10; b++) {
 					if (designed_level[selection][b + (a * 10)] > 9)
 						std::cout << designed_level[selection][b + (a * 10)];
 					else
 						std::cout << " " << designed_level[selection][b + (a * 10)];
-					if (b < 9)
-						std::cout << ", ";
+					if (b < 9) std::cout << ", ";
 				}
 				std::cout << "\n";
 			}
 			std::cout << "                  Press X to save level.";
 			std::cout << "    Press B or Start to return to title.";
 			std::cout << "        Press Select to play your level!";
+			refresh_screen = false;
 		}
 	}
 	return 0;
@@ -934,19 +816,15 @@ int level_designer() {
 int save_level(int selection) {
 	std::cout << "Are you sure you want to save this?\n";
 	std::cout << "A to save B to return";
-	while (true)
-	{
+	while (true) {
 		hidScanInput();
 		kDown = hidKeysDown();
-		if (kDown & KEY_B)
-			break;
-		if (kDown & KEY_A)
-		{
+		if (kDown & KEY_B) break;
+		if (kDown & KEY_A) {
 			fclose(saved_level[selection]);
 			remove(saved_level_filename[selection].c_str());
 			saved_level[selection] = fopen(saved_level_filename[selection].c_str(), "w");
-			for (int i = 0; i < 50; i++)
-				fprintf(saved_level[selection], "%d\n", designed_level[selection][i]);
+			for (int i = 0; i < 50; i++) fprintf(saved_level[selection], "%d\n", designed_level[selection][i]);
 			fclose(saved_level[selection]);
 			saved_level[selection] = fopen(saved_level_filename[selection].c_str(), "r");
 			break;

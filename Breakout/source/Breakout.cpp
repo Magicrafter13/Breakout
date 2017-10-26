@@ -6,8 +6,8 @@
 #include "ishupe.hpp"
 
 //init
-char versiontxtt[8] = "  Beta ", versiontxtn[9] = "01.06.01";
-char buildnumber[14] = "17.10.24.2159", ishupeversion[9] = "00.04.01";
+std::string versiontxtt = "  Beta ", versiontxtn = "01.06.01";
+std::string buildnumber = "17.10.25.0934", ishupeversion = "00.04.01";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
@@ -28,7 +28,7 @@ int last_power, times_power_1, times_power_2, times_power_3;
 int press_select_frame = 0; bool press_select_visible = true;
 
 paddle the_paddle; ball the_ball; mCircle trail_new_frame_circle[8]; brick brick_array[def_level_count][50];
-SFX_s *testsound[1], *ball_bounce[8];
+std::vector<SFX_s> *testsound (1), ball_bounce (8);
 
 /*integer mask for levels*/
 int level_mask[def_level_count][50] = {
@@ -214,11 +214,7 @@ void create_save_files(int setup_type) {
 void load_save_files()
 {
 	for (int i = 0; i < SAVE_FILES; i++)
-	{
-		saved_level_filename[i] = "sdmc:/3ds/breakout_level_";
-		saved_level_filename[i] += std::to_string(i);
-		saved_level_filename[i] += ".bsl";
-	}
+		saved_level_filename[i] = "sdmc:/3ds/breakout_level_" + std::to_string(i) + ".bsl";
 	for (int i = 0; i < SAVE_FILES; i++)
 	{
 		saved_level[i] = fopen(saved_level_filename[i].c_str(), "r");
@@ -846,6 +842,33 @@ int level_designer() {
 		{
 			save_level(selection);
 			refresh_screen = true;
+		}
+		if (kDown & KEY_Y)
+		{
+			//randomize level
+			std::cout << "Are you sure?\nPress A to randomize level\nPress B to cancel\n";
+			while (true) {
+				hidScanInput();
+				kDown = hidKeysDown();
+				if (kDown & KEY_A)
+				{
+					for (int i = 0; i < 50; i++)
+					{
+						int chance_block_type = rand() % 3;
+						int chance_type_more = rand() % 5;
+						if (chance_block_type == 0)
+							designed_level[selection][i] = 0;
+						if (chance_block_type == 1)
+							designed_level[selection][i] = chance_type_more + 1;
+						if (chance_block_type == 2)
+							designed_level[selection][i] = chance_type_more + 6;
+					}
+					break;
+				}
+				if (kDown & KEY_B)
+					break;
+				gspWaitForVBlank();
+			}
 		}
 		if (kDown & KEY_SELECT)
 		{

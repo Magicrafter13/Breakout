@@ -72,6 +72,29 @@ extern int brick_second_texture_by_type[brick_types];
 /*point value by brick type*/
 extern int brick_point_value[brick_types];
 
+class laser {
+public:
+	int x;
+	int y;
+	int width;
+	int height;
+	int texture_id;
+	mRectangle mask;
+	void setDefaults(int set_x, int set_y, int set_width, int set_height, int set_texture) {
+		mask.setDefaults(set_x, set_y, set_width, set_height);
+		x = set_x;
+		y = set_y;
+		width = set_width;
+		height = set_height;
+		texture_id = set_texture;
+	}
+	void setPosition(int set_x, int set_y) {
+		x = set_x;
+		y = set_y;
+		mask.setPosition(set_x, set_y);
+	}
+};
+
 class powerup {
 public:
 	int x;
@@ -390,6 +413,11 @@ class paddle {
 public:
 	int texture_id;
 	mRectangle paddle_mrect;
+	bool has_laser;
+	bool laser_on_screen;
+	bool has_big;
+	bool has_small;
+	laser the_laser;
 	/*
 	sets the paddle's default position size and texture id
 	bx: X position
@@ -403,10 +431,16 @@ public:
 		paddle_mrect.setDefaults(bx, by, bwidth, bheight);
 		texture_id = paddle_texture_id;
 	}
+	void remove_powerups() {
+		has_laser = false;
+		has_big = false;
+		has_small = false;
+	}
 	/*resets the paddle to it's default values*/
 	void reset()
 	{
 		paddle_mrect.reset();
+		has_laser = false;
 	}
 	/*
 	returns the leftmost side of the paddle

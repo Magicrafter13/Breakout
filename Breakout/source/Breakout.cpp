@@ -22,11 +22,11 @@ int level_designer();
 int save_level(int selection);
 
 int lives, points, level;
-double ball_dx, ball_dy, ball_angle; std::vector<double> trail_new_frame_x(8), trail_new_frame_y(8); bool crushBall = false; bool ball_is_attached;
+double ball_dx, ball_dy, ball_angle; std::vector<double> trail_new_frame_x(8), trail_new_frame_y(8), laser_trail_x(29), laser_trail_y(29); bool crushBall = false; bool ball_is_attached;
 int last_power, times_power_1, times_power_2, times_power_3;
 int press_select_frame = 0; bool press_select_visible = true;
 
-paddle the_paddle; ball the_ball; std::vector<mCircle> trail_new_frame_circle(8); brick brick_array[def_level_count][50];
+paddle the_paddle; ball the_ball; std::vector<mCircle> trail_new_frame_circle(8); std::vector<laser> trail_new_frame_laser(29); brick brick_array[def_level_count][50];
 std::vector<SFX_s *> testsound, ball_bounce;
 
 /*integer mask for levels*/
@@ -67,6 +67,14 @@ std::vector<std::vector<int>> level_mask = {
 		 5,  0,  3,  2,  0,  0,  2,  3,  0,  5
 	}
 };
+
+/*set laser trail*/
+void trail_new_frame(laser laser_object) {
+	laser_trail_x.insert(laser_trail_x.begin(), laser_object.x);
+	laser_trail_y.insert(laser_trail_y.begin(), laser_object.y);
+	laser_trail_x.shrink_to_fit(); laser_trail_y.shrink_to_fit();
+	for (int i = 0; i < trail_new_frame_laser.size; i++) trail_new_frame_laser[i].setPosition(laser_trail_x[i], laser_trail_y[i]);
+}
 
 /*set ball trail*/
 void trail_new_frame(ball ball_object)
@@ -141,6 +149,7 @@ void init_game_textures() {
 	pp2d_load_texture_png(27, "romfs:/sprites/background/press_select.png");
 	pp2d_load_texture_png(28, "romfs:/sprites/powerup/life00.png");
 	pp2d_load_texture_png(29, "romfs:/sprites/powerup/laser00.png");
+	pp2d_load_texture_png(30, "romfs:/sprites/misc/laser_trail.png");
 };
 
 /*initialize audio*/
@@ -360,7 +369,7 @@ bool has_hit_paddle, has_hit_wall;
 void run_powerup(int typef) {
 	switch (typef) {
 	case 1:
-		//do something to give lasers
+		the_paddle.has_laser = true;
 		break;
 	case 2:
 		//do something to give large paddle
@@ -408,6 +417,19 @@ int breakout()
 	bool hasInteracted = false;
 	has_hit_paddle = false; has_hit_wall = false;
 	if (kDown & KEY_A && ball_is_attached == true) ball_is_attached = false;
+	if (kDown & KEY_A && ball_is_attached == false) {
+		if (the_paddle.has_laser && !the_paddle.laser_on_screen) {
+			the_paddle.the_laser.setDefaults(the_paddle.paddle_mrect.x + (the_paddle.paddle_mrect.width / 2.0) - (the_paddle.the_laser.width / 2.0), the_paddle.paddle_mrect.y, 3, 30, 30);
+			the_paddle.laser_on_screen = true;
+		}
+	}
+	if (the_paddle.laser_on_screen) {
+		the_paddle.the_laser.setPosition(the_paddle.the_laser.x + 1, the_paddle.the_laser.y + 1);
+		trail_new_frame(the_paddle.the_laser);
+		pp2d_draw_texture(the_paddle.the_laser.texture_id, the_paddle.the_laser.x, the_paddle.the_laser.y);
+		for (int i = 0; i < the_paddle.the_laser.height; i++) pp2d_draw_texture(the_paddle.the_laser.texture_id, trail_new_frame_laser[i].x, trail_new_frame_laser[i].y);
+
+	}
 	/*run main engine code if the ball is not attached to the paddle*/
 	if (!ball_is_attached) {
 		bricks_hit_this_frame = 0;

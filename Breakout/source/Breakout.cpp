@@ -70,14 +70,6 @@ int level_mask[def_level_count][50] = {
 	}
 };
 
-/*set laser trail*/
-void trail_new_frame(laser laser_object) {
-	laser_trail_x.insert(laser_trail_x.begin(), laser_object.x);
-	laser_trail_y.insert(laser_trail_y.begin(), laser_object.y);
-	laser_trail_x.shrink_to_fit(); laser_trail_y.shrink_to_fit();
-	for (unsigned int i = 0; i < trail_new_frame_laser.size(); i++) trail_new_frame_laser[i].setPosition(laser_trail_x[i], laser_trail_y[i]);
-}
-
 /*set ball trail*/
 void trail_new_frame(ball ball_object)
 {

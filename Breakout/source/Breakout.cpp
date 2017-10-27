@@ -9,7 +9,7 @@ FILE* debug = fopen("sdmc:/3ds/debug.txt", "w");
 
 //init
 std::string versiontxtt = "  Beta ", versiontxtn = "01.06.01";
-std::string buildnumber = "17.10.26.2009", ishupeversion = "00.04.01";
+std::string buildnumber = "17.10.27.0900", ishupeversion = "00.04.01";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
@@ -75,6 +75,7 @@ void trail_new_frame(ball ball_object)
 {
 	trail_new_frame_x.insert(trail_new_frame_x.begin(), ball_object.ball_mcirc.x);
 	trail_new_frame_y.insert(trail_new_frame_y.begin(), ball_object.ball_mcirc.y);
+	trail_new_frame_x.resize(8); trail_new_frame_y.resize(8);
 	trail_new_frame_x.shrink_to_fit(); trail_new_frame_y.shrink_to_fit();
 	for (int i = 0; i < 8; i++) trail_new_frame_circle[i].setPosition(trail_new_frame_x[i], trail_new_frame_y[i]);
 }

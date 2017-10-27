@@ -25,6 +25,9 @@ extern PrintConsole bottomScreen, versionWin, killBox, debugBox;
 
 extern std::string versiontxtt, versiontxtn;
 extern std::string buildnumber, ishupeversion;
+extern std::vector<FILE*> saved_level;
+extern int designed_level[SAVE_FILES][50];
+extern std::string saved_level_filename[SAVE_FILES];
 extern int vernumqik;
 
 #define ANSI "\x1b["

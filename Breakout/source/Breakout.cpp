@@ -4,12 +4,11 @@
 #include "audio/sfx.h"
 #include "audio/filesystem.h"
 #include "ishupe.hpp"
-
-FILE* debug = fopen("sdmc:/3ds/debug.txt", "w");
+#include "file/file_access.hpp"
 
 //init
 std::string versiontxtt = "  Beta ", versiontxtn = "01.06.01";
-std::string buildnumber = "17.10.27.0900", ishupeversion = "00.04.01";
+std::string buildnumber = "17.10.27.0920", ishupeversion = "00.04.01";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
@@ -171,59 +170,26 @@ void initialize_brick_array() {
 	}
 }
 
-void create_save_files(int setup_type) {
-	for (int i = 0; i < SAVE_FILES; i++)
-		saved_level_filename[i] = "sdmc:/3ds/breakout_level_" + std::to_string(i) + ".bsl";
-	if (setup_type == 0) {
-		rename("sdmc:/3ds/breakout_level.bsl", "sdmc:/3ds/breakout_level_0.bsl");
-		for (int i = 1; i < SAVE_FILES; i++) {
-			saved_level[i] = fopen(saved_level_filename[i].c_str(), "w");
-			fprintf(saved_level[i], "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ");
-			fclose(saved_level[i]);
-		}
-	}
-	if (setup_type == 1) {
-		for (int i = 0; i < SAVE_FILES; i++) {
-			saved_level[i] = fopen(saved_level_filename[i].c_str(), "w");
-			fprintf(saved_level[i], "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ");
-			fclose(saved_level[i]);
-		}
-	}
-}
-
-void load_save_files()
-{
-	for (int i = 0; i < SAVE_FILES; i++)
-		saved_level_filename[i] = "sdmc:/3ds/breakout_level_" + std::to_string(i) + ".bsl";
-	for (int i = 0; i < SAVE_FILES; i++) {
-		saved_level[i] = fopen(saved_level_filename[i].c_str(), "r");
-		for (int j = 0; j < 50; j++)
-			fscanf(saved_level[i], "%d ", &designed_level[i][j]);
-	}
-}
-
 /*begin application*/
 int main(int argc, char **argv)
 {
-	fprintf(debug, "main started\n");
 	pp2d_init();
 	pp2d_set_screen_color(GFX_TOP, ABGR8(255, 149, 149, 149));
 	romfsInit();
+	csndInit();
+	initSound();
 	init_game_textures();
 
 	if (FILE *file = fopen("sdmc:/3ds/breakout_level.bsl", "r")) {
 		fclose(file);
 		create_save_files(0);
 	}
-	if (FILE *file = fopen("sdmc:/3ds/breakout_level_0.bsl", "r"))
-		fclose(file);
-	else
-		create_save_files(1);
+	if (FILE *file = fopen("sdmc:/3ds/breakout_level_0.bsl", "r")) fclose(file);
+	else create_save_files(1);
 
 	load_save_files();
-	
-	csndInit();
-	initSound();
+	initialize_audio();
+	initialize_brick_array();
 	
 	srand(time(NULL));
 	
@@ -234,20 +200,12 @@ int main(int argc, char **argv)
 	consoleSetWindow(&killBox, 0, 28, 40, 2);
 	consoleSetWindow(&debugBox, 18, 4, 9, 12);
 
-	hidTouchRead(&touch);
-
-	initialize_audio();
-
 	for (int i = 0; i < 8; i++) trail_new_frame_circle[7 - i].setDefaults(200.0, 120.0, (0.875 * (i + 1)));
 
 	the_paddle.setDefaults(175, 215, 50, 10, 19);
 	the_ball.setDefaults(200.0, 200.0, 7.0, 1);
 	
-	initialize_brick_array();
-
 	int bottom_screen_text = 0;
-
-	playSFX(testsound[0]);
 
 	// Main loop
 	while (aptMainLoop()) {
@@ -257,8 +215,7 @@ int main(int argc, char **argv)
 		/*go to extras when X pressed*/
 		if (kDown & KEY_X) {
 			int ext_return = extras_10_13_2017();
-			if (ext_return == 3)
-				break;
+			if (ext_return == 3) break;
 			bottom_screen_text = 0;
 		}
 		/*level designer*/
@@ -605,6 +562,13 @@ int breakout()
 	std::cout << ANSI "13;0" PEND;
 	std::cout << "Score: " << points << "\n"; std::cout << "Lives: " << lives << "\n";
 	pp2d_end_draw();
+	hidTouchRead(&touch);
+
+	/*exit game if red box touched*/
+	if (touchInBox(touch, 0, 224, 320, 16)) {
+		std::cout << "Exiting...\n";
+		return 2;
+	}
 	return 0;
 }
 

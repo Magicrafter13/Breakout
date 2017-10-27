@@ -5,9 +5,11 @@
 #include "audio/filesystem.h"
 #include "ishupe.hpp"
 
+FILE* debug = fopen("sdmc:/3ds/debug.txt", "w");
+
 //init
 std::string versiontxtt = "  Beta ", versiontxtn = "01.06.01";
-std::string buildnumber = "17.10.26.1726", ishupeversion = "00.04.01";
+std::string buildnumber = "17.10.26.2009", ishupeversion = "00.04.01";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
@@ -27,10 +29,10 @@ int last_power, times_power_1, times_power_2, times_power_3;
 int press_select_frame = 0; bool press_select_visible = true;
 
 paddle the_paddle; ball the_ball; std::vector<mCircle> trail_new_frame_circle(8); std::vector<laser> trail_new_frame_laser(29); brick brick_array[def_level_count][50];
-std::vector<SFX_s *> testsound, ball_bounce;
+SFX_s *testsound[1], *ball_bounce[8];
 
 /*integer mask for levels*/
-std::vector<std::vector<int>> level_mask = {
+int level_mask[def_level_count][50] = {
 	{
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -210,6 +212,7 @@ void load_save_files()
 /*begin application*/
 int main(int argc, char **argv)
 {
+	fprintf(debug, "main started\n");
 	pp2d_init();
 	pp2d_set_screen_color(GFX_TOP, ABGR8(255, 149, 149, 149));
 	romfsInit();

@@ -7,7 +7,7 @@
 
 //init
 std::string versiontxtt = "  Beta ", versiontxtn = "01.06.01";
-std::string buildnumber = "17.10.25.2213", ishupeversion = "00.04.01";
+std::string buildnumber = "17.10.26.1726", ishupeversion = "00.04.01";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
@@ -73,7 +73,7 @@ void trail_new_frame(laser laser_object) {
 	laser_trail_x.insert(laser_trail_x.begin(), laser_object.x);
 	laser_trail_y.insert(laser_trail_y.begin(), laser_object.y);
 	laser_trail_x.shrink_to_fit(); laser_trail_y.shrink_to_fit();
-	for (int i = 0; i < trail_new_frame_laser.size; i++) trail_new_frame_laser[i].setPosition(laser_trail_x[i], laser_trail_y[i]);
+	for (unsigned int i = 0; i < trail_new_frame_laser.size(); i++) trail_new_frame_laser[i].setPosition(laser_trail_x[i], laser_trail_y[i]);
 }
 
 /*set ball trail*/
@@ -416,19 +416,30 @@ int breakout()
 
 	bool hasInteracted = false;
 	has_hit_paddle = false; has_hit_wall = false;
-	if (kDown & KEY_A && ball_is_attached == true) ball_is_attached = false;
-	if (kDown & KEY_A && ball_is_attached == false) {
+	if (kDown & KEY_A && ball_is_attached)
+		ball_is_attached = false;
+	else if ((kDown | kHeld) & KEY_A && !ball_is_attached) {
 		if (the_paddle.has_laser && !the_paddle.laser_on_screen) {
 			the_paddle.the_laser.setDefaults(the_paddle.paddle_mrect.x + (the_paddle.paddle_mrect.width / 2.0) - (the_paddle.the_laser.width / 2.0), the_paddle.paddle_mrect.y, 3, 30, 30);
 			the_paddle.laser_on_screen = true;
 		}
 	}
 	if (the_paddle.laser_on_screen) {
-		the_paddle.the_laser.setPosition(the_paddle.the_laser.x + 1, the_paddle.the_laser.y + 1);
-		trail_new_frame(the_paddle.the_laser);
-		pp2d_draw_texture(the_paddle.the_laser.texture_id, the_paddle.the_laser.x, the_paddle.the_laser.y);
+		the_paddle.the_laser.setPosition(the_paddle.the_laser.x, the_paddle.the_laser.y - 8);
+		//trail_new_frame(the_paddle.the_laser);
+		int the_number = 30;
+		int other_number = the_paddle.paddle_mrect.y - the_paddle.the_laser.y;
+		if (other_number < the_number) the_number = other_number;
+		for (int i = 0; i < the_number; i++)
+			pp2d_draw_texture(the_paddle.the_laser.texture_id, the_paddle.the_laser.x, the_paddle.the_laser.y + i);
 		for (int i = 0; i < the_paddle.the_laser.height; i++) pp2d_draw_texture(the_paddle.the_laser.texture_id, trail_new_frame_laser[i].x, trail_new_frame_laser[i].y);
-
+		for (int i = 0; i < 50; i++)
+			if (test_collision(the_paddle.the_laser, brick_array[level][i].brick_mrect) && brick_array[level][i].exists) {
+				brick_array[level][i].destroy();
+				the_paddle.laser_on_screen = false;
+			}
+		if (off_screen(the_paddle.the_laser))
+			the_paddle.laser_on_screen = false;
 	}
 	/*run main engine code if the ball is not attached to the paddle*/
 	if (!ball_is_attached) {

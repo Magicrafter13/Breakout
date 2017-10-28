@@ -6,6 +6,8 @@
 #include "ishupe.hpp"
 #include "file/file_access.hpp"
 
+//By Matthew Rease https://github.com/Magicrafter13/Breakout
+
 //init
 std::string versiontxtt = "  Beta ", versiontxtn = "01.06.01";
 std::string buildnumber = "17.10.27.0920", ishupeversion = "00.04.01";

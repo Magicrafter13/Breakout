@@ -1,5 +1,12 @@
 #pragma once
 
+/*
+Creates a rectangle object.
+Used for drawing or hit mask
+
+public contains x, y, width, and height
+use setDefaults before using the rectangle
+*/
 class mRectangle {
 	double default_x;
 	double default_y;
@@ -72,14 +79,36 @@ extern int brick_second_texture_by_type[brick_types];
 /*point value by brick type*/
 extern int brick_point_value[brick_types];
 
+/*
+laser object
+for use with a paddle object
+
+public variables are x, y, width, height, texture_id, and mask
+use setDefaults before anything else.
+*/
 class laser {
 public:
+	/*laser x coordinate*/
 	int x;
+	/*laser y coordinate*/
 	int y;
+	/*laser width*/
 	int width;
+	/*laser height*/
 	int height;
+	/*laser texture*/
 	int texture_id;
+	/*laser mask*/
 	mRectangle mask;
+	/*
+	Sets the lasers default values
+	
+	int set_x: x coordinate
+	int set_y: y coordinate
+	int set_width: mask width
+	int set_height: mask height
+	int set_texture: texture_id
+	*/
 	void setDefaults(int set_x, int set_y, int set_width, int set_height, int set_texture) {
 		mask.setDefaults(set_x, set_y, set_width, set_height);
 		x = set_x;
@@ -88,6 +117,13 @@ public:
 		height = set_height;
 		texture_id = set_texture;
 	}
+	/*
+	Sets the lasers position
+	(aboslute, not relative)
+	
+	int set_x: new x coordinate
+	int set_y: new y coordinate
+	*/
 	void setPosition(int set_x, int set_y) {
 		x = set_x;
 		y = set_y;
@@ -95,15 +131,37 @@ public:
 	}
 };
 
+/*
+powerup object
+public values: x, y, width, height, powerup type, mask, and texture
+use setDefaults before anything else
+*/
 class powerup {
 public:
+	/*x coordinate*/
 	int x;
+	/*y coordinate*/
 	int y;
+	/*width (mask)*/
 	int width;
+	/*height (mask)*/
 	int height;
+	/*powerup type*/
 	int my_type;
+	/*mask*/
 	mRectangle mask;
+	/*texture id*/
 	int texture_id;
+	/*
+	Sets the powerups default values
+	
+	int set_x: x coordinate
+	int set_y: y coordinate
+	int set_width: width (mask)
+	int set_height: height(mask)
+	int set_texture: texture_id
+	int type: powerup type
+	*/
 	void setDefaults(int set_x, int set_y, int set_width, int set_height, int set_texture, int type) {
 		mask.setDefaults(set_x, set_y, set_width, set_height);
 		x = set_x;
@@ -115,6 +173,10 @@ public:
 	}
 };
 
+/*
+Brick object
+public values: texture, remaining hits, (powerup, <- existance <- timer), existance, and mask
+*/
 class brick {
 private:
 	int internal_brick_type;
@@ -182,10 +244,15 @@ private:
 		return 0;
 	}
 public:
+	/*texture*/
 	int texture_id;
+	/*remaining hits*/
 	int hits_left;
+	/*whether or not powerup exists*/
 	bool has_powerup_on_screen;
+	/*individual powerup*/
 	powerup my_powerup;
+	/*powerup animation timer*/
 	int powerup_timer;
 	/*wether or not the brick is currently in play*/
 	bool exists;
@@ -275,6 +342,13 @@ public:
 	}
 };
 
+/*
+Circle object
+Used for drawing* or hit mask
+
+public contains: x, y, and radius
+*no longer used for drawing, only for hit mask
+*/
 class mCircle {
 	double default_x;
 	double default_y;
@@ -331,11 +405,18 @@ public:
 /*id for textures (or null)*/
 extern int ball_texture_id[2];
 
+/*
+Ball object
+public values: existance, mask, and texture
+*/
 class ball {
 	int internal_ball_type;
 public:
+	/*whether or not the ball exists*/
 	bool exists;
+	/*mask*/
 	mCircle ball_mcirc;
+	/*texture*/
 	int texture_id;
 	/*
 	sets ball's default position, size, and type
@@ -409,14 +490,25 @@ public:
 	}
 };
 
+/*
+Paddle object
+public values: texture, mask, powerup <- (existance, on_screen), and * <- (whatever powerup object, ie laser or big)
+*/
 class paddle {
 public:
+	/*texture*/
 	int texture_id;
+	/*mask*/
 	mRectangle paddle_mrect;
+	/*whether or not laser ability active*/
 	bool has_laser;
+	/*whether or not laser on screen*/
 	bool laser_on_screen;
+	/*whether or not big paddle active*/
 	bool has_big;
+	/*whether or not small paddle active*/
 	bool has_small;
+	/*laser object*/
 	laser the_laser;
 	/*
 	sets the paddle's default position size and texture id
@@ -431,6 +523,7 @@ public:
 		paddle_mrect.setDefaults(bx, by, bwidth, bheight);
 		texture_id = paddle_texture_id;
 	}
+	/*removes powerups from paddle*/
 	void remove_powerups() {
 		has_laser = false;
 		has_big = false;

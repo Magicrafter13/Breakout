@@ -9,8 +9,8 @@
 //By Matthew Rease https://github.com/Magicrafter13/Breakout
 
 //init
-std::string versiontxtt = "  Beta ", versiontxtn = "01.06.01";
-std::string buildnumber = "17.10.29.2144", ishupeversion = "00.04.01";
+std::string versiontxtt = "  Beta ", versiontxtn = "01.07.00";
+std::string buildnumber = "17.10.29.2153", ishupeversion = "00.04.01";
 int vernumqik = 0;
 u32 kDown, kHeld;
 

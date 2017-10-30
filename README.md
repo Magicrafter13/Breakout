@@ -24,6 +24,7 @@ To play this, just download a precompiled binary (3dsx, cia, or elf) from the re
 * __L__ and __R__ to switch brick type
 * __X__ to save level layout
 * __B__ or __Start__ to return to title
+* __Y__ to randomize brick layout
 
 ## "Nightlies"
 Available on my website. [Click Here!](http://oldforgeinn.ddns.net/Games/?game=Breakout#download)

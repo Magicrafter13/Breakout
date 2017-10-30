@@ -14,7 +14,7 @@ To play this, just download a precompiled binary (3dsx, cia, or elf) from the re
 ## Controls
 #### In - Game ####
 * __D-Pad__ or Joystick to move Left and Right
-* __A Button__ to launch ball
+* __A Button__ to launch ball (when ball attached) or shoot laser if power up has been acquired.
 * __Select__ to start game (or return to title)
 * __Y__ to open Level editor
 * __Start__ to exit

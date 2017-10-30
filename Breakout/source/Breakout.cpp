@@ -10,7 +10,7 @@
 
 //init
 std::string versiontxtt = "  Beta ", versiontxtn = "01.06.01";
-std::string buildnumber = "17.10.27.0920", ishupeversion = "00.04.01";
+std::string buildnumber = "17.10.29.2144", ishupeversion = "00.04.01";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
@@ -146,6 +146,11 @@ void init_game_textures() {
 	pp2d_load_texture_png(28, "romfs:/sprites/powerup/life00.png");
 	pp2d_load_texture_png(29, "romfs:/sprites/powerup/laser00.png");
 	pp2d_load_texture_png(30, "romfs:/sprites/misc/laser_trail.png");
+	pp2d_load_texture_png(31, "romfs:/sprites/paddle_big.png");
+	pp2d_load_texture_png(32, "romfs:/sprites/paddle_small.png");
+	pp2d_load_texture_png(33, "romfs:/sprites/powerup/paddle_big00.png");
+	pp2d_load_texture_png(34, "romfs:/sprites/powerup/paddle_small00.png");
+	pp2d_load_texture_png(35, "romfs:/sprites/misc/laser_paddle.png");
 };
 
 /*initialize audio*/
@@ -324,13 +329,19 @@ bool has_hit_paddle, has_hit_wall;
 void run_powerup(int typef) {
 	switch (typef) {
 	case 1:
+		the_paddle.remove_powerups();
 		the_paddle.has_laser = true;
+		the_paddle.texture_id = 35;
 		break;
 	case 2:
-		//do something to give large paddle
+		the_paddle.remove_powerups();
+		the_paddle.has_big = true;
+		the_paddle.getBig();
 		break;
 	case 3:
-		//do something to give small paddle
+		the_paddle.remove_powerups();
+		the_paddle.has_small = true;
+		the_paddle.getSmall();
 		break;
 	case 4:
 		lives++;

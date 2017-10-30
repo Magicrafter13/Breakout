@@ -334,6 +334,12 @@ public:
 		case 1:
 			my_powerup.setDefaults(brick_mrect.x + ((brick_mrect.width - 28) / 2), brick_mrect.y + ((brick_mrect.height - 7) / 2), 18, 7, 29, type);
 			break;
+		case 2:
+			my_powerup.setDefaults(brick_mrect.x + ((brick_mrect.width - 28) / 2), brick_mrect.y + ((brick_mrect.height - 7) / 2), 18, 7, 33, type);
+			break;
+		case 3:
+			my_powerup.setDefaults(brick_mrect.x + ((brick_mrect.width - 28) / 2), brick_mrect.y + ((brick_mrect.height - 7) / 2), 18, 7, 34, type);
+			break;
 		case 4:
 			my_powerup.setDefaults(brick_mrect.x + ((brick_mrect.width - 28) / 2), brick_mrect.y + ((brick_mrect.height - 7) / 2), 18, 7, 28, type);
 			break;
@@ -495,6 +501,9 @@ Paddle object
 public values: texture, mask, powerup <- (existance, on_screen), and * <- (whatever powerup object, ie laser or big)
 */
 class paddle {
+	int default_texture_id;
+	double default_width;
+	double default_height;
 public:
 	/*texture*/
 	int texture_id;
@@ -522,18 +531,49 @@ public:
 	{
 		paddle_mrect.setDefaults(bx, by, bwidth, bheight);
 		texture_id = paddle_texture_id;
+		default_texture_id = texture_id;
+		default_width = bwidth;
+		default_height = bheight;
+	}
+	/*runs script for enlarging paddle*/
+	void getBig() {
+		paddle_mrect.width = 70;
+		paddle_mrect.x -= 10;
+		if (paddle_mrect.x < 1) paddle_mrect.x = 1;
+		if (paddle_mrect.x > 329) paddle_mrect.x = 329;
+		texture_id = 31;
+	}
+	/*runs script for shrinking paddle*/
+	void getSmall() {
+		paddle_mrect.width = 30;
+		paddle_mrect.x += 10;
+		texture_id = 32;
 	}
 	/*removes powerups from paddle*/
 	void remove_powerups() {
+		if (has_big) {
+			paddle_mrect.width = default_width;
+			paddle_mrect.x += 10;
+			has_big = false;
+		}
+		if (has_small) {
+			paddle_mrect.width = default_width;
+			paddle_mrect.x -= 10;
+			if (paddle_mrect.x < 1) paddle_mrect.x = 1;
+			if (paddle_mrect.x > 329) paddle_mrect.x = 329;
+			has_small = false;
+		}
 		has_laser = false;
-		has_big = false;
-		has_small = false;
+		texture_id = default_texture_id;
 	}
 	/*resets the paddle to it's default values*/
 	void reset()
 	{
 		paddle_mrect.reset();
 		has_laser = false;
+		has_big = false;
+		has_small = false;
+		texture_id = default_texture_id;
 	}
 	/*
 	returns the leftmost side of the paddle

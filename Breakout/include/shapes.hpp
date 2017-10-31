@@ -1,5 +1,7 @@
 #pragma once
 
+extern std::vector<std::vector<int>> powerup_texture_id;
+
 /*
 Creates a rectangle object.
 Used for drawing or hit mask
@@ -152,6 +154,10 @@ public:
 	mRectangle mask;
 	/*texture id*/
 	int texture_id;
+	/*texture id array [animation]*/
+	std::vector<int> animation_id;
+	/*frame count*/
+	int frame_count;
 	/*
 	Sets the powerups default values
 	
@@ -162,7 +168,7 @@ public:
 	int set_texture: texture_id
 	int type: powerup type
 	*/
-	void setDefaults(int set_x, int set_y, int set_width, int set_height, int set_texture, int type) {
+	void setDefaults(int set_x, int set_y, int set_width, int set_height, int set_texture, int type, std::vector<int> set_animate, int set_frame_count) {
 		mask.setDefaults(set_x, set_y, set_width, set_height);
 		x = set_x;
 		y = set_y;
@@ -170,6 +176,8 @@ public:
 		height = set_height;
 		my_type = type;
 		texture_id = set_texture;
+		animation_id = set_animate;
+		frame_count = set_frame_count;
 	}
 };
 
@@ -243,6 +251,7 @@ private:
 		}
 		return 0;
 	}
+	int wait_frame;
 public:
 	/*texture*/
 	int texture_id;
@@ -282,6 +291,21 @@ public:
 		set_hits();
 		has_powerup_on_screen = false;
 		powerup_timer = 0;
+		wait_frame = 0;
+	}
+	void draw() {
+		if (wait_frame == 9) {
+			wait_frame = 0;
+			powerup_timer++;
+		}
+		if (powerup_timer == my_powerup.frame_count)
+			powerup_timer = 0;
+		if (powerup_timer == 0)
+			pp2d_draw_texture(my_powerup.texture_id, my_powerup.x, my_powerup.y);
+		else {
+			pp2d_draw_texture(my_powerup.animation_id[my_powerup.my_type], my_powerup.x, my_powerup.y);
+		}
+		wait_frame++;
 	}
 	/*
 	Sets the exists value to false thus removing it from play
@@ -309,6 +333,9 @@ public:
 		brick_mrect.reset();
 		texture_id = brick_texture_by_type[internal_brick_type];
 		set_hits();
+		powerup_timer = 0;
+		has_powerup_on_screen = false;
+		wait_frame = 0;
 	}
 	/*
 	Integer: Returns the point value given by the brick
@@ -332,16 +359,16 @@ public:
 	void spawn_powerup(int type) {
 		switch (type) {
 		case 1:
-			my_powerup.setDefaults(brick_mrect.x + ((brick_mrect.width - 28) / 2), brick_mrect.y + ((brick_mrect.height - 7) / 2), 18, 7, 29, type);
+			my_powerup.setDefaults(brick_mrect.x + ((brick_mrect.width - 28) / 2), brick_mrect.y + ((brick_mrect.height - 7) / 2), 18, 7, 29, type, powerup_texture_id[type - 1], powerup_texture_id[type - 1].size());
 			break;
 		case 2:
-			my_powerup.setDefaults(brick_mrect.x + ((brick_mrect.width - 28) / 2), brick_mrect.y + ((brick_mrect.height - 7) / 2), 18, 7, 33, type);
+			my_powerup.setDefaults(brick_mrect.x + ((brick_mrect.width - 28) / 2), brick_mrect.y + ((brick_mrect.height - 7) / 2), 18, 7, 33, type, powerup_texture_id[type - 1], powerup_texture_id[type - 1].size());
 			break;
 		case 3:
-			my_powerup.setDefaults(brick_mrect.x + ((brick_mrect.width - 28) / 2), brick_mrect.y + ((brick_mrect.height - 7) / 2), 18, 7, 34, type);
+			my_powerup.setDefaults(brick_mrect.x + ((brick_mrect.width - 28) / 2), brick_mrect.y + ((brick_mrect.height - 7) / 2), 18, 7, 34, type, powerup_texture_id[type - 1], powerup_texture_id[type - 1].size());
 			break;
 		case 4:
-			my_powerup.setDefaults(brick_mrect.x + ((brick_mrect.width - 28) / 2), brick_mrect.y + ((brick_mrect.height - 7) / 2), 18, 7, 28, type);
+			my_powerup.setDefaults(brick_mrect.x + ((brick_mrect.width - 28) / 2), brick_mrect.y + ((brick_mrect.height - 7) / 2), 18, 7, 28, type, powerup_texture_id[type - 1], powerup_texture_id[type - 1].size());
 			break;
 		}
 		has_powerup_on_screen = true;

@@ -14,3 +14,10 @@ int brick_point_value[brick_types] = {
 int ball_texture_id[2] = {
 	0, 18
 };
+
+std::vector<std::vector<int>> powerup_texture_id = {
+	{0},
+	{0},
+	{0},
+	{36, 37, 38, 39, 40}
+};

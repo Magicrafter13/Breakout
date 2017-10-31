@@ -151,6 +151,11 @@ void init_game_textures() {
 	pp2d_load_texture_png(33, "romfs:/sprites/powerup/paddle_big00.png");
 	pp2d_load_texture_png(34, "romfs:/sprites/powerup/paddle_small00.png");
 	pp2d_load_texture_png(35, "romfs:/sprites/misc/laser_paddle.png");
+	pp2d_load_texture_png(36, "romfs:/sprites/powerup/life01.png");
+	pp2d_load_texture_png(37, "romfs:/sprites/powerup/life02.png");
+	pp2d_load_texture_png(38, "romfs:/sprites/powerup/life03.png");
+	pp2d_load_texture_png(39, "romfs:/sprites/powerup/life04.png");
+	pp2d_load_texture_png(40, "romfs:/sprites/powerup/life05.png");
 };
 
 /*initialize audio*/
@@ -561,7 +566,7 @@ int breakout()
 				run_powerup(brick_array[level][i].my_powerup.my_type);
 				brick_array[level][i].has_powerup_on_screen = false;
 			}
-			pp2d_draw_texture(brick_array[level][i].my_powerup.texture_id, brick_array[level][i].my_powerup.x, brick_array[level][i].my_powerup.y);
+			brick_array[level][i].draw();
 		}
 	draw_object(the_paddle);
 	for (int i = 0; i < 50; i++)
@@ -571,9 +576,11 @@ int breakout()
 		pp2d_draw_texture_scale(27 - i, (trail_new_frame_circle[i].x - trail_new_frame_circle[i].rad) + 1.0, (trail_new_frame_circle[i].y - trail_new_frame_circle[i].rad) + 2.0, (7 - i) / 8.0, (7 - i) / 8.0); //RGBA8(0xFF, 0xFF, 0xFF, 32 * (7 - i))
 	draw_object(the_ball);
 	std::cout << ANSI "13;0" PEND;
-	for (int i = 0; i < 2; i++) std::cout << "                                        ";
+	for (int i = 0; i < 3; i++) std::cout << "                                        ";
 	std::cout << ANSI "13;0" PEND;
 	std::cout << "Score: " << points << "\n"; std::cout << "Lives: " << lives << "\n";
+	for (int i = 0; i < powerup_texture_id[3].size(); i++)
+		std::cout << powerup_texture_id[3][i] << " ";
 	pp2d_end_draw();
 	hidTouchRead(&touch);
 

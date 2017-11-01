@@ -8,9 +8,11 @@
 
 //By Matthew Rease https://github.com/Magicrafter13/Breakout
 
+FILE* debug_file;
+
 //init
 std::string versiontxtt = "  Beta ", versiontxtn = "01.07.00";
-std::string buildnumber = "17.10.31.2305", ishupeversion = "00.04.01";
+std::string buildnumber = "17.11.01.1312", ishupeversion = "00.04.01";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
@@ -33,7 +35,7 @@ paddle the_paddle; ball the_ball; std::vector<mCircle> trail_new_frame_circle(8)
 SFX_s *testsound[1], *ball_bounce[8];
 
 /*integer mask for levels*/
-std::vector<std::vector<int>> level_mask = {
+int level_mask[def_level_count][50] = {
 	{
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -141,6 +143,25 @@ void init_game_textures() {
 	pp2d_load_texture_png(33, "romfs:/sprites/powerup/paddle_big00.png");
 	pp2d_load_texture_png(34, "romfs:/sprites/powerup/paddle_small00.png");
 	pp2d_load_texture_png(35, "romfs:/sprites/misc/laser_paddle.png");
+	/*std::vector<std::string> powerup_capsule_names = {
+		"life",
+		"laser",
+		"paddle_big",
+		"paddle_small"
+	};
+	std::vector<int> which_vector = {
+		3, 0, 1, 2
+	};
+	for (int i = 0; i < 4; i++)
+		for (unsigned int j = 1; j < powerup_texture_id[which_vector[i]].size() + 1; j++) {
+			std::string temp_file_name = "romfs:/sprites/powerup/" + powerup_capsule_names[i];
+			fprintf(debug_file, "%s\n", temp_file_name.c_str());
+			if (j < 10) temp_file_name += "0";
+			fprintf(debug_file, "%s\n", temp_file_name.c_str());
+			temp_file_name += std::to_string(j) + ".png";
+			fprintf(debug_file, "%s\n", temp_file_name.c_str());
+			pp2d_load_texture_png(powerup_texture_id[which_vector[i]][j - 1], temp_file_name.c_str());
+		}*/
 	pp2d_load_texture_png(36, "romfs:/sprites/powerup/life01.png");
 	pp2d_load_texture_png(37, "romfs:/sprites/powerup/life02.png");
 	pp2d_load_texture_png(38, "romfs:/sprites/powerup/life03.png");
@@ -151,6 +172,16 @@ void init_game_textures() {
 	pp2d_load_texture_png(43, "romfs:/sprites/powerup/laser03.png");
 	pp2d_load_texture_png(44, "romfs:/sprites/powerup/laser04.png");
 	pp2d_load_texture_png(45, "romfs:/sprites/powerup/laser05.png");
+	pp2d_load_texture_png(46, "romfs:/sprites/powerup/paddle_big01.png");
+	pp2d_load_texture_png(47, "romfs:/sprites/powerup/paddle_big02.png");
+	pp2d_load_texture_png(48, "romfs:/sprites/powerup/paddle_big03.png");
+	pp2d_load_texture_png(49, "romfs:/sprites/powerup/paddle_big04.png");
+	pp2d_load_texture_png(50, "romfs:/sprites/powerup/paddle_big05.png");
+	pp2d_load_texture_png(51, "romfs:/sprites/powerup/paddle_small01.png");
+	pp2d_load_texture_png(52, "romfs:/sprites/powerup/paddle_small02.png");
+	pp2d_load_texture_png(53, "romfs:/sprites/powerup/paddle_small03.png");
+	pp2d_load_texture_png(54, "romfs:/sprites/powerup/paddle_small04.png");
+	pp2d_load_texture_png(55, "romfs:/sprites/powerup/paddle_small05.png");
 };
 
 /*initialize audio*/
@@ -180,9 +211,13 @@ void initialize_brick_array() {
 /*begin application*/
 int main(int argc, char **argv)
 {
+	debug_file = fopen("sdmc:/3ds/breakout_debug.txt", "w");
+	fprintf(debug_file, "first\n");
 	pp2d_init();
 	pp2d_set_screen_color(GFX_TOP, ABGR8(255, 149, 149, 149));
+	fprintf(debug_file, "second\n");
 	romfsInit();
+	fprintf(debug_file, "third\n");
 	csndInit();
 	initSound();
 	init_game_textures();

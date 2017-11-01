@@ -18,9 +18,10 @@ using std::string;
 
 extern PrintConsole bottomScreen, versionWin, killBox, debugBox;
 
-#define texture_count 46
+#define texture_count 56
 #define brick_types 11
 #define brick_sprites 15
+#define powerup_types 4
 #define ball_sprites 7
 #define def_level_count 5
 #define SAVE_FILES 3

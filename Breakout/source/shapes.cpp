@@ -16,7 +16,7 @@ int ball_texture_id[2] = {
 };
 
 std::vector<std::vector<int>> powerup_texture_id = {
-	{0},
+	{41, 42, 43, 44, 45},
 	{0},
 	{0},
 	{36, 37, 38, 39, 40}

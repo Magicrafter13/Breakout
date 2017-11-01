@@ -298,12 +298,12 @@ public:
 			wait_frame = 0;
 			powerup_timer++;
 		}
-		if (powerup_timer == my_powerup.frame_count)
+		if (powerup_timer > my_powerup.frame_count)
 			powerup_timer = 0;
 		if (powerup_timer == 0)
 			pp2d_draw_texture(my_powerup.texture_id, my_powerup.x, my_powerup.y);
 		else {
-			pp2d_draw_texture(my_powerup.animation_id[my_powerup.my_type], my_powerup.x, my_powerup.y);
+			pp2d_draw_texture(my_powerup.animation_id[powerup_timer - 1], my_powerup.x, my_powerup.y);
 		}
 		wait_frame++;
 	}
@@ -601,6 +601,7 @@ public:
 		has_big = false;
 		has_small = false;
 		texture_id = default_texture_id;
+		laser_on_screen = false;
 	}
 	/*
 	returns the leftmost side of the paddle

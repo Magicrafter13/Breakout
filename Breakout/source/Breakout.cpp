@@ -10,7 +10,7 @@
 
 //init
 std::string versiontxtt = "  Beta ", versiontxtn = "01.07.00";
-std::string buildnumber = "17.10.29.2153", ishupeversion = "00.04.01";
+std::string buildnumber = "17.10.31.2054", ishupeversion = "00.04.01";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
@@ -33,7 +33,7 @@ paddle the_paddle; ball the_ball; std::vector<mCircle> trail_new_frame_circle(8)
 SFX_s *testsound[1], *ball_bounce[8];
 
 /*integer mask for levels*/
-int level_mask[def_level_count][50] = {
+std::vector<std::vector<int>> level_mask = {
 	{
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -156,6 +156,11 @@ void init_game_textures() {
 	pp2d_load_texture_png(38, "romfs:/sprites/powerup/life03.png");
 	pp2d_load_texture_png(39, "romfs:/sprites/powerup/life04.png");
 	pp2d_load_texture_png(40, "romfs:/sprites/powerup/life05.png");
+	pp2d_load_texture_png(41, "romfs:/sprites/powerup/laser01.png");
+	pp2d_load_texture_png(42, "romfs:/sprites/powerup/laser02.png");
+	pp2d_load_texture_png(43, "romfs:/sprites/powerup/laser03.png");
+	pp2d_load_texture_png(44, "romfs:/sprites/powerup/laser04.png");
+	pp2d_load_texture_png(45, "romfs:/sprites/powerup/laser05.png");
 };
 
 /*initialize audio*/
@@ -579,7 +584,7 @@ int breakout()
 	for (int i = 0; i < 3; i++) std::cout << "                                        ";
 	std::cout << ANSI "13;0" PEND;
 	std::cout << "Score: " << points << "\n"; std::cout << "Lives: " << lives << "\n";
-	for (int i = 0; i < powerup_texture_id[3].size(); i++)
+	for (unsigned int i = 0; i < powerup_texture_id[3].size(); i++)
 		std::cout << powerup_texture_id[3][i] << " ";
 	pp2d_end_draw();
 	hidTouchRead(&touch);

@@ -10,7 +10,7 @@
 
 //init
 std::string versiontxtt = "  Beta ", versiontxtn = "01.07.00";
-std::string buildnumber = "17.10.31.2054", ishupeversion = "00.04.01";
+std::string buildnumber = "17.10.31.2305", ishupeversion = "00.04.01";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
@@ -115,33 +115,23 @@ void closeSD()
 
 /*initialize textures*/
 void init_game_textures() {
-	pp2d_load_texture_png(0, "romfs:/sprites/brick/brick00.png");
-	pp2d_load_texture_png(1, "romfs:/sprites/brick/brick01.png");
-	pp2d_load_texture_png(2, "romfs:/sprites/brick/brick02.png");
-	pp2d_load_texture_png(3, "romfs:/sprites/brick/brick03.png");
-	pp2d_load_texture_png(4, "romfs:/sprites/brick/brick04.png");
-	pp2d_load_texture_png(5, "romfs:/sprites/brick/brick05.png");
-	pp2d_load_texture_png(6, "romfs:/sprites/brick/brick06.png");
-	pp2d_load_texture_png(7, "romfs:/sprites/brick/brick07.png");
-	pp2d_load_texture_png(8, "romfs:/sprites/brick/brick08.png");
-	pp2d_load_texture_png(9, "romfs:/sprites/brick/brick09.png");
-	pp2d_load_texture_png(10, "romfs:/sprites/brick/brick10.png");
-	pp2d_load_texture_png(11, "romfs:/sprites/brick/brick11.png");
-	pp2d_load_texture_png(12, "romfs:/sprites/brick/brick12.png");
-	pp2d_load_texture_png(13, "romfs:/sprites/brick/brick13.png");
-	pp2d_load_texture_png(14, "romfs:/sprites/brick/brick14.png");
+	for (int i = 0; i < brick_sprites; i++) {
+		std::string temp = "romfs:/sprites/brick/brick";
+		if (i < 10) temp += "0";
+		temp += std::to_string(i) + ".png";
+		pp2d_load_texture_png(i, temp.c_str());
+	}
 	pp2d_load_texture_png(15, "romfs:/sprites/background/Title.png");
 	pp2d_load_texture_png(16, "romfs:/sprites/background/thanksbeta.png");
 	pp2d_load_texture_png(17, "romfs:/sprites/background/waveform.png");
 	pp2d_load_texture_png(18, "romfs:/sprites/ball00.png");
 	pp2d_load_texture_png(19, "romfs:/sprites/paddle.png");
-	pp2d_load_texture_png(20, "romfs:/sprites/misc/extra_ball/ball01.png");
-	pp2d_load_texture_png(21, "romfs:/sprites/misc/extra_ball/ball02.png");
-	pp2d_load_texture_png(22, "romfs:/sprites/misc/extra_ball/ball03.png");
-	pp2d_load_texture_png(23, "romfs:/sprites/misc/extra_ball/ball04.png");
-	pp2d_load_texture_png(24, "romfs:/sprites/misc/extra_ball/ball05.png");
-	pp2d_load_texture_png(25, "romfs:/sprites/misc/extra_ball/ball06.png");
-	pp2d_load_texture_png(26, "romfs:/sprites/misc/extra_ball/ball07.png");
+	for (int i = 0; i < ball_sprites; i++) {
+		std::string temp = "romfs:/sprites/misc/extra_ball/ball";
+		if (i < 10) temp += "0";
+		temp += std::to_string(i - 1) + ".png";
+		pp2d_load_texture_png(i + 20, temp.c_str());
+	}
 	pp2d_load_texture_png(27, "romfs:/sprites/background/press_select.png");
 	pp2d_load_texture_png(28, "romfs:/sprites/powerup/life00.png");
 	pp2d_load_texture_png(29, "romfs:/sprites/powerup/laser00.png");

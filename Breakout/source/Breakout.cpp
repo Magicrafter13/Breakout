@@ -1,4 +1,4 @@
-#include "Breakout.hpp"
+﻿#include "Breakout.hpp"
 #include "shapes.hpp"
 #include "draw.hpp"
 #include "audio/sfx.h"
@@ -6,7 +6,8 @@
 #include "ishupe.hpp"
 #include "file/file_access.hpp"
 
-//By Matthew Rease https://github.com/Magicrafter13/Breakout
+//By Matthew Rease (马太) https://github.com/Magicrafter13/Breakout
+//你好中国！我的名字是马太。我是中文一班。对不起，如果我的中文不好。(I did have to use Google translate for the last sentence :/ ).
 
 FILE* debug_file;
 

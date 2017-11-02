@@ -12,7 +12,7 @@ FILE* debug_file;
 
 //init
 std::string versiontxtt = "  Beta ", versiontxtn = "01.07.00";
-std::string buildnumber = "17.11.01.1312", ishupeversion = "00.04.01";
+std::string buildnumber = "17.11.01.1720", ishupeversion = "00.04.01";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
@@ -117,7 +117,7 @@ void closeSD()
 
 /*initialize textures*/
 void init_game_textures() {
-	for (int i = 0; i < brick_sprites; i++) {
+	for (size_t i = 0; i < 15; i++) {
 		std::string temp = "romfs:/sprites/brick/brick";
 		if (i < 10) temp += "0";
 		temp += std::to_string(i) + ".png";
@@ -128,11 +128,12 @@ void init_game_textures() {
 	pp2d_load_texture_png(17, "romfs:/sprites/background/waveform.png");
 	pp2d_load_texture_png(18, "romfs:/sprites/ball00.png");
 	pp2d_load_texture_png(19, "romfs:/sprites/paddle.png");
-	for (int i = 0; i < ball_sprites; i++) {
+	for (size_t i = 20; i < 27; i++) {
+		int thing = i - 19;
 		std::string temp = "romfs:/sprites/misc/extra_ball/ball";
-		if (i < 10) temp += "0";
-		temp += std::to_string(i - 1) + ".png";
-		pp2d_load_texture_png(i + 20, temp.c_str());
+		if (thing < 10) temp += "0";
+		temp += std::to_string(thing) + ".png";
+		pp2d_load_texture_png(i, temp.c_str());
 	}
 	pp2d_load_texture_png(27, "romfs:/sprites/background/press_select.png");
 	pp2d_load_texture_png(28, "romfs:/sprites/powerup/life00.png");
@@ -143,7 +144,7 @@ void init_game_textures() {
 	pp2d_load_texture_png(33, "romfs:/sprites/powerup/paddle_big00.png");
 	pp2d_load_texture_png(34, "romfs:/sprites/powerup/paddle_small00.png");
 	pp2d_load_texture_png(35, "romfs:/sprites/misc/laser_paddle.png");
-	/*std::vector<std::string> powerup_capsule_names = {
+	std::vector<std::string> powerup_capsule_names = {
 		"life",
 		"laser",
 		"paddle_big",
@@ -152,8 +153,8 @@ void init_game_textures() {
 	std::vector<int> which_vector = {
 		3, 0, 1, 2
 	};
-	for (int i = 0; i < 4; i++)
-		for (unsigned int j = 1; j < powerup_texture_id[which_vector[i]].size() + 1; j++) {
+	for (size_t i = 0; i < 4; i++)
+		for (size_t j = 1; j < powerup_texture_id[which_vector[i]].size() + 1; j++) {
 			std::string temp_file_name = "romfs:/sprites/powerup/" + powerup_capsule_names[i];
 			fprintf(debug_file, "%s\n", temp_file_name.c_str());
 			if (j < 10) temp_file_name += "0";
@@ -161,8 +162,8 @@ void init_game_textures() {
 			temp_file_name += std::to_string(j) + ".png";
 			fprintf(debug_file, "%s\n", temp_file_name.c_str());
 			pp2d_load_texture_png(powerup_texture_id[which_vector[i]][j - 1], temp_file_name.c_str());
-		}*/
-	pp2d_load_texture_png(36, "romfs:/sprites/powerup/life01.png");
+		}
+	/*pp2d_load_texture_png(36, "romfs:/sprites/powerup/life01.png");
 	pp2d_load_texture_png(37, "romfs:/sprites/powerup/life02.png");
 	pp2d_load_texture_png(38, "romfs:/sprites/powerup/life03.png");
 	pp2d_load_texture_png(39, "romfs:/sprites/powerup/life04.png");
@@ -181,7 +182,7 @@ void init_game_textures() {
 	pp2d_load_texture_png(52, "romfs:/sprites/powerup/paddle_small02.png");
 	pp2d_load_texture_png(53, "romfs:/sprites/powerup/paddle_small03.png");
 	pp2d_load_texture_png(54, "romfs:/sprites/powerup/paddle_small04.png");
-	pp2d_load_texture_png(55, "romfs:/sprites/powerup/paddle_small05.png");
+	pp2d_load_texture_png(55, "romfs:/sprites/powerup/paddle_small05.png");*/
 };
 
 /*initialize audio*/

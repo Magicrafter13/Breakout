@@ -13,7 +13,7 @@ FILE* debug_file;
 
 //init
 std::string versiontxtt = "  Beta ", versiontxtn = "01.07.00";
-std::string buildnumber = "17.11.01.1720", ishupeversion = "00.04.01";
+std::string buildnumber = "17.11.01.1233", ishupeversion = "00.04.01";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
@@ -90,12 +90,10 @@ bool touchInBox(touchPosition touch, int x, int y, int w, int h)
 	int tx = touch.px;
 	int ty = touch.py;
 	kDown = hidKeysDown();
-	if (kDown & KEY_TOUCH && tx > x && tx < x + w && ty > y && ty < y + h) {
+	if (kDown & KEY_TOUCH && tx > x && tx < x + w && ty > y && ty < y + h)
 		return true;
-	}
-	else {
+	else
 		return false;
-	}
 }
 
 touchPosition touch;
@@ -164,26 +162,6 @@ void init_game_textures() {
 			fprintf(debug_file, "%s\n", temp_file_name.c_str());
 			pp2d_load_texture_png(powerup_texture_id[which_vector[i]][j - 1], temp_file_name.c_str());
 		}
-	/*pp2d_load_texture_png(36, "romfs:/sprites/powerup/life01.png");
-	pp2d_load_texture_png(37, "romfs:/sprites/powerup/life02.png");
-	pp2d_load_texture_png(38, "romfs:/sprites/powerup/life03.png");
-	pp2d_load_texture_png(39, "romfs:/sprites/powerup/life04.png");
-	pp2d_load_texture_png(40, "romfs:/sprites/powerup/life05.png");
-	pp2d_load_texture_png(41, "romfs:/sprites/powerup/laser01.png");
-	pp2d_load_texture_png(42, "romfs:/sprites/powerup/laser02.png");
-	pp2d_load_texture_png(43, "romfs:/sprites/powerup/laser03.png");
-	pp2d_load_texture_png(44, "romfs:/sprites/powerup/laser04.png");
-	pp2d_load_texture_png(45, "romfs:/sprites/powerup/laser05.png");
-	pp2d_load_texture_png(46, "romfs:/sprites/powerup/paddle_big01.png");
-	pp2d_load_texture_png(47, "romfs:/sprites/powerup/paddle_big02.png");
-	pp2d_load_texture_png(48, "romfs:/sprites/powerup/paddle_big03.png");
-	pp2d_load_texture_png(49, "romfs:/sprites/powerup/paddle_big04.png");
-	pp2d_load_texture_png(50, "romfs:/sprites/powerup/paddle_big05.png");
-	pp2d_load_texture_png(51, "romfs:/sprites/powerup/paddle_small01.png");
-	pp2d_load_texture_png(52, "romfs:/sprites/powerup/paddle_small02.png");
-	pp2d_load_texture_png(53, "romfs:/sprites/powerup/paddle_small03.png");
-	pp2d_load_texture_png(54, "romfs:/sprites/powerup/paddle_small04.png");
-	pp2d_load_texture_png(55, "romfs:/sprites/powerup/paddle_small05.png");*/
 };
 
 /*initialize audio*/
@@ -748,6 +726,15 @@ int level_designer() {
 			quit = true;
 			break;
 		}
+		hidTouchRead(&touch);
+		bool touched = false;
+		for (int i = 0; i < SAVE_FILES; i++) {
+			if (touchInBox(touch, 112, 32 + (16 * i), 96, 8)) {
+				selection = i;
+				touched = true;
+			}
+		}
+		if (touched) break;
 		gspWaitForVBlank();
 	}
 	if (quit) return 0;

@@ -13,7 +13,7 @@ FILE* debug_file;
 
 //init
 std::string versiontxtt = "  Beta ", versiontxtn = "01.07.00";
-std::string buildnumber = "17.11.01.1233", ishupeversion = "00.04.01";
+std::string buildnumber = "17.11.03.0941", ishupeversion = "00.04.01";
 int vernumqik = 0;
 u32 kDown, kHeld;
 

@@ -449,6 +449,8 @@ class ball {
 public:
 	/*whether or not the ball exists*/
 	bool exists;
+	/*ball angle*/
+	double angle;
 	/*mask*/
 	mCircle ball_mcirc;
 	/*texture*/
@@ -546,8 +548,12 @@ public:
 	bool has_big;
 	/*whether or not small paddle active*/
 	bool has_small;
+	/*whether or not multi ball*/
+	bool has_multi;
 	/*laser object*/
 	laser the_laser;
+	/*multi ball 0 - 3*/
+	std::vector<ball> multi_ball;
 	/*
 	sets the paddle's default position size and texture id
 	bx: X position
@@ -563,6 +569,16 @@ public:
 		default_texture_id = texture_id;
 		default_width = bwidth;
 		default_height = bheight;
+	}
+	/*spawns extra balls*/
+	void spawn_multi(ball the_ball, double current_angle) {
+		multi_ball[0].setDefaults(the_ball.ball_mcirc.x, the_ball.ball_mcirc.y, the_ball.ball_mcirc.rad, 1);
+		multi_ball[1].setDefaults(the_ball.ball_mcirc.x, the_ball.ball_mcirc.y, the_ball.ball_mcirc.rad, 1);
+		multi_ball[2].setDefaults(the_ball.ball_mcirc.x, the_ball.ball_mcirc.y, the_ball.ball_mcirc.rad, 1);
+		multi_ball[3].setDefaults(the_ball.ball_mcirc.x, the_ball.ball_mcirc.y, the_ball.ball_mcirc.rad, 1);
+		multi_ball[4] = the_ball;
+		for (int i = 0; i < 4; i++)
+			multi_ball[i].angle = current_angle + (72 * (i + 1));
 	}
 	/*runs script for enlarging paddle*/
 	void getBig() {
@@ -583,16 +599,16 @@ public:
 		if (has_big) {
 			paddle_mrect.width = default_width;
 			paddle_mrect.x += 10;
-			has_big = false;
 		}
 		if (has_small) {
 			paddle_mrect.width = default_width;
 			paddle_mrect.x -= 10;
 			if (paddle_mrect.x < 1) paddle_mrect.x = 1;
 			if (paddle_mrect.x > 329) paddle_mrect.x = 329;
-			has_small = false;
 		}
 		has_laser = false;
+		has_big = false;
+		has_small = false;
 		texture_id = default_texture_id;
 	}
 	/*resets the paddle to it's default values*/

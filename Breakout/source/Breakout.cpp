@@ -363,6 +363,11 @@ void run_powerup(int typef) {
 	case 4:
 		lives++;
 		break;
+	case 5:
+		the_paddle.remove_powerups();
+		the_paddle.has_multi = true;
+		the_paddle.spawn_multi(the_ball, ball_angle);
+		break;
 	}
 }
 
@@ -389,12 +394,21 @@ int breakout()
 	}
 
 	/*lose life if outside of game field*/
-	if (the_ball.getTop(false) > 240) {
-		lives--;
-		the_ball.reset(); the_paddle.reset();
-		ball_is_attached = true;
-		do ball_angle = rand() % 360; while(ball_angle < 225.0 || ball_angle > 315.0 || (ball_angle > 265 && ball_angle < 275));
-		return 0;
+	if (!the_paddle.has_multi) {
+		if (the_ball.getTop(false) > 240) {
+			lives--;
+			the_ball.reset(); the_paddle.reset();
+			ball_is_attached = true;
+			do ball_angle = rand() % 360; while (ball_angle < 225.0 || ball_angle > 315.0 || (ball_angle > 265 && ball_angle < 275));
+			return 0;
+		}
+	}
+	else {
+		for (int i = 0; i < 5; i++) {
+			if (the_paddle.multi_ball[i].getTop(false) > 240) {
+				the_paddle.multi_ball[i].exists = false;
+			}
+		}
 	}
 
 	bool hasInteracted = false;

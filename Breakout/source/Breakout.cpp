@@ -148,7 +148,7 @@ void init_game_textures() {
 		"life",
 		"laser",
 		"paddle_big",
-		"paddle_small"
+		"paddle_small",
 		"multi_ball"
 	};
 	std::vector<int> which_vector = {

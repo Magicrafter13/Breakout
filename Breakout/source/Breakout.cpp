@@ -12,8 +12,8 @@
 FILE* debug_file;
 
 //init
-std::string versiontxtt = "  Beta ", versiontxtn = "01.07.00";
-std::string buildnumber = "17.11.03.0941", ishupeversion = "00.04.01";
+std::string versiontxtt = "  Beta ", versiontxtn = "01.07.02";
+std::string buildnumber = "17.11.06.1015", ishupeversion = "00.04.01";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
@@ -143,14 +143,16 @@ void init_game_textures() {
 	pp2d_load_texture_png(33, "romfs:/sprites/powerup/paddle_big00.png");
 	pp2d_load_texture_png(34, "romfs:/sprites/powerup/paddle_small00.png");
 	pp2d_load_texture_png(35, "romfs:/sprites/misc/laser_paddle.png");
+	pp2d_load_texture_png(61, "romfs:/sprites/powerup/multi_ball00.png");
 	std::vector<std::string> powerup_capsule_names = {
 		"life",
 		"laser",
 		"paddle_big",
 		"paddle_small"
+		"multi_ball"
 	};
 	std::vector<int> which_vector = {
-		3, 0, 1, 2
+		3, 0, 1, 2, 4
 	};
 	for (size_t i = 0; i < 4; i++)
 		for (size_t j = 1; j < powerup_texture_id[which_vector[i]].size() + 1; j++) {

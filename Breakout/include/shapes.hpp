@@ -370,6 +370,8 @@ public:
 		case 4:
 			my_powerup.setDefaults(brick_mrect.x + ((brick_mrect.width - 28) / 2), brick_mrect.y + ((brick_mrect.height - 7) / 2), 18, 7, 28, type, powerup_texture_id[type - 1], powerup_texture_id[type - 1].size());
 			break;
+		case 5:
+			my_powerup.setDefaults(brick_mrect.x + ((brick_mrect.width - 28) / 2), brick_mrect.y + ((brick_mrect.height - 7) / 2), 18, 7, 61, type, powerup_texture_id[type - 1], powerup_texture_id[type - 1].size());
 		}
 		has_powerup_on_screen = true;
 	}

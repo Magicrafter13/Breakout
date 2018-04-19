@@ -209,53 +209,33 @@ private:
 	bool internal_is_used;
 	int get_powerup()
 	{
-		switch (internal_brick_type)
-		{
-			case 0: return 0;
-			case 1: {
-				int temp_number = rand() % 20;
-				if (temp_number <= 3)
-				{
-					temp_number = rand() % 4;
-					return (temp_number + 1);
-				}
-				return 0;
+		switch (internal_brick_type) {
+		case 0: return 0;
+		case 1:
+		case 2: 
+		case 6:
+		case 7: {
+			int temp_number = rand() % 20;
+			if (temp_number <= 3)
+			{
+				temp_number = rand() % 5;
+				return (temp_number + 1);
 			}
-			case 2: {
-				int temp_number = rand() % 20;
-				if (temp_number <= 3)
-				{
-					temp_number = rand() % 4;
-					return (temp_number + 1);
-				}
-				return 0;
+			return 0;
 			}
-			case 3: {
-				int temp_number = rand() % 4;
-				if (temp_number == 1)
-				{
-					temp_number = rand() % 4;
-					return (temp_number + 1);
-				}
-				return 0;
+		case 3:
+		case 4:
+		case 5:
+		case 8:
+		case 9:
+		case 10: {
+			int temp_number = rand() % 4;
+			if (temp_number == 1)
+			{
+				temp_number = rand() % 5;
+				return (temp_number + 1);
 			}
-			case 4: {
-				int temp_number = rand() % 4;
-				if (temp_number == 1)
-				{
-					temp_number = rand() % 4;
-					return (temp_number + 1);
-				}
-				return 0;
-			}
-			case 5: {
-				int temp_number = rand() % 4;
-				if (temp_number == 1)
-				{
-					temp_number = rand() % 4;
-					return (temp_number + 1);
-				}
-				return 0;
+			return 0;
 			}
 		}
 		return 0;

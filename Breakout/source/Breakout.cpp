@@ -154,12 +154,10 @@ void init_game_textures() {
 	std::vector<int> which_vector = {
 		3, 0, 1, 2, 4
 	};
-	for (size_t i = 0; i < 4; i++)
+	for (size_t i = 0; i < 5; i++)
 		for (size_t j = 1; j < powerup_texture_id[which_vector[i]].size() + 1; j++) {
 			std::string temp_file_name = "romfs:/sprites/powerup/" + powerup_capsule_names[i];
-			fprintf(debug_file, "%s\n", temp_file_name.c_str());
 			if (j < 10) temp_file_name += "0";
-			fprintf(debug_file, "%s\n", temp_file_name.c_str());
 			temp_file_name += std::to_string(j) + ".png";
 			fprintf(debug_file, "%s\n", temp_file_name.c_str());
 			pp2d_load_texture_png(powerup_texture_id[which_vector[i]][j - 1], temp_file_name.c_str());
@@ -301,6 +299,7 @@ int main(int argc, char **argv)
 		draw_object(the_paddle);
 		pp2d_draw_texture(15, 80, 20);
 		pp2d_draw_texture(19, 122, 92);
+		pp2d_draw_texture(58, 0, 0);
 		if (press_select_visible) pp2d_draw_texture(27, 100, 180);
 		pp2d_end_draw();
 
@@ -342,6 +341,7 @@ int bricks_hit_this_frame;
 bool change_level;
 int thanks_text_display;
 bool has_hit_paddle, has_hit_wall;
+std::string debug_string;
 
 void run_powerup(int typef) {
 	switch (typef) {
@@ -379,9 +379,7 @@ int breakout()
 	if (kDown & KEY_SELECT || lives == 0) return 2;
 	if (kHeld & KEY_START) return 3;
 	/*move paddle (if applicable)*/
-	double tl = 0.1, tr = 0.1;
-	if (kHeld & KEY_LEFT) tl = movePaddle(true, the_paddle, ball_is_attached, the_ball);
-	if (kHeld & KEY_RIGHT) tr = movePaddle(false, the_paddle, ball_is_attached, the_ball);
+	if (kHeld & (KEY_LEFT | KEY_RIGHT)) movePaddle((kHeld & KEY_LEFT ? false : true), the_paddle, ball_is_attached, the_ball);
 
 	/*lose life if outside of game field*/
 	if (!the_paddle.has_multi) {
@@ -497,6 +495,7 @@ int breakout()
 						if (!brick_array[level][j].exists) {
 							points += brick_array[level][j].point_value();
 							last_power = brick_array[level][j].random_powerup();
+							debug_string = std::to_string(last_power);
 							if (last_power != 0) brick_array[level][j].spawn_powerup(last_power);
 							if (last_power == 1) times_power_1++;
 							if (last_power == 2) times_power_2++;
@@ -594,7 +593,8 @@ int breakout()
 	std::cout << ANSI "13;0" PEND;
 	for (int i = 0; i < 3; i++) std::cout << "                                        ";
 	std::cout << ANSI "13;0" PEND;
-	std::cout << "Score: " << points << "\n"; std::cout << "Lives: " << lives << "\n";
+	std::cout << "Score: " << points << "\n" << "Lives: " << lives << "\n";
+	std::cout << debug_string << std::endl;
 	for (unsigned int i = 0; i < powerup_texture_id[3].size(); i++)
 		std::cout << powerup_texture_id[3][i] << " ";
 	pp2d_end_draw();

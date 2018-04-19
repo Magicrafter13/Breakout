@@ -248,6 +248,15 @@ private:
 				}
 				return 0;
 			}
+			case 5: {
+				int temp_number = rand() % 4;
+				if (temp_number == 1)
+				{
+					temp_number = rand() % 4;
+					return (temp_number + 1);
+				}
+				return 0;
+			}
 		}
 		return 0;
 	}

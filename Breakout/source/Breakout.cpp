@@ -376,22 +376,12 @@ int breakout()
 {
 	hidScanInput();
 	kDown = hidKeysDown(); kHeld = hidKeysHeld();
-	/*if (kDown & KEY_R)
-		level++;
-	if (kDown & KEY_L)
-		level--;*/
 	if (kDown & KEY_SELECT || lives == 0) return 2;
 	if (kHeld & KEY_START) return 3;
-	/*move paddle left (if applicable)*/
-	if (kHeld & KEY_LEFT && the_paddle.paddle_mrect.x > 1) {
-		the_paddle.paddle_mrect.x -= 3;
-		if (ball_is_attached) the_ball.move(-3.0, 0.0);
-	}
-	/*move paddle right (if applicable)*/
-	if (kHeld & KEY_RIGHT && the_paddle.paddle_mrect.x < 399 - the_paddle.paddle_mrect.width) {
-		the_paddle.paddle_mrect.x += 3;
-		if (ball_is_attached) the_ball.move(3.0, 0.0);
-	}
+	/*move paddle (if applicable)*/
+	double tl = 0.1, tr = 0.1;
+	if (kHeld & KEY_LEFT) tl = movePaddle(true, the_paddle, ball_is_attached, the_ball);
+	if (kHeld & KEY_RIGHT) tr = movePaddle(false, the_paddle, ball_is_attached, the_ball);
 
 	/*lose life if outside of game field*/
 	if (!the_paddle.has_multi) {

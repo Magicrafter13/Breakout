@@ -3,7 +3,7 @@
 #include <time.h>
 #include <string.h>
 #include <string>
-using std::string;
+//using std::string;
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <iostream>

@@ -92,3 +92,4 @@ Variable Requirements:
 	rad <numeric value>
 */
 extern bool off_screen(mCircle object);
+extern double movePaddle(bool right, paddle &the_paddle, bool ball_is_attached, ball &the_ball);

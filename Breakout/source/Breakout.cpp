@@ -35,7 +35,7 @@ int press_select_frame = 0; bool press_select_visible = true;
 paddle the_paddle; ball the_ball; std::vector<mCircle> trail_new_frame_circle(8); std::vector<laser> trail_new_frame_laser(29); brick brick_array[def_level_count][50];
 SFX_s *testsound[1], *ball_bounce[8];
 
-bool cMode = false;
+bool cMode = false, update_text = true;
 
 /*integer mask for levels*/
 int level_mask[def_level_count][50] = {
@@ -59,6 +59,13 @@ int level_mask[def_level_count][50] = {
 		3, 3, 3, 3, 3, 3, 0, 0, 0, 0,
 		2, 2, 2, 2, 2, 2, 2, 2, 0, 0,
 		lvlFullLine(1)
+	},
+	{
+		0,  1, 0, 0, 0, 0, 0, 0,  1, 0,
+		0, 10, 0, 0, 0, 0, 0, 0,  6, 0,
+		0,  8, 0, 0, 0, 0, 0, 0,  9, 0,
+		0,  9, 3, 1, 3, 4, 3, 2,  8, 0,
+		0,  6, 3, 3, 5, 3, 2, 2, 10, 0
 	},
 	{
 		0, 0, 1, 1, 2, 2, 1, 1, 0, 0,
@@ -419,6 +426,7 @@ int breakout()
 	if (!the_paddle.has_multi) {
 		if (the_ball.getTop(false) > 240) {
 			lives--;
+			update_text = true;
 			the_ball.reset(); the_paddle.reset();
 			ball_is_attached = true;
 			do ball_angle = rand() % 360; while (ball_angle < 225.0 || ball_angle > 315.0 || (ball_angle > 265 && ball_angle < 275));
@@ -579,6 +587,7 @@ int breakout()
 
 	/*plays random SFX if a brick has been hit*/
 	if (bricks_hit_this_frame > 0 && !ball_is_attached) {
+		update_text = true;
 		int which_bounce = rand() % 7;
 		playSFX(ball_bounce[which_bounce]);
 	}
@@ -604,14 +613,15 @@ int breakout()
 	for (int i = 7; i > 0; i--)
 		pp2d_draw_texture_scale(27 - i, (trail_new_frame_circle[i].x - trail_new_frame_circle[i].rad) + 1.0, (trail_new_frame_circle[i].y - trail_new_frame_circle[i].rad) + 2.0, (7 - i) / 8.0, (7 - i) / 8.0); //RGBA8(0xFF, 0xFF, 0xFF, 32 * (7 - i))
 	draw_object(the_ball);
-	std::cout << ANSI "13;0" PEND;
-	for (int i = 0; i < 3; i++) std::cout << "                                        ";
-	std::cout << ANSI "13;0" PEND;
-	std::cout << "Score: " << points << "\n" << "Lives: " << lives << "\n";
-	std::cout << "Collision being tested " << (cMode ? 100 : 300) << "x/frame." << std::endl;
-	std::cout << debug_string << std::endl;
-	for (unsigned int i = 0; i < powerup_texture_id[3].size(); i++)
-		std::cout << powerup_texture_id[3][i] << " ";
+	if (update_text) {
+		std::cout << ANSI "13;0" PEND;
+		for (int i = 0; i < 3; i++) std::cout << "                                        ";
+		std::cout << ANSI "13;0" PEND;
+		std::cout << "Score: " << points << "\n" << "Lives: " << lives << "\n";
+		std::cout << "Collision being tested " << (cMode ? 100 : 300) << "x/frame." << std::endl;
+		std::cout << debug_string << std::endl;
+		update_text = false;
+	}
 	pp2d_end_draw();
 	hidTouchRead(&touch);
 

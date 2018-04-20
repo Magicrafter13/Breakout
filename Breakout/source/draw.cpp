@@ -1,5 +1,5 @@
 #include "Breakout.hpp"
-#include "shapes.hpp"
+#include "objects.hpp"
 #include "draw.hpp"
 
 void draw_object(brick brick_to_draw)

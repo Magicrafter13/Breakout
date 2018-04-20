@@ -1,8 +1,6 @@
 #include "Breakout.hpp"
 #include "ishupe.hpp"
-#include "shapes.hpp"
-
-#define paddleMax(the_paddle) (399 - the_paddle.paddle_mrect.width)
+#include "objects.hpp"
 
 bool off_screen(mCircle object) {
 	if ((object.x + object.rad <= 0) ||

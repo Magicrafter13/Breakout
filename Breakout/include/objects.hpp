@@ -1,6 +1,10 @@
 #pragma once
 
 extern std::vector<std::vector<int>> powerup_texture_id;
+extern int brick_texture_by_type[brick_types];
+extern int brick_second_texture_by_type[brick_types];
+/*point value by brick type*/
+extern int brick_point_value[brick_types];
 
 /*
 Creates a rectangle object.
@@ -75,11 +79,6 @@ public:
 		height = sheight;
 	}
 };
-
-extern int brick_texture_by_type[brick_types];
-extern int brick_second_texture_by_type[brick_types];
-/*point value by brick type*/
-extern int brick_point_value[brick_types];
 
 /*
 laser object
@@ -204,6 +203,7 @@ private:
 		case 9:
 		case 10: hits_left = 2;
 			break;
+		case 11: hits_left = std::numeric_limits<int>::max(); // Technically it is possible to destroy these bricks... but come on, it takes like 2+ billion hits so yeah.
 		}
 	}
 	bool internal_is_used;

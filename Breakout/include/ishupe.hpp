@@ -1,5 +1,5 @@
 #include "Breakout.hpp"
-#include "shapes.hpp"
+#include "objects.hpp"
 
 /*
 Returns true if two objects are colliding
@@ -92,4 +92,6 @@ Variable Requirements:
 	rad <numeric value>
 */
 extern bool off_screen(mCircle object);
+
+#define paddleMax(the_paddle) (399 - the_paddle.paddle_mrect.width)
 extern void movePaddle(bool right, paddle &the_paddle, bool ball_is_attached, ball &the_ball);

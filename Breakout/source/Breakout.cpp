@@ -1,5 +1,5 @@
 ﻿#include "Breakout.hpp"
-#include "shapes.hpp"
+#include "objects.hpp"
 #include "draw.hpp"
 #include "audio/sfx.h"
 #include "audio/filesystem.h"
@@ -9,7 +9,7 @@
 //By Matthew Rease (马太) https://github.com/Magicrafter13/Breakout
 //你好中国！我的名字是马太。我是中文一班。对不起，如果我的中文不好。(I did have to use Google translate for the last sentence :/ ).
 
-FILE* debug_file;
+FILE* debug_file,* settings_file;
 
 //init
 std::string versiontxtt = "  Beta ", versiontxtn = "01.07.02";
@@ -35,28 +35,30 @@ int press_select_frame = 0; bool press_select_visible = true;
 paddle the_paddle; ball the_ball; std::vector<mCircle> trail_new_frame_circle(8); std::vector<laser> trail_new_frame_laser(29); brick brick_array[def_level_count][50];
 SFX_s *testsound[1], *ball_bounce[8];
 
+bool cMode = false;
+
 /*integer mask for levels*/
 int level_mask[def_level_count][50] = {
 	{
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+		lvlFullLine(0),
+		lvlFullLine(0),
+		lvlFullLine(0),
+		lvlFullLine(0),
+		lvlFullLine(0)
 	},
 	{
-		5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
-		4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
-		3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-		2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-		1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+		lvlFullLine(5),
+		lvlFullLine(4),
+		lvlFullLine(3),
+		lvlFullLine(2),
+		lvlFullLine(1),
 	},
 	{
 		5, 5, 0, 0, 0, 0, 0, 0, 0, 0,
 		4, 4, 4, 4, 0, 0, 0, 0, 0, 0,
 		3, 3, 3, 3, 3, 3, 0, 0, 0, 0,
 		2, 2, 2, 2, 2, 2, 2, 2, 0, 0,
-		1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+		lvlFullLine(1)
 	},
 	{
 		0, 0, 1, 1, 2, 2, 1, 1, 0, 0,
@@ -188,16 +190,38 @@ void initialize_brick_array() {
 	}
 }
 
+/*Writes Settings File*/
+void writeSettings() {
+	settings_file = fopen("sdmc:/3ds/settings.bsf", "w");
+	fprintf(settings_file, "%s %d ", "old", (cMode ? 1 : 0));
+	fclose(settings_file);
+}
+
+void readSettings() {
+	char dummy;
+	int cModeT;
+	settings_file = fopen("sdmc:/3ds/settings.bsf", "r");
+	fscanf(settings_file, "%s %d", &dummy, &cModeT);
+	fclose(settings_file);
+	cMode = (cModeT == 1 ? true : false);
+}
+
 /*begin application*/
 int main(int argc, char **argv)
 {
 	debug_file = fopen("sdmc:/3ds/breakout_debug.txt", "w");
-	fprintf(debug_file, "first\n");
+	if ((settings_file = fopen("sdmc:/3ds/settings.bsf", "r"))) {
+		fclose(settings_file);
+		readSettings();
+	}
+	else {
+		writeSettings();
+		readSettings();
+	}
+	settings_file = fopen("sdmc:/3ds/settings.bsf", "r");
 	pp2d_init();
 	pp2d_set_screen_color(GFX_TOP, ABGR8(255, 149, 149, 149));
-	fprintf(debug_file, "second\n");
 	romfsInit();
-	fprintf(debug_file, "third\n");
 	csndInit();
 	initSound();
 	init_game_textures();
@@ -245,6 +269,13 @@ int main(int argc, char **argv)
 			level_designer();
 			bottom_screen_text = 0;
 		}
+		/*Toggle Compatibility Mode*/
+		if (kDown & KEY_R) {
+			cMode = (cMode ? false : true);
+			writeSettings();
+			readSettings();
+			bottom_screen_text = 0;
+		}
 		/*begin game*/
 		if (kDown & KEY_SELECT) {
 			lives = 3;
@@ -287,9 +318,13 @@ int main(int argc, char **argv)
 			consoleSelect(&bottomScreen);
 			std::cout << CRESET ANSI "20;0" PEND;
 
-			std::cout << CRESET ANSI "2;0" PEND "Press Select to begin.\n";
-			std::cout << "Press X to see what I'm working on or have planned.\n";
-			std::cout << "Press Y to open level editor.\n";
+			std::cout << CRESET ANSI "2;0" PEND "Press Select to begin." << std::endl;
+			std::cout << "Press X to see what I'm working on or have planned." << std::endl;
+			std::cout << "Press Y to open level editor." << std::endl << std::endl;
+
+			std::cout << "Compatibility Mode: " << (cMode ? "On" : "Off") << std::endl;
+			std::cout << "(Turn on if not using a 'New' 3DS/2DS)" << std::endl << "Press R" << std::endl;
+			std::cout << "May cause undesireable results on VERY" << std::endl << "rare occasions." << std::endl;
 
 			bottom_screen_text = 1;
 		}
@@ -299,7 +334,6 @@ int main(int argc, char **argv)
 		draw_object(the_paddle);
 		pp2d_draw_texture(15, 80, 20);
 		pp2d_draw_texture(19, 122, 92);
-		pp2d_draw_texture(58, 0, 0);
 		if (press_select_visible) pp2d_draw_texture(27, 100, 180);
 		pp2d_end_draw();
 
@@ -431,28 +465,19 @@ int breakout()
 		bricks_hit_this_frame = 0;
 		change_level = false;
 		/*main hit detection engine (runs 300 times per frame)*/
-		for (int i = 0; i < 300; i++) {
+		for (int i = 0; i < (cMode ? 100 : 300); i++) {
 			hasInteracted = false;
-			if (the_paddle.getTop(false) <= the_ball.getBottom(false) && (the_paddle.paddle_mrect.x <= the_ball.ball_mcirc.x && the_ball.ball_mcirc.x <= the_paddle.paddle_mrect.x + the_paddle.paddle_mrect.width /*balls x coordinate is <= paddles x coordinate + it's width*/))
-				hasHitPadd = true;
-			else
-				hasHitPadd = false;
+			hasHitPadd = (the_paddle.getTop(false) <= the_ball.getBottom(false) && (the_paddle.paddle_mrect.x <= the_ball.ball_mcirc.x && the_ball.ball_mcirc.x <= the_paddle.paddle_mrect.x + the_paddle.paddle_mrect.width /*balls x coordinate is <= paddles x coordinate + it's width*/));
 			if (hasHitPadd && the_ball.getBottom(false) >= the_paddle.getTop(false) + 0.02) hasHitPadd = false;
 			if (hasHitPadd) has_hit_paddle = true;
 			//Add gravity powerup (magnet but different) rotates around paddle until button pressed.
-			if (the_ball.getLeft(true) <= 0.00 || the_ball.getRight(true) >= 400.00 || the_ball.getTop(false) <= 0.00)
-				hasHitWall = true;
-			else
-				hasHitWall = false;
+			hasHitWall = (the_ball.getLeft(true) <= 0.00 || the_ball.getRight(true) >= 400.00 || the_ball.getTop(false) <= 0.00);
 			if (hasHitWall) has_hit_wall = true;
 			/*first time ball is detected touching wall*/
 			if (hasHitWall && !isInWall) {
 				hasInteracted = true;
 				isInWall = true;
-				if (the_ball.getTop(false) <= 0.00)
-					ball_angle = 360.0 - ball_angle;
-				else
-					ball_angle = 180.0 - ball_angle;
+				ball_angle = (the_ball.getTop(false) <= 0.00) ? (360.0 - ball_angle) : (180.0 - ball_angle);
 			}
 
 			while (ball_angle < 0.0) ball_angle += 360.0;
@@ -495,36 +520,25 @@ int breakout()
 						if (!brick_array[level][j].exists) {
 							points += brick_array[level][j].point_value();
 							last_power = brick_array[level][j].random_powerup();
-							debug_string = std::to_string(last_power);
 							if (last_power != 0) brick_array[level][j].spawn_powerup(last_power);
-							if (last_power == 1) times_power_1++;
-							if (last_power == 2) times_power_2++;
-							if (last_power == 3) times_power_3++;
 						}
 						bricks_hit_this_frame++;
 						/*if brick hit V and H reverse direction*/
-						if (brickHitV && brickHitH) {
-							ball_angle -= 180.0;
-							if (ball_angle < 0.0) ball_angle += 360.0;
-						}
-						else if (brickHitV)
-							ball_angle = -ball_angle + 360.0;
-						else if (brickHitH)
-							ball_angle = -ball_angle + 180.0;
+						ball_angle = (brickHitV ? (brickHitH ? ball_angle - 180.0 : 360.0 - ball_angle) : (brickHitH ? 180 - ball_angle : ball_angle));
 					}
 					brickHitV = false; brickHitH = false;
 				}
 			}
 			ball_dx = 2.0 * cos(ball_angle * (M_PI / 180.0)); ball_dy = 2.0 * sin(ball_angle * (M_PI / 180.0));
 			if (hasHitPadd && isInPaddle)
-				the_ball.move(ball_dx / 300.0, ball_dy / 300.0);
+				the_ball.move(ball_dx / (cMode ? 100.0 : 300.0), ball_dy / (cMode ? 100.0 : 300.0));
 			else if (isInPaddle && !hasHitPadd)
 				isInPaddle = false;
 			if (hasHitWall && isInWall)
-				the_ball.move(ball_dx / 300.0, ball_dy / 300.0);
+				the_ball.move(ball_dx / (cMode ? 100.0 : 300.0), ball_dy / (cMode ? 100.0 : 300.0));
 			else if (isInWall && !hasHitWall)
 				isInWall = false;
-			if (!hasInteracted && !hasHitPadd && !hasHitWall && !isInPaddle && !isInWall) the_ball.move(ball_dx / 300.0, ball_dy / 300.0);
+			if (!hasInteracted && !hasHitPadd && !hasHitWall && !isInPaddle && !isInWall) the_ball.move(ball_dx / (cMode ? 100.0 : 300.0), ball_dy / (cMode ? 100.0 : 300.0));
 			/*if paddle and wall hit in same frame, ball is "crushed" (this could cause problems later*/
 			if (hasHitPadd && hasHitWall) {
 				lives--;
@@ -594,6 +608,7 @@ int breakout()
 	for (int i = 0; i < 3; i++) std::cout << "                                        ";
 	std::cout << ANSI "13;0" PEND;
 	std::cout << "Score: " << points << "\n" << "Lives: " << lives << "\n";
+	std::cout << "Collision being tested " << (cMode ? 100 : 300) << "x/frame." << std::endl;
 	std::cout << debug_string << std::endl;
 	for (unsigned int i = 0; i < powerup_texture_id[3].size(); i++)
 		std::cout << powerup_texture_id[3][i] << " ";

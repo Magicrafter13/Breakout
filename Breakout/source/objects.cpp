@@ -1,5 +1,5 @@
 #include "Breakout.hpp"
-#include "shapes.hpp"
+#include "objects.hpp"
 
 int brick_texture_by_type[brick_types] = {
 	0, 1, 2, 3, 4, 5, 10, 11, 12, 13, 14

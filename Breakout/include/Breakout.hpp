@@ -19,7 +19,7 @@
 extern PrintConsole bottomScreen, versionWin, killBox, debugBox;
 
 #define texture_count 62
-#define brick_types 11
+#define brick_types 12
 #define powerup_types 4
 #define ball_sprites 7
 #define def_level_count 5
@@ -53,3 +53,7 @@ extern int vernumqik;
 #define ASEP ";"
 #define CEND "m"
 #define PEND "H"
+
+// For level creation
+
+#define lvlFullLine(a) a, a, a, a, a, a, a, a, a, a

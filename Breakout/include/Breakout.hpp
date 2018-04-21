@@ -13,7 +13,7 @@
 #include <3ds.h>
 #include <citro3d.h>
 #include "gfx/pp2d.h"
-
+#include <limits>
 #include <vector>
 
 extern PrintConsole bottomScreen, versionWin, killBox, debugBox;
@@ -22,7 +22,7 @@ extern PrintConsole bottomScreen, versionWin, killBox, debugBox;
 #define brick_types 12
 #define powerup_types 4
 #define ball_sprites 7
-#define def_level_count 5
+#define def_level_count 6
 #define SAVE_FILES 3
 
 extern std::string versiontxtt, versiontxtn;

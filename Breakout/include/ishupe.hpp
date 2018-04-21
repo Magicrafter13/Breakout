@@ -95,3 +95,6 @@ extern bool off_screen(mCircle object);
 
 #define paddleMax(the_paddle) (399 - the_paddle.paddle_mrect.width)
 extern void movePaddle(bool right, paddle &the_paddle, bool ball_is_attached, ball &the_ball);
+extern void setBallDirection(double &dirX, double &dirY, double angle, double speed);
+extern inline void moveBall(ball &tBall, double dirX, double dirY, bool cMode);
+extern inline void setNewBallAngle(double &angle);

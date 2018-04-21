@@ -16,3 +16,17 @@ void movePaddle(bool right, paddle &the_paddle, bool ball_is_attached, ball &the
 	if (x != 0 && ball_is_attached) the_ball.move(x, 0.0);
 	the_paddle.paddle_mrect.x += x;
 }
+
+void setBallDirection(double &dirX, double &dirY, double angle, double speed) {
+	dirX = speed * cos(angle * (M_PI / 180.0));
+	dirY = speed * sin(angle * (M_PI / 180.0));
+}
+
+inline void moveBall(ball &tBall, double dirX, double dirY, bool cMode) {
+	tBall.move(dirX / (cMode ? 100.0 : 300.0), dirY / (cMode ? 100.0 : 300.0));
+}
+
+inline void setNewBallAngle(double &angle) {
+	do angle = (rand() % 120) + 30.0;
+	while (angle > 80 && angle < 100);
+}

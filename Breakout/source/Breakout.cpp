@@ -405,6 +405,15 @@ void run_powerup(int typef) {
 	}
 }
 
+int loseLife() {
+	lives--;
+	the_ball.reset();
+	the_paddle.reset();
+	ball_is_attached = true;
+	setNewBallAngle(ball_angle);
+	return 0;
+}
+
 /*main game*/
 int breakout()
 {
@@ -416,22 +425,10 @@ int breakout()
 	if (kHeld & (KEY_LEFT | KEY_RIGHT)) movePaddle((kHeld & KEY_LEFT ? false : true), the_paddle, ball_is_attached, the_ball);
 
 	/*lose life if outside of game field*/
-	if (!the_paddle.has_multi) {
-		if (the_ball.getTop(false) > 240) {
-			lives--;
-			the_ball.reset(); the_paddle.reset();
-			ball_is_attached = true;
-			do ball_angle = rand() % 360; while (ball_angle < 225.0 || ball_angle > 315.0 || (ball_angle > 265 && ball_angle < 275));
-			return 0;
-		}
-	}
-	else {
-		for (int i = 0; i < 5; i++) {
-			if (the_paddle.multi_ball[i].getTop(false) > 240) {
-				the_paddle.multi_ball[i].exists = false;
-			}
-		}
-	}
+	if (!the_paddle.has_multi) 
+		if (the_ball.getTop(false) > 240) return loseLife();
+	else for (int i = 0; i < 5; i++)
+		if (the_paddle.multi_ball[i].getTop(false) > 240) the_paddle.multi_ball[i].exists = false;
 
 	bool hasInteracted = false;
 	has_hit_paddle = false; has_hit_wall = false;
@@ -529,24 +526,18 @@ int breakout()
 					brickHitV = false; brickHitH = false;
 				}
 			}
-			ball_dx = 2.0 * cos(ball_angle * (M_PI / 180.0)); ball_dy = 2.0 * sin(ball_angle * (M_PI / 180.0));
+			setBallDirection(ball_dx, ball_dy, ball_angle, 2.0);
 			if (hasHitPadd && isInPaddle)
-				the_ball.move(ball_dx / (cMode ? 100.0 : 300.0), ball_dy / (cMode ? 100.0 : 300.0));
+				moveBall(the_ball, ball_dx, ball_dy, cMode);
 			else if (isInPaddle && !hasHitPadd)
 				isInPaddle = false;
 			if (hasHitWall && isInWall)
-				the_ball.move(ball_dx / (cMode ? 100.0 : 300.0), ball_dy / (cMode ? 100.0 : 300.0));
+				moveBall(the_ball, ball_dx, ball_dy, cMode);
 			else if (isInWall && !hasHitWall)
 				isInWall = false;
-			if (!hasInteracted && !hasHitPadd && !hasHitWall && !isInPaddle && !isInWall) the_ball.move(ball_dx / (cMode ? 100.0 : 300.0), ball_dy / (cMode ? 100.0 : 300.0));
-			/*if paddle and wall hit in same frame, ball is "crushed" (this could cause problems later*/
-			if (hasHitPadd && hasHitWall) {
-				lives--;
-				the_ball.reset();
-				ball_angle = 0.0;
-				while (ball_angle < 30.0 || ball_angle > 150.0 || (ball_angle > 80 && ball_angle < 100)) ball_angle = rand() % 360;
-				return 0;
-			}
+			if (!hasInteracted && !hasHitPadd && !hasHitWall && !isInPaddle && !isInWall) moveBall(the_ball, ball_dx, ball_dy, cMode);
+			/*if paddle and wall hit in same frame, ball is "crushed" (this could cause problems later)*/
+			if (hasHitPadd && hasHitWall) return loseLife();
 			int bricks_available = 0;
 			for (int brick_array_pos = 0; brick_array_pos < 50; brick_array_pos++)
 				if (brick_array[level][brick_array_pos].exists)
@@ -675,8 +666,8 @@ int extras_10_13_2017()
 	std::cout << "phones. It's this game where you aim\n";
 	std::cout << "your ball, and it shoots out like 100\n";
 	std::cout << "balls. And all the bricks in the game\n";
-	std::cout << "many hits, which is determined via a\n";
-	std::cout << "number displayed on the brick.\n";
+	std::cout << "take many hits, which is determined via\n";
+	std::cout << "a number displayed on the brick.\n";
 	std::cout << "So I figure I'll add this sometime.\n\n";
 	std::cout << "These new graphics and SFX aren't\n";
 	std::cout << "necessarily permanent. This update is\n";

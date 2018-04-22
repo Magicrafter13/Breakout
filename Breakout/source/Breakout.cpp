@@ -13,7 +13,7 @@ FILE* debug_file,* settings_file;
 
 //init
 std::string versiontxtt = "  Beta ", versiontxtn = "01.07.02";
-std::string buildnumber = "17.11.06.1015", ishupeversion = "00.04.01";
+std::string buildnumber = "18.04.21.2231", ishupeversion = "01.00.00";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
@@ -28,14 +28,14 @@ int level_designer();
 int save_level(int selection);
 
 int lives, points, level;
-double ball_dx, ball_dy, ball_angle; std::vector<double> trail_new_frame_x(8), trail_new_frame_y(8), laser_trail_x(29), laser_trail_y(29); bool crushBall = false; bool ball_is_attached;
+bool crushBall = false;
 int last_power, times_power_1, times_power_2, times_power_3;
 int press_select_frame = 0; bool press_select_visible = true;
 
-paddle the_paddle; ball the_ball; std::vector<mCircle> trail_new_frame_circle(8); std::vector<laser> trail_new_frame_laser(29); brick brick_array[def_level_count][50];
-SFX_s *testsound[1], *ball_bounce[8];
+paddle the_paddle; std::vector<ball> the_ball(1); brick brick_array[def_level_count][50];
+SFX_s *ball_bounce[8];
 
-bool cMode = false, update_text = true;
+bool cMode = false, update_text;
 
 /*integer mask for levels*/
 int level_mask[def_level_count][50] = {
@@ -84,13 +84,15 @@ int level_mask[def_level_count][50] = {
 };
 
 /*set ball trail*/
-void trail_new_frame(ball ball_object)
+void trail_new_frame(std::vector<ball> &ball_vec)
 {
-	trail_new_frame_x.insert(trail_new_frame_x.begin(), ball_object.ball_mcirc.x);
-	trail_new_frame_y.insert(trail_new_frame_y.begin(), ball_object.ball_mcirc.y);
-	trail_new_frame_x.resize(8); trail_new_frame_y.resize(8);
-	trail_new_frame_x.shrink_to_fit(); trail_new_frame_y.shrink_to_fit();
-	for (int i = 0; i < 8; i++) trail_new_frame_circle[i].setPosition(trail_new_frame_x[i], trail_new_frame_y[i]);
+	for (auto &tBall : ball_vec) {
+		tBall.trail_new_frame_x.insert(tBall.trail_new_frame_x.begin(), tBall.ball_mcirc.x);
+		tBall.trail_new_frame_y.insert(tBall.trail_new_frame_y.begin(), tBall.ball_mcirc.y);
+		tBall.trail_new_frame_x.resize(8); tBall.trail_new_frame_y.resize(8);
+		tBall.trail_new_frame_x.shrink_to_fit(); tBall.trail_new_frame_y.shrink_to_fit();
+		for (int i = 0; i < 8; i++) tBall.trail_new_frame_circle[i].setPosition(tBall.trail_new_frame_x[i], tBall.trail_new_frame_y[i]);
+	}
 }
 
 /*returns if area is being touched by stylus*/
@@ -103,6 +105,13 @@ bool touchInBox(touchPosition touch, int x, int y, int w, int h)
 		return true;
 	else
 		return false;
+}
+
+void resetBalls(std::vector<ball> &ball_vec) {
+	ball_vec.resize(1);
+	ball_vec[0].reset();
+	setNewBallAngle(ball_vec[0].angle);
+	ball_vec[0].is_attached = true;
 }
 
 touchPosition touch;
@@ -175,7 +184,6 @@ void init_game_textures() {
 
 /*initialize audio*/
 void initialize_audio() {
-	testsound[0] = createSFX("romfs:/testfile.raw", SOUND_FORMAT_16BIT);
 	for (int i = 0; i < 8; i++) {
 		std::string filename = "romfs:/bounce" + std::to_string(i) + ".raw";
 		ball_bounce[i] = createSFX(filename.c_str(), SOUND_FORMAT_16BIT);
@@ -253,10 +261,11 @@ int main(int argc, char **argv)
 	consoleSetWindow(&killBox, 0, 28, 40, 2);
 	consoleSetWindow(&debugBox, 18, 4, 9, 12);
 
-	for (int i = 0; i < 8; i++) trail_new_frame_circle[7 - i].setDefaults(200.0, 120.0, (0.875 * (i + 1)));
-
 	the_paddle.setDefaults(175, 215, 50, 10, 19);
-	the_ball.setDefaults(200.0, 200.0, 7.0, 1);
+	the_ball[0].setDefaults(200.0, 200.0, 7.0, 1);
+	for (auto &tBall : the_ball)
+		for (int i = 0; i < 8; i++)
+			tBall.trail_new_frame_circle[7 - i].setDefaults(200.0, 120.0, (0.875 * (i + 1)));
 	
 	int bottom_screen_text = 0;
 
@@ -285,18 +294,18 @@ int main(int argc, char **argv)
 		}
 		/*begin game*/
 		if (kDown & KEY_SELECT) {
+			update_text = true;
 			lives = 3;
 			int result = 3;
-			the_ball.reset();
+			resetBalls(the_ball);
 			the_paddle.reset();
-			ball_angle = 0.0;
-			do ball_angle = rand() % 360; while (ball_angle < 225.0 || ball_angle > 315.0 || (ball_angle > 265 && ball_angle < 275));
+			setNewBallAngle(the_ball[0].angle);
 			for (int i = 0; i < def_level_count; i++)
 				for (int j = 0; j < 50; j++)
 					brick_array[i][j].reset();
 			level = 1; points = 0; last_power = 0;
 			times_power_1 = 0; times_power_2 = 0; times_power_3 = 0;
-			ball_is_attached = true;
+			the_ball[0].is_attached = true;
 			/*main breakout loop*/
 			while (true) {
 				result = breakout();
@@ -372,16 +381,8 @@ int main(int argc, char **argv)
 	return 0;
 }
 
-bool hitWallH = false, hitWallV = false;
-bool hasHitPadd = false, hasHitWall = false;
-bool isMovingRight = false;
-bool isInPaddle = false, isInWall = false;
-bool brickHitV = false, brickHitH = false;
-//int angle;
-int bricks_hit_this_frame;
 bool change_level;
 int thanks_text_display;
-bool has_hit_paddle, has_hit_wall;
 std::string debug_string;
 
 void run_powerup(int typef) {
@@ -407,17 +408,19 @@ void run_powerup(int typef) {
 	case 5:
 		the_paddle.remove_powerups();
 		the_paddle.has_multi = true;
-		the_paddle.spawn_multi(the_ball, ball_angle);
+		for (auto tBall : the_ball) {
+			if (tBall.exists) the_paddle.spawn_multi(tBall, the_ball);
+			break;
+		}
 		break;
 	}
 }
 
 int loseLife() {
 	lives--;
-	the_ball.reset();
 	the_paddle.reset();
-	ball_is_attached = true;
-	setNewBallAngle(ball_angle);
+	resetBalls(the_ball);
+	update_text = true;
 	return 0;
 }
 
@@ -429,24 +432,38 @@ int breakout()
 	if (kDown & KEY_SELECT || lives == 0) return 2;
 	if (kHeld & KEY_START) return 3;
 	/*move paddle (if applicable)*/
-	if (kHeld & (KEY_LEFT | KEY_RIGHT)) movePaddle((kHeld & KEY_LEFT ? false : true), the_paddle, ball_is_attached, the_ball);
+	if ((kHeld | kDown) & (KEY_LEFT | KEY_RIGHT)) movePaddle((kHeld & KEY_LEFT ? false : true), the_paddle, the_ball);
+	int balls_on_screen = 0;
+	for (auto &tBall : the_ball) {
+		if (tBall.getTop(false) > 240) tBall.exists = false;
+		if (tBall.exists) balls_on_screen++;
+	}
+	if (balls_on_screen == 0) return loseLife();
 
-	/*lose life if outside of game field*/
-	if (!the_paddle.has_multi) 
-		if (the_ball.getTop(false) > 240) return loseLife();
-	else for (int i = 0; i < 5; i++)
-		if (the_paddle.multi_ball[i].getTop(false) > 240) the_paddle.multi_ball[i].exists = false;
-
-	bool hasInteracted = false;
-	has_hit_paddle = false; has_hit_wall = false;
-	if (kDown & KEY_A && ball_is_attached)
-		ball_is_attached = false;
-	else if ((kDown | kHeld) & KEY_A && !ball_is_attached) {
+	for (auto &tBall : the_ball) {
+		if (tBall.exists) {
+			tBall.has_interacted = false;
+			tBall.has_hit_paddle = false;
+			tBall.has_hit_wall = false;
+		}
+	}
+	bool ball_was_shot = false;
+	if (kDown & KEY_A) {
+		for (auto &tBall : the_ball) {
+			if (tBall.is_attached) {
+				tBall.is_attached = false;
+				ball_was_shot = true;
+				update_text = true;
+			}
+		}
+	}
+	if ((kDown | kHeld) & KEY_A && !ball_was_shot) {
 		if (the_paddle.has_laser && !the_paddle.laser_on_screen) {
 			the_paddle.the_laser.setDefaults(the_paddle.paddle_mrect.x + (the_paddle.paddle_mrect.width / 2.0) - (the_paddle.the_laser.width / 2.0), the_paddle.paddle_mrect.y, 3, 30, 30);
 			the_paddle.laser_on_screen = true;
 		}
 	}
+
 	if (the_paddle.laser_on_screen) {
 		the_paddle.the_laser.setPosition(the_paddle.the_laser.x, the_paddle.the_laser.y - 8);
 		//trail_new_frame(the_paddle.the_laser);
@@ -455,133 +472,136 @@ int breakout()
 		if (other_number < the_number) the_number = other_number;
 		for (int i = 0; i < the_number; i++)
 			pp2d_draw_texture(the_paddle.the_laser.texture_id, the_paddle.the_laser.x, the_paddle.the_laser.y + i);
-		for (int i = 0; i < the_paddle.the_laser.height; i++) pp2d_draw_texture(the_paddle.the_laser.texture_id, trail_new_frame_laser[i].x, trail_new_frame_laser[i].y);
 		for (int i = 0; i < 50; i++)
 			if (test_collision(the_paddle.the_laser, brick_array[level][i].brick_mrect) && brick_array[level][i].exists) {
 				brick_array[level][i].destroy();
 				the_paddle.laser_on_screen = false;
 			}
-		if (off_screen(the_paddle.the_laser))
-			the_paddle.laser_on_screen = false;
+		if (off_screen(the_paddle.the_laser)) the_paddle.laser_on_screen = false;
 	}
 	/*run main engine code if the ball is not attached to the paddle*/
-	if (!ball_is_attached) {
-		bricks_hit_this_frame = 0;
-		change_level = false;
-		/*main hit detection engine (runs 300 times per frame)*/
-		for (int i = 0; i < (cMode ? 100 : 300); i++) {
-			hasInteracted = false;
-			hasHitPadd = (the_paddle.getTop(false) <= the_ball.getBottom(false) && (the_paddle.paddle_mrect.x <= the_ball.ball_mcirc.x && the_ball.ball_mcirc.x <= the_paddle.paddle_mrect.x + the_paddle.paddle_mrect.width /*balls x coordinate is <= paddles x coordinate + it's width*/));
-			if (hasHitPadd && the_ball.getBottom(false) >= the_paddle.getTop(false) + 0.02) hasHitPadd = false;
-			if (hasHitPadd) has_hit_paddle = true;
-			//Add gravity powerup (magnet but different) rotates around paddle until button pressed.
-			hasHitWall = (the_ball.getLeft(true) <= 0.00 || the_ball.getRight(true) >= 400.00 || the_ball.getTop(false) <= 0.00);
-			if (hasHitWall) has_hit_wall = true;
-			/*first time ball is detected touching wall*/
-			if (hasHitWall && !isInWall) {
-				hasInteracted = true;
-				isInWall = true;
-				ball_angle = (the_ball.getTop(false) <= 0.00) ? (360.0 - ball_angle) : (180.0 - ball_angle);
-			}
-
-			while (ball_angle < 0.0) ball_angle += 360.0;
-			while (ball_angle > 360.0) ball_angle -= 360.0;
-
-			/*first time ball is detected touching paddle*/
-			if (hasHitPadd && !isInPaddle) {
-				hasInteracted = true;
-				isInPaddle = true;
-				double paddle_width_ninth = the_paddle.paddle_mrect.width / 9.0;
-				int angle = 1;
-				for (double z = 1.0; z < 9.0; z += 1.0)
-					if (the_ball.getBottom(true) >= the_paddle.paddle_mrect.x + (paddle_width_ninth * z))
-						angle += 1;
-				/*change ball angle according to the area of paddle hit*/
-				double angle_of_change = 0.0;
-				switch (angle) {
-				case 4: angle_of_change -= 10.0;
-				case 3: angle_of_change -= 10.0;
-				case 2: angle_of_change -= 10.0;
-				case 1: angle_of_change -= 10.0;
-					break;
-				case 9: angle_of_change += 10.0;
-				case 8: angle_of_change += 10.0;
-				case 7: angle_of_change += 10.0;
-				case 6: angle_of_change += 10.0;
-					break;
+	for (auto &tBall : the_ball)
+		tBall.bricks_hit = 0;
+	change_level = false;
+	//main hit detection engine (runs 300 times per frame)
+	for (int i = 0; i < (cMode ? 100 : 300); i++) {
+		for (auto &tBall : the_ball) {
+			if (tBall.exists && !tBall.is_attached) {
+				tBall.has_interacted = false;
+				tBall.hasHitPadd = (the_paddle.getTop(false) <= tBall.getBottom(false) && (the_paddle.paddle_mrect.x <= tBall.ball_mcirc.x && tBall.ball_mcirc.x <= the_paddle.paddle_mrect.x + the_paddle.paddle_mrect.width)); //balls x coordinate is <= paddles x coordinate + it's width
+				if (tBall.hasHitPadd && tBall.getBottom(false) >= the_paddle.getTop(false) + 0.02) tBall.hasHitPadd = false;
+				if (tBall.hasHitPadd) tBall.has_hit_paddle = true;
+				//Add gravity powerup (magnet but different) rotates around paddle until button pressed.
+				tBall.hasHitWall = (tBall.getLeft(true) <= 0.00 || tBall.getRight(true) >= 400.00 || tBall.getTop(false) <= 0.00);
+				if (tBall.hasHitWall) tBall.has_hit_wall = true;
+				//first time ball is detected touching wall
+				if (tBall.hasHitWall && !tBall.isInWall) {
+					tBall.has_interacted = true;
+					tBall.isInWall = true;
+					tBall.angle = (tBall.getTop(false) <= 0.00) ? (360.0 - tBall.angle) : (180.0 - tBall.angle);
 				}
-				ball_angle = (360.0 - ball_angle) + angle_of_change;
-			}
-			/*large if statement to determine if a brick has been hit (run once per brick)*/
-			for (int j = 0; j < 50; j++) {
-				if (test_collision(the_ball.ball_mcirc, brick_array[level][j].brick_mrect, false)) brickHitV = true;
-				if (test_collision(the_ball.ball_mcirc, brick_array[level][j].brick_mrect, true)) brickHitH = true;
-				/*code if brick(s) hit*/
-				if (brickHitV || brickHitH) {
-					/*check if brick is actually in play*/
-					if (brick_array[level][j].exists) {
-						brick_array[level][j].destroy();
-						if (!brick_array[level][j].exists) {
-							points += brick_array[level][j].point_value();
-							last_power = brick_array[level][j].random_powerup();
-							if (last_power != 0) brick_array[level][j].spawn_powerup(last_power);
-						}
-						bricks_hit_this_frame++;
-						/*if brick hit V and H reverse direction*/
-						ball_angle = (brickHitV ? (brickHitH ? ball_angle - 180.0 : 360.0 - ball_angle) : (brickHitH ? 180 - ball_angle : ball_angle));
+
+				while (tBall.angle < 0.0) tBall.angle += 360.0;
+				while (tBall.angle > 360.0) tBall.angle -= 360.0;
+
+				//first time ball is detected touching paddle
+				if (tBall.hasHitPadd && !tBall.isInPaddle) {
+					tBall.has_interacted = true;
+					tBall.isInPaddle = true;
+					double paddle_width_ninth = the_paddle.paddle_mrect.width / 9.0;
+					int angle = 1;
+					for (double z = 1.0; z < 9.0; z += 1.0)
+						if (tBall.getBottom(true) >= the_paddle.paddle_mrect.x + (paddle_width_ninth * z))
+							angle += 1;
+					//change ball angle according to the area of paddle hit
+					double angle_of_change = 0.0;
+					switch (angle) {
+					case 4: angle_of_change -= 10.0;
+					case 3: angle_of_change -= 10.0;
+					case 2: angle_of_change -= 10.0;
+					case 1: angle_of_change -= 10.0;
+						break;
+					case 9: angle_of_change += 10.0;
+					case 8: angle_of_change += 10.0;
+					case 7: angle_of_change += 10.0;
+					case 6: angle_of_change += 10.0;
+						break;
 					}
-					brickHitV = false; brickHitH = false;
+					tBall.angle = (360.0 - tBall.angle) + angle_of_change;
 				}
+				//large if statement to determine if a brick has been hit (run once per brick)
+				for (int j = 0; j < 50; j++) {
+					if (test_collision(tBall.ball_mcirc, brick_array[level][j].brick_mrect, false)) tBall.brickHitV = true;
+					if (test_collision(tBall.ball_mcirc, brick_array[level][j].brick_mrect, true)) tBall.brickHitH = true;
+					//code if brick(s) hit
+					if (tBall.brickHitV || tBall.brickHitH) {
+						//check if brick is actually in play
+						if (brick_array[level][j].exists) {
+							brick_array[level][j].destroy();
+							if (!brick_array[level][j].exists) {
+								points += brick_array[level][j].point_value();
+								last_power = brick_array[level][j].random_powerup();
+								if (last_power != 0) brick_array[level][j].spawn_powerup(last_power);
+							}
+							tBall.bricks_hit++;
+							//if brick hit V and H reverse direction
+							tBall.angle = (tBall.brickHitV ? (tBall.brickHitH ? tBall.angle - 180.0 : 360.0 - tBall.angle) : (tBall.brickHitH ? 180 - tBall.angle : tBall.angle));
+						}
+						tBall.brickHitV = false; tBall.brickHitH = false;
+					}
+				}
+				setBallDirection(tBall, 2.0);
+				if (tBall.hasHitPadd && tBall.isInPaddle)
+					moveBall(tBall, cMode);
+				else if (tBall.isInPaddle && !tBall.hasHitPadd)
+					tBall.isInPaddle = false;
+				if (tBall.hasHitWall && tBall.isInWall)
+					moveBall(tBall, cMode);
+				else if (tBall.isInWall && !tBall.hasHitWall)
+					tBall.isInWall = false;
+				if (!tBall.has_interacted && !tBall.hasHitPadd && !tBall.hasHitWall && !tBall.isInPaddle && !tBall.isInWall) moveBall(tBall, cMode);
+				//if paddle and wall hit in same frame, ball is "crushed" (this could cause problems later)
+				if (tBall.hasHitPadd && tBall.hasHitWall) tBall.exists = false;
+				int bricks_available = 0;
+				for (int brick_array_pos = 0; brick_array_pos < 50; brick_array_pos++)
+					if (brick_array[level][brick_array_pos].exists)
+						bricks_available++;
+				if (bricks_available == 0) change_level = true;
 			}
-			setBallDirection(ball_dx, ball_dy, ball_angle, 2.0);
-			if (hasHitPadd && isInPaddle)
-				moveBall(the_ball, ball_dx, ball_dy, cMode);
-			else if (isInPaddle && !hasHitPadd)
-				isInPaddle = false;
-			if (hasHitWall && isInWall)
-				moveBall(the_ball, ball_dx, ball_dy, cMode);
-			else if (isInWall && !hasHitWall)
-				isInWall = false;
-			if (!hasInteracted && !hasHitPadd && !hasHitWall && !isInPaddle && !isInWall) moveBall(the_ball, ball_dx, ball_dy, cMode);
-			/*if paddle and wall hit in same frame, ball is "crushed" (this could cause problems later)*/
-			if (hasHitPadd && hasHitWall) return loseLife();
-			int bricks_available = 0;
-			for (int brick_array_pos = 0; brick_array_pos < 50; brick_array_pos++)
-				if (brick_array[level][brick_array_pos].exists)
-					bricks_available++;
-			if (bricks_available == 0) change_level = true;
 		}
-		/*either increase level, or go to win screen*/
-		if (change_level == true) {
-			if (level == def_level_count - 1) {
-				int thanks_return;
-				thanks_text_display = 0;
-				do (thanks_return = thanks_for_playing_the_beta()); while (thanks_return == 0);
-				return thanks_return;
-			}
-			else {
-				level++;
-				ball_is_attached = true;
-				the_ball.reset();
-				the_paddle.reset();
-				while (ball_angle < 225.0 || ball_angle > 315.0 || (ball_angle > 265 && ball_angle < 275)) ball_angle = rand() % 360;
-			}
+	}
+	//either increase level, or go to win screen
+	if (change_level == true) {
+		if (level == def_level_count - 1) {
+			int thanks_return;
+			thanks_text_display = 0;
+			do (thanks_return = thanks_for_playing_the_beta()); while (thanks_return == 0);
+			return thanks_return;
 		}
-		/*to avoid a glitch, if more than one brick is hit on the same frame the direction is reversed*/
-		if (bricks_hit_this_frame > 1) {
-			ball_angle += 180.0;
-			if (ball_angle > 360.0)
-				ball_angle -= 360.0;
+		else {
+			level++;
+			resetBalls(the_ball);
+			the_paddle.reset();
+		}
+	}
+	//to avoid a glitch, if more than one brick is hit on the same frame the direction is reversed
+	for (auto &tBall : the_ball) {
+		if (tBall.bricks_hit > 1) {
+			tBall.angle += 180.0;
+			if (tBall.angle > 360.0)
+				tBall.angle -= 360.0;
 		}
 	}
 
 	/*plays random SFX if a brick has been hit*/
-	if (bricks_hit_this_frame > 0 && !ball_is_attached) {
-		update_text = true;
-		int which_bounce = rand() % 7;
-		playSFX(ball_bounce[which_bounce]);
+	for (auto &tBall : the_ball) {
+		if (tBall.bricks_hit > 0) {
+			update_text = true;
+			int which_bounce = rand() % 7;
+			playSFX(ball_bounce[which_bounce]);
+		}
+		if (tBall.has_hit_paddle || tBall.has_hit_wall) playSFX(ball_bounce[7]);
 	}
-	if (has_hit_paddle || has_hit_wall) playSFX(ball_bounce[7]);
 
 	trail_new_frame(the_ball);
 
@@ -600,9 +620,11 @@ int breakout()
 	for (int i = 0; i < 50; i++)
 		if (brick_array[level][i].exists)
 			draw_object(brick_array[level][i]);
-	for (int i = 7; i > 0; i--)
-		pp2d_draw_texture_scale(27 - i, (trail_new_frame_circle[i].x - trail_new_frame_circle[i].rad) + 1.0, (trail_new_frame_circle[i].y - trail_new_frame_circle[i].rad) + 2.0, (7 - i) / 8.0, (7 - i) / 8.0); //RGBA8(0xFF, 0xFF, 0xFF, 32 * (7 - i))
-	draw_object(the_ball);
+	for (auto tBall : the_ball)
+		for (int i = 7; i > 0; i--)
+			pp2d_draw_texture_scale(27 - i, (tBall.trail_new_frame_circle[i].x - tBall.trail_new_frame_circle[i].rad) + 1.0, (tBall.trail_new_frame_circle[i].y - tBall.trail_new_frame_circle[i].rad) + 2.0, (7 - i) / 8.0, (7 - i) / 8.0); //RGBA8(0xFF, 0xFF, 0xFF, 32 * (7 - i))
+	for (auto tBall : the_ball)
+		draw_object(tBall);
 	if (update_text) {
 		std::cout << ANSI "13;0" PEND;
 		for (int i = 0; i < 3; i++) std::cout << "                                        ";
@@ -822,16 +844,15 @@ int level_designer() {
 			initialize_brick_array();
 			lives = 3;
 			int result = 3;
-			the_ball.reset();
+			resetBalls(the_ball);
 			the_paddle.reset();
-			ball_angle = 0.0;
-			do ball_angle = rand() % 360; while (ball_angle < 225.0 || ball_angle > 315.0 || (ball_angle > 265 && ball_angle < 275));
 			for (int i = 0; i < def_level_count; i++)
 				for (int j = 0; j < 50; j++)
 					brick_array[i][j].reset();
 			level = 0; points = 0; last_power = 0;
 			times_power_1 = 0; times_power_2 = 0; times_power_3 = 0;
-			ball_is_attached = true;
+			for (auto &tBall : the_ball)
+				tBall.is_attached = true;
 			/*main breakout loop*/
 			while (true) {
 				result = breakout();

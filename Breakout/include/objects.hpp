@@ -436,6 +436,10 @@ public values: existance, mask, and texture
 class ball {
 	int internal_ball_type;
 public:
+	bool brickHitH, brickHitV;
+	double dx, dy;
+	std::vector<double> trail_new_frame_x, trail_new_frame_y;
+	std::vector<mCircle> trail_new_frame_circle;
 	/*whether or not the ball exists*/
 	bool exists;
 	/*ball angle*/
@@ -444,6 +448,22 @@ public:
 	mCircle ball_mcirc;
 	/*texture*/
 	int texture_id;
+	/*Whether or not the ball has interacted this frame*/
+	bool has_interacted;
+	/*Whether or not the ball has hit the paddle this frame*/
+	bool hasHitPadd;
+	bool has_hit_paddle;
+	/*Whether or not the ball has hit a wall this frame*/
+	bool hasHitWall;
+	bool has_hit_wall;
+	/*Whether or not the ball is attached to the paddle currently*/
+	bool is_attached;
+	/*Whether or not the ball is in the wall*/
+	bool isInWall;
+	/*Whether or not the ball is in the paddle*/
+	bool isInPaddle;
+	/*Bricks hit this frame*/
+	int bricks_hit;
 	/*
 	sets ball's default position, size, and type
 	*/
@@ -454,11 +474,18 @@ public:
 		if (!(ball_texture_id[ball_type] == 0))
 			texture_id = ball_texture_id[ball_type];
 		exists = true;
+		trail_new_frame_x.resize(8);
+		trail_new_frame_y.resize(8);
+		trail_new_frame_circle.resize(8);
 	}
 	/*resets the ball to it's default values*/
 	void reset()
 	{
 		ball_mcirc.reset();
+		exists = true;
+		hasHitPadd = false, hasHitWall = false;
+		isInPaddle = false, isInWall = false;
+		brickHitV = false, brickHitH = false;
 	}
 	/*
 	returns the leftmost side of the ball
@@ -560,14 +587,20 @@ public:
 		default_height = bheight;
 	}
 	/*spawns extra balls*/
-	void spawn_multi(ball the_ball, double current_angle) {
-		multi_ball[0].setDefaults(the_ball.ball_mcirc.x, the_ball.ball_mcirc.y, the_ball.ball_mcirc.rad, 1);
-		multi_ball[1].setDefaults(the_ball.ball_mcirc.x, the_ball.ball_mcirc.y, the_ball.ball_mcirc.rad, 1);
-		multi_ball[2].setDefaults(the_ball.ball_mcirc.x, the_ball.ball_mcirc.y, the_ball.ball_mcirc.rad, 1);
-		multi_ball[3].setDefaults(the_ball.ball_mcirc.x, the_ball.ball_mcirc.y, the_ball.ball_mcirc.rad, 1);
-		multi_ball[4] = the_ball;
-		for (int i = 0; i < 4; i++)
-			multi_ball[i].angle = current_angle + (72 * (i + 1));
+	void spawn_multi(ball tBall, std::vector<ball> &ball_vec) {
+		ball new_ball_1, new_ball_2;
+		new_ball_1.setDefaults(tBall.ball_mcirc.x, tBall.ball_mcirc.y, tBall.ball_mcirc.rad, 1);
+		new_ball_2.setDefaults(tBall.ball_mcirc.x, tBall.ball_mcirc.y, tBall.ball_mcirc.rad, 1);
+		new_ball_1.angle = tBall.angle - 20.0;
+		new_ball_2.angle = tBall.angle + 20.0;
+		for (int i = 0; i < 8; i++) {
+			new_ball_1.trail_new_frame_circle[7 - i].setDefaults(tBall.ball_mcirc.x, tBall.ball_mcirc.y, (0.875 * (i + 1)));
+			new_ball_2.trail_new_frame_circle[7 - i].setDefaults(tBall.ball_mcirc.x, tBall.ball_mcirc.y, (0.875 * (i + 1)));
+		}
+		new_ball_1.is_attached = false;
+		new_ball_2.is_attached = false;
+		ball_vec.push_back(new_ball_1);
+		ball_vec.push_back(new_ball_2);
 	}
 	/*runs script for enlarging paddle*/
 	void getBig() {

@@ -32,7 +32,7 @@ extern std::vector<FILE*> saved_level;
 extern int designed_level[SAVE_FILES][50];
 extern std::string saved_level_filename[SAVE_FILES];
 extern int vernumqik;
-extern size_t ball00ID;
+extern size_t ball00ID, paddleBigID, paddleSmallID;
 extern std::vector<size_t> pLaserID, pLifeID, pMultiBallID, pPaddleBigID, pPaddleSmallID;
 
 #define ANSI "\x1b["

@@ -555,7 +555,7 @@ class paddle {
 	double default_height;
 public:
 	/*texture*/
-	int texture_id;
+	size_t texture_id;
 	/*mask*/
 	mRectangle paddle_mrect;
 	/*whether or not laser ability active*/
@@ -580,7 +580,7 @@ public:
 	bheight: paddle height (for collision)
 	paddle_texture_id: texture id for paddle
 	*/
-	void setDefaults(double bx, double by, double bwidth, double bheight, int paddle_texture_id)
+	void setDefaults(double bx, double by, double bwidth, double bheight, size_t paddle_texture_id)
 	{
 		paddle_mrect.setDefaults(bx, by, bwidth, bheight);
 		texture_id = paddle_texture_id;
@@ -610,13 +610,13 @@ public:
 		paddle_mrect.x -= 10;
 		if (paddle_mrect.x < 1) paddle_mrect.x = 1;
 		if (paddle_mrect.x > 329) paddle_mrect.x = 329;
-		texture_id = 31;
+		texture_id = paddleBigID;
 	}
 	/*runs script for shrinking paddle*/
 	void getSmall() {
 		paddle_mrect.width = 30;
 		paddle_mrect.x += 10;
-		texture_id = 32;
+		texture_id = paddleSmallID;
 	}
 	/*removes powerups from paddle*/
 	void remove_powerups() {

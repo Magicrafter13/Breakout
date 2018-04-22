@@ -429,7 +429,7 @@ void run_powerup(int typef) {
 	case 1:
 		the_paddle.remove_powerups();
 		the_paddle.has_laser = true;
-		the_paddle.texture_id = 35;
+		the_paddle.texture_id = laserPaddleID;
 		break;
 	case 2:
 		the_paddle.remove_powerups();

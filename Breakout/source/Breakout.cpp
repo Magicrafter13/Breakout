@@ -34,6 +34,8 @@ int press_select_frame = 0; bool press_select_visible = true;
 
 paddle the_paddle; std::vector<ball> the_ball(1); brick brick_array[def_level_count][50];
 SFX_s *ball_bounce[8];
+size_t titleID, thanksBetaID, waveformID, paddleID, ball00ID, pressSelectID, laserPaddleID, laserID, paddleBigID, paddleSmallID;
+std::vector<size_t> extraBallID, pLaserID(6), pLifeID(6), pMultiBallID(6), pPaddleBigID(6), pPaddleSmallID(6);
 
 bool cMode = false, update_text;
 
@@ -134,52 +136,89 @@ void closeSD()
 
 /*initialize textures*/
 void init_game_textures() {
-	for (size_t i = 0; i < 15; i++) {
+	size_t id;
+	for (id = 0; id < 15; id++) {
 		std::string temp = "romfs:/sprites/brick/brick";
-		if (i < 10) temp += "0";
-		temp += std::to_string(i) + ".png";
-		pp2d_load_texture_png(i, temp.c_str());
+		if (id < 10) temp += "0";
+		temp += std::to_string(id) + ".png";
+		pp2d_load_texture_png(id, temp.c_str());
 	}
-	pp2d_load_texture_png(15, "romfs:/sprites/background/Title.png");
-	pp2d_load_texture_png(16, "romfs:/sprites/background/thanksbeta.png");
-	pp2d_load_texture_png(17, "romfs:/sprites/background/waveform.png");
-	pp2d_load_texture_png(18, "romfs:/sprites/ball00.png");
-	pp2d_load_texture_png(19, "romfs:/sprites/paddle.png");
-	for (size_t i = 20; i < 27; i++) {
-		int thing = i - 19;
-		std::string temp = "romfs:/sprites/misc/extra_ball/ball";
-		if (thing < 10) temp += "0";
-		temp += std::to_string(thing) + ".png";
-		pp2d_load_texture_png(i, temp.c_str());
+	std::vector<std::string> backgroundS = {
+		"press_select.png",
+		"thanksbeta.png",
+		"Title.png",
+		"waveform.png"
+	};
+	std::vector<size_t*> backgroundI = {
+		&pressSelectID,
+		&thanksBetaID,
+		&titleID,
+		&waveformID
+	};
+	size_t i = id;
+	for (id = i; id < i + backgroundS.size(); id++) {
+		pp2d_load_texture_png(id, ("romfs:/sprites/background/" + backgroundS[id - i]).c_str());
+		*backgroundI[id - i] = id;
 	}
-	pp2d_load_texture_png(27, "romfs:/sprites/background/press_select.png");
-	pp2d_load_texture_png(28, "romfs:/sprites/powerup/life00.png");
-	pp2d_load_texture_png(29, "romfs:/sprites/powerup/laser00.png");
-	pp2d_load_texture_png(30, "romfs:/sprites/misc/laser_trail.png");
-	pp2d_load_texture_png(31, "romfs:/sprites/paddle_big.png");
-	pp2d_load_texture_png(32, "romfs:/sprites/paddle_small.png");
-	pp2d_load_texture_png(33, "romfs:/sprites/powerup/paddle_big00.png");
-	pp2d_load_texture_png(34, "romfs:/sprites/powerup/paddle_small00.png");
-	pp2d_load_texture_png(35, "romfs:/sprites/misc/laser_paddle.png");
-	pp2d_load_texture_png(61, "romfs:/sprites/powerup/multi_ball00.png");
-	std::vector<std::string> powerup_capsule_names = {
-		"life",
+	std::vector<std::string> miscS {
+		"laser_paddle.png",
+		"laser_trail.png"
+	};
+	std::vector<size_t*> miscI {
+		&laserPaddleID,
+		&laserID
+	};
+	i = id;
+	for (id = i; id < i + miscS.size(); id++) {
+		pp2d_load_texture_png(id, ("romfs:/sprites/misc/" + miscS[id - i]).c_str());
+		*miscI[id - i] = id;
+	}
+	i = id;
+	int extra_balls = 7;
+	extraBallID.resize(extra_balls);
+	for (id = i; id < i + extra_balls; id++) {
+		pp2d_load_texture_png(id, ("romfs:/sprites/misc/extra_ball/ball" + (((id - i + 1) < 10) ? ("0" + std::to_string((id - i + 1))) : (std::to_string((id - i + 1)))) + ".png").c_str());
+		extraBallID[id - i] = id;
+	}
+	std::vector<std::string> powerupS {
 		"laser",
+		"life",
+		"multi_ball",
 		"paddle_big",
-		"paddle_small",
-		"multi_ball"
+		"paddle_small"
 	};
-	std::vector<int> which_vector = {
-		3, 0, 1, 2, 4
+	std::vector<std::vector<size_t>*> powerupI = {
+		&pLaserID,
+		&pLifeID,
+		&pMultiBallID,
+		&pPaddleBigID,
+		&pPaddleSmallID
 	};
-	for (size_t i = 0; i < 5; i++)
-		for (size_t j = 1; j < powerup_texture_id[which_vector[i]].size() + 1; j++) {
-			std::string temp_file_name = "romfs:/sprites/powerup/" + powerup_capsule_names[i];
-			if (j < 10) temp_file_name += "0";
-			temp_file_name += std::to_string(j) + ".png";
-			fprintf(debug_file, "%s\n", temp_file_name.c_str());
-			pp2d_load_texture_png(powerup_texture_id[which_vector[i]][j - 1], temp_file_name.c_str());
+	for (int f = 0; f < AMOUNT_OF_POWERUPS; f++) {
+		i = id;
+		powerupI[f]->resize(1);
+		for (id = i; id < i + 6; id++) {
+			pp2d_load_texture_png(id, ("romfs:/sprites/powerup/" + powerupS[f] + (((id - i) < 10) ? ("0" + std::to_string((id - i))) : (std::to_string((id - i)))) + ".png").c_str());
+			powerupI[f]->push_back(id);
 		}
+	}
+	std::vector<std::string> rootS = {
+		"ball00.png",
+		"paddle.png",
+		"paddle_big.png",
+		"paddle_small.png"
+	};
+	std::vector<size_t*> rootI = {
+		&ball00ID,
+		&paddleID,
+		&paddleBigID,
+		&paddleSmallID
+	};
+	i = id;
+	for (id = i; id < i + 4; id++) {
+		pp2d_load_texture_png(id, ("romfs:/sprites/" + rootS[id - i]).c_str());
+		*rootI[id - i] = id;
+	}
 };
 
 /*initialize audio*/
@@ -261,7 +300,7 @@ int main(int argc, char **argv)
 	consoleSetWindow(&killBox, 0, 28, 40, 2);
 	consoleSetWindow(&debugBox, 18, 4, 9, 12);
 
-	the_paddle.setDefaults(175, 215, 50, 10, 19);
+	the_paddle.setDefaults(175, 215, 50, 10, paddleID);
 	the_ball[0].setDefaults(200.0, 200.0, 7.0, 1);
 	for (auto &tBall : the_ball)
 		for (int i = 0; i < 8; i++)
@@ -348,9 +387,9 @@ int main(int argc, char **argv)
 
 		pp2d_begin_draw(GFX_TOP, GFX_LEFT);
 		draw_object(the_paddle);
-		pp2d_draw_texture(15, 80, 20);
-		pp2d_draw_texture(19, 122, 92);
-		if (press_select_visible) pp2d_draw_texture(27, 100, 180);
+		pp2d_draw_texture(titleID, 80, 20);
+		pp2d_draw_texture(paddleID, 122, 92);
+		if (press_select_visible) pp2d_draw_texture(pressSelectID, 100, 180);
 		pp2d_end_draw();
 
 		/*after half a second, Press Select to play! is toggled*/
@@ -622,7 +661,7 @@ int breakout()
 			draw_object(brick_array[level][i]);
 	for (auto tBall : the_ball)
 		for (int i = 7; i > 0; i--)
-			pp2d_draw_texture_scale(27 - i, (tBall.trail_new_frame_circle[i].x - tBall.trail_new_frame_circle[i].rad) + 1.0, (tBall.trail_new_frame_circle[i].y - tBall.trail_new_frame_circle[i].rad) + 2.0, (7 - i) / 8.0, (7 - i) / 8.0); //RGBA8(0xFF, 0xFF, 0xFF, 32 * (7 - i))
+			pp2d_draw_texture_scale(extraBallID[i], (tBall.trail_new_frame_circle[i].x - tBall.trail_new_frame_circle[i].rad) + 1.0, (tBall.trail_new_frame_circle[i].y - tBall.trail_new_frame_circle[i].rad) + 2.0, (7 - i) / 8.0, (7 - i) / 8.0); //RGBA8(0xFF, 0xFF, 0xFF, 32 * (7 - i))
 	for (auto tBall : the_ball)
 		draw_object(tBall);
 	if (update_text) {
@@ -652,7 +691,7 @@ int thanks_for_playing_the_beta() {
 	if (kDown & (KEY_SELECT | KEY_A | KEY_B | KEY_X | KEY_Y | KEY_L | KEY_R | KEY_ZL | KEY_ZR)) return 2;
 	if (kHeld & KEY_START) return 3;
 	pp2d_begin_draw(GFX_TOP, GFX_LEFT);
-	pp2d_draw_texture(16, 80, 20);
+	pp2d_draw_texture(thanksBetaID, 80, 20);
 	/*run text display once (to avoid screen tear)*/
 	if (thanks_text_display == 0) {
 		std::cout << ANSI "0;0" PEND;
@@ -715,8 +754,8 @@ int extras_10_13_2017()
 	{
 		pp2d_begin_draw(GFX_TOP, GFX_LEFT);
 		pp2d_draw_texture_scale(0, 20, 20, 2.0, 2.0);
-		pp2d_draw_texture(19, 350, 110);
-		pp2d_draw_texture(17, 40, 97);
+		pp2d_draw_texture(paddleID, 350, 110);
+		pp2d_draw_texture(waveformID, 40, 97);
 		hidScanInput();
 		kDown = hidKeysDown();
 		if (kDown & (KEY_SELECT | KEY_A | KEY_B | KEY_X | KEY_Y | KEY_L | KEY_R | KEY_ZL | KEY_ZR | KEY_START)) break;
@@ -790,7 +829,7 @@ int level_designer() {
 			for (int b = 0; b < 10; b++)
 			{
 				if (!designed_level[selection][array_step] == 0) pp2d_draw_texture(brick_texture_by_type[designed_level[selection][array_step]], (40 * b) + 2, (20 * a) + 2);
-				if (array_step == current_spot) pp2d_draw_texture(18, (40 * b) + 20, (20 * a) + 8);
+				if (array_step == current_spot) pp2d_draw_texture(ball00ID, (40 * b) + 20, (20 * a) + 8);
 				array_step++;
 			}
 		pp2d_end_draw();
@@ -801,14 +840,14 @@ int level_designer() {
 		if (kDown & KEY_LEFT && current_spot > 0) current_spot--;
 		if (kDown & KEY_RIGHT && current_spot < 49) current_spot++;
 		if (kDown & KEY_R) {
-			if (designed_level[selection][current_spot] == 10)
+			if (designed_level[selection][current_spot] == (brick_types - 1))
 				designed_level[selection][current_spot] = 0;
 			else
 				designed_level[selection][current_spot]++;
 		}
 		if (kDown & KEY_L) {
 			if (designed_level[selection][current_spot] == 0)
-				designed_level[selection][current_spot] = 10;
+				designed_level[selection][current_spot] = (brick_types - 1);
 			else
 				designed_level[selection][current_spot]--;
 		}

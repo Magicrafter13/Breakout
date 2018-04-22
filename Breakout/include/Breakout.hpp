@@ -24,6 +24,7 @@ extern PrintConsole bottomScreen, versionWin, killBox, debugBox;
 #define ball_sprites 7
 #define def_level_count 6
 #define SAVE_FILES 3
+#define AMOUNT_OF_POWERUPS 5
 
 extern std::string versiontxtt, versiontxtn;
 extern std::string buildnumber, ishupeversion;
@@ -31,6 +32,8 @@ extern std::vector<FILE*> saved_level;
 extern int designed_level[SAVE_FILES][50];
 extern std::string saved_level_filename[SAVE_FILES];
 extern int vernumqik;
+extern size_t ball00ID;
+extern std::vector<size_t> pLaserID, pLifeID, pMultiBallID, pPaddleBigID, pPaddleSmallID;
 
 #define ANSI "\x1b["
 #define RED "31"

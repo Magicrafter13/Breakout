@@ -1,8 +1,8 @@
 #pragma once
 
-extern std::vector<std::vector<int>> powerup_texture_id;
-extern int brick_texture_by_type[brick_types];
-extern int brick_second_texture_by_type[brick_types];
+extern std::vector<std::vector<size_t>> powerup_texture_id;
+extern size_t brick_texture_by_type[brick_types];
+extern size_t brick_second_texture_by_type[brick_types];
 /*point value by brick type*/
 extern int brick_point_value[brick_types];
 
@@ -152,9 +152,9 @@ public:
 	/*mask*/
 	mRectangle mask;
 	/*texture id*/
-	int texture_id;
+	size_t texture_id;
 	/*texture id array [animation]*/
-	std::vector<int> animation_id;
+	std::vector<size_t> animation_id;
 	/*frame count*/
 	int frame_count;
 	/*
@@ -167,7 +167,7 @@ public:
 	int set_texture: texture_id
 	int type: powerup type
 	*/
-	void setDefaults(int set_x, int set_y, int set_width, int set_height, int set_texture, int type, std::vector<int> set_animate, int set_frame_count) {
+	void setDefaults(int set_x, int set_y, int set_width, int set_height, size_t set_texture, int type, std::vector<size_t> set_animate, int set_frame_count) {
 		mask.setDefaults(set_x, set_y, set_width, set_height);
 		x = set_x;
 		y = set_y;
@@ -427,7 +427,9 @@ public:
 };
 
 /*id for textures (or null)*/
-extern int ball_texture_id[2];
+extern std::vector<size_t*> ball_texture_id;
+
+extern size_t stZ;
 
 /*
 Ball object
@@ -447,7 +449,7 @@ public:
 	/*mask*/
 	mCircle ball_mcirc;
 	/*texture*/
-	int texture_id;
+	size_t texture_id;
 	/*Whether or not the ball has interacted this frame*/
 	bool has_interacted;
 	/*Whether or not the ball has hit the paddle this frame*/
@@ -471,8 +473,8 @@ public:
 	{
 		ball_mcirc.setDefaults(bx, by, brad);
 		internal_ball_type = ball_type;
-		if (!(ball_texture_id[ball_type] == 0))
-			texture_id = ball_texture_id[ball_type];
+		if (!(*ball_texture_id[ball_type] == stZ))
+			texture_id = *ball_texture_id[ball_type];
 		exists = true;
 		trail_new_frame_x.resize(8);
 		trail_new_frame_y.resize(8);

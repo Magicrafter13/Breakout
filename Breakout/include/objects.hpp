@@ -1,6 +1,6 @@
 #pragma once
 
-extern std::vector<std::vector<size_t>> powerup_texture_id;
+extern std::vector<std::vector<size_t>*> powerup_texture_id;
 extern size_t brick_texture_by_type[brick_types];
 extern size_t brick_second_texture_by_type[brick_types];
 /*point value by brick type*/
@@ -287,13 +287,9 @@ public:
 			wait_frame = 0;
 			powerup_timer++;
 		}
-		if (powerup_timer > my_powerup.frame_count)
+		if (powerup_timer >= my_powerup.frame_count)
 			powerup_timer = 0;
-		if (powerup_timer == 0)
-			pp2d_draw_texture(my_powerup.texture_id, my_powerup.x, my_powerup.y);
-		else {
-			pp2d_draw_texture(my_powerup.animation_id[powerup_timer - 1], my_powerup.x, my_powerup.y);
-		}
+		pp2d_draw_texture(my_powerup.animation_id[powerup_timer], my_powerup.x, my_powerup.y);
 		wait_frame++;
 	}
 	/*
@@ -346,22 +342,7 @@ public:
 	}
 	/*spawns powerup*/
 	void spawn_powerup(int type) {
-		switch (type) {
-		case 1:
-			my_powerup.setDefaults(brick_mrect.x + ((brick_mrect.width - 28) / 2), brick_mrect.y + ((brick_mrect.height - 7) / 2), 18, 7, 29, type, powerup_texture_id[type - 1], powerup_texture_id[type - 1].size());
-			break;
-		case 2:
-			my_powerup.setDefaults(brick_mrect.x + ((brick_mrect.width - 28) / 2), brick_mrect.y + ((brick_mrect.height - 7) / 2), 18, 7, 33, type, powerup_texture_id[type - 1], powerup_texture_id[type - 1].size());
-			break;
-		case 3:
-			my_powerup.setDefaults(brick_mrect.x + ((brick_mrect.width - 28) / 2), brick_mrect.y + ((brick_mrect.height - 7) / 2), 18, 7, 34, type, powerup_texture_id[type - 1], powerup_texture_id[type - 1].size());
-			break;
-		case 4:
-			my_powerup.setDefaults(brick_mrect.x + ((brick_mrect.width - 28) / 2), brick_mrect.y + ((brick_mrect.height - 7) / 2), 18, 7, 28, type, powerup_texture_id[type - 1], powerup_texture_id[type - 1].size());
-			break;
-		case 5:
-			my_powerup.setDefaults(brick_mrect.x + ((brick_mrect.width - 28) / 2), brick_mrect.y + ((brick_mrect.height - 7) / 2), 18, 7, 61, type, powerup_texture_id[type - 1], powerup_texture_id[type - 1].size());
-		}
+		my_powerup.setDefaults(brick_mrect.x + ((brick_mrect.width - 28) / 2), brick_mrect.y + ((brick_mrect.height - 7) / 2), 18, 7, (*powerup_texture_id[type - 1])[0], type, *powerup_texture_id[type - 1], powerup_texture_id[type - 1]->size());
 		has_powerup_on_screen = true;
 	}
 };

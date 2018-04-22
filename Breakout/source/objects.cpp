@@ -25,12 +25,12 @@ std::vector<size_t*> ball_texture_id = {
 	0, &ball00ID
 };
 
-std::vector<std::vector<size_t>> powerup_texture_id = {
-	pLaserID,
-	pPaddleBigID,
-	pPaddleSmallID,
-	pLifeID,
-	pMultiBallID
+std::vector<std::vector<size_t>*> powerup_texture_id = {
+	&pLaserID,
+	&pPaddleBigID,
+	&pPaddleSmallID,
+	&pLifeID,
+	&pMultiBallID
 };
 
 size_t stZ = 0;

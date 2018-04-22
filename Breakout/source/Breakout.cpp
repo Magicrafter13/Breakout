@@ -13,7 +13,7 @@ FILE* debug_file,* settings_file;
 
 //init
 std::string versiontxtt = "  Beta ", versiontxtn = "01.07.02";
-std::string buildnumber = "18.04.21.2231", ishupeversion = "01.00.00";
+std::string buildnumber = "18.04.22.1228", ishupeversion = "01.00.00";
 int vernumqik = 0;
 u32 kDown, kHeld;
 
@@ -196,7 +196,7 @@ void init_game_textures() {
 	};
 	for (int f = 0; f < AMOUNT_OF_POWERUPS; f++) {
 		i = id;
-		powerupI[f]->resize(1);
+		powerupI[f]->resize(0);
 		for (id = i; id < i + 6; id++) {
 			pp2d_load_texture_png(id, ("romfs:/sprites/powerup/" + powerupS[f] + (((id - i) < 10) ? ("0" + std::to_string((id - i))) : (std::to_string((id - i)))) + ".png").c_str());
 			powerupI[f]->push_back(id);

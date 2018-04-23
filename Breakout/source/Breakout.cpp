@@ -446,6 +446,7 @@ void run_powerup(int typef) {
 		break;
 	case 5:
 		the_paddle.remove_powerups();
+		the_paddle.has_multi = true;
 		for (auto tBall : the_ball) {
 			if (tBall.exists) the_paddle.spawn_multi(tBall, the_ball);
 			break;
@@ -473,8 +474,7 @@ int breakout()
 	if ((kHeld | kDown) & (KEY_LEFT | KEY_RIGHT)) movePaddle((kHeld & KEY_LEFT ? false : true), the_paddle, the_ball);
 	int balls_on_screen = 0;
 	for (auto &tBall : the_ball) {
-		if (off_screen(tBall)) tBall.exists = false;
-		//if (tBall.getTop(false) > 240) tBall.exists = false;
+		if (tBall.getTop(false) > 240) tBall.exists = false;
 		if (tBall.exists) balls_on_screen++;
 	}
 	if (balls_on_screen == 0) return loseLife();
@@ -539,7 +539,9 @@ int breakout()
 					tBall.isInWall = true;
 					tBall.angle = (tBall.getTop(false) <= 0.00) ? (360.0 - tBall.angle) : (180.0 - tBall.angle);
 				}
-				ensureGoodAngle(tBall.angle);
+
+				while (tBall.angle < 0.0) tBall.angle += 360.0;
+				while (tBall.angle > 360.0) tBall.angle -= 360.0;
 
 				//first time ball is detected touching paddle
 				if (tBall.hasHitPadd && !tBall.isInPaddle) {
@@ -625,7 +627,8 @@ int breakout()
 	for (auto &tBall : the_ball) {
 		if (tBall.bricks_hit > 1) {
 			tBall.angle += 180.0;
-			ensureGoodAngle(tBall.angle);
+			if (tBall.angle > 360.0)
+				tBall.angle -= 360.0;
 		}
 	}
 

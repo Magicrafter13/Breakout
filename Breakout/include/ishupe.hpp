@@ -98,4 +98,3 @@ extern void movePaddle(bool right, paddle &the_paddle, std::vector<ball> &ball_v
 extern void setBallDirection(ball &tBall, double speed);
 extern void moveBall(ball &tBall, bool cMode);
 extern void setNewBallAngle(double &angle);
-extern void ensureGoodAngle(double &angle);

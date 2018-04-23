@@ -31,8 +31,3 @@ void setNewBallAngle(double &angle) {
 	do angle = (rand() % 90) + 225.0;
 	while (angle > 265 && angle < 275);
 }
-
-void ensureGoodAngle(double &angle) {
-	while (angle < 0.0) angle += 360.0;
-	while (angle > 360.0) angle -= 360.0;
-}

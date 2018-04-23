@@ -3,7 +3,6 @@
 extern std::vector<std::vector<size_t>*> powerup_texture_id;
 extern size_t brick_texture_by_type[brick_types];
 extern size_t brick_second_texture_by_type[brick_types];
-/*point value by brick type*/
 extern int brick_point_value[brick_types];
 
 /*
@@ -19,13 +18,9 @@ class mRectangle {
 	double default_width;
 	double default_height;
 public:
-	/*current x coordinate*/
 	double x;
-	/*current y coordinate*/
 	double y;
-	/*current width*/
 	double width;
-	/*current height*/
 	double height;
 	/*
 	i_x: X
@@ -289,7 +284,7 @@ public:
 		}
 		if (powerup_timer >= my_powerup.frame_count)
 			powerup_timer = 0;
-		pp2d_draw_texture(my_powerup.animation_id[powerup_timer], my_powerup.x, my_powerup.y);
+		draw_object(my_powerup, powerup_timer);
 		wait_frame++;
 	}
 	/*
@@ -344,6 +339,10 @@ public:
 	void spawn_powerup(int type) {
 		my_powerup.setDefaults(brick_mrect.x + ((brick_mrect.width - 28) / 2), brick_mrect.y + ((brick_mrect.height - 7) / 2), 18, 7, (*powerup_texture_id[type - 1])[0], type, *powerup_texture_id[type - 1], powerup_texture_id[type - 1]->size());
 		has_powerup_on_screen = true;
+	}
+	/*returns coordinate true for x false for y*/
+	double getCoord(bool X) {
+		return (X ? brick_mrect.x : brick_mrect.y);
 	}
 };
 
@@ -547,8 +546,6 @@ public:
 	bool has_big;
 	/*whether or not small paddle active*/
 	bool has_small;
-	/*whether or not multi ball*/
-	bool has_multi;
 	/*laser object*/
 	laser the_laser;
 	/*multi ball 0 - 3*/
@@ -669,5 +666,12 @@ public:
 			return paddle_mrect.x + (paddle_mrect.width / 2.0);
 		else
 			return paddle_mrect.y + paddle_mrect.height;
+	}
+	/*
+	returns the top left coordinate of the paddle
+	true for X false for Y
+	*/
+	double getCoord(bool X) {
+		return (X ? paddle_mrect.x, paddle_mrect.y);
 	}
 };

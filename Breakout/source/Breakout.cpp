@@ -498,7 +498,7 @@ int breakout()
 	}
 	if ((kDown | kHeld) & KEY_A && !ball_was_shot) {
 		if (the_paddle.has_laser && !the_paddle.laser_on_screen) {
-			the_paddle.the_laser.setDefaults(the_paddle.paddle_mrect.x + (the_paddle.paddle_mrect.width / 2.0) - (the_paddle.the_laser.width / 2.0), the_paddle.paddle_mrect.y, 3, 30, 30);
+			the_paddle.the_laser.setDefaults(the_paddle.paddle_mrect.x + (the_paddle.paddle_mrect.width / 2.0) - (the_paddle.the_laser.width / 2.0), the_paddle.paddle_mrect.y, 3, 30, laserID);
 			the_paddle.laser_on_screen = true;
 		}
 	}

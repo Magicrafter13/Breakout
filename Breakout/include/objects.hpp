@@ -306,12 +306,12 @@ Ball object
 class ball {
 	int internal_ball_type;
 	double dX, dY;
-	double dRad;
+	double dWidth, dHeight;
 public:
 	double x, y;
 	bool brickHitH, brickHitV;
 	double dx, dy;
-	double rad;
+	double width, height;
 	std::vector<double> trail_x, trail_y;
 	std::vector<circle> trail_circle;
 	bool exists;
@@ -323,14 +323,19 @@ public:
 	bool is_attached;
 	bool isInWall, isInPaddle;
 	int bricks_hit;
+	double mask_width;
+	double mask_height;
 	/*
 	sets ball's default position, size, and type
 	*/
-	void setDefaults(double fx, double fy, double frad, int ball_type)
+	void setDefaults(double fx, double fy, double fwidth, double fheight, int ball_type, double fMw, double fMh)
 	{
 		x = fx; dX = fx;
 		y = fy; dY = fy;
-		rad = frad; dRad = frad;
+		width = fwidth; dWidth = fwidth;
+		height = fheight; dHeight = fheight;
+		mask_width = fMw;
+		mask_height = fMh;
 		internal_ball_type = ball_type;
 		if (*ball_texture_id[ball_type] != stZ) texture_id = *ball_texture_id[ball_type];
 		exists = true;
@@ -342,7 +347,8 @@ public:
 	void reset() {
 		x = dX;
 		y = dY;
-		rad = dRad;
+		width = dWidth;
+		height = dHeight;
 		exists = true;
 		hasHitPadd = false, hasHitWall = false;
 		isInPaddle = false, isInWall = false;
@@ -354,28 +360,28 @@ public:
 	*/
 	double getLeft(bool X)
 	{
-		return (X ? x - rad : y);
+		return (X ? x : y + (height / 2));
 	}
 	/*
 	returns the rightmost side of the ball
 	X: (boolean) if true returns X coordinate, if false returns Y coordinate
 	*/
 	double getRight(bool X) {
-		return (X ? x + rad : y);
+		return (X ? x + width : y + (height / 2));
 	}
 	/*
 	returns the upmost side of the ball
 	X: (boolean) if true returns X coordinate, if false returns Y coordinate
 	*/
 	double getTop(bool X) {
-		return (X ? x : y - rad);
+		return (X ? x + (width / 2): y);
 	}
 	/*
 	returns the downmost side of the ball
 	X: (boolean) if true returns X coordinate, if false returns Y coordinate
 	*/
 	double getBottom(bool X) {
-		return (X ? x : y + rad);
+		return (X ? x + (width / 2) : y + height);
 	}
 	void setPosition(double X, double Y) {
 		x = X;
@@ -435,7 +441,7 @@ public:
 	void spawn_multi(ball tBall, std::vector<ball> &ball_vec) {
 		ball *new_ball[2] = { new ball, new ball };
 		for (int i = 0; i < 2; i++) {
-			new_ball[i]->setDefaults(tBall.x, tBall.y, tBall.rad, 1);
+			new_ball[i]->setDefaults(tBall.x, tBall.y, tBall.width, tBall.height, 1, tBall.mask_width, tBall.mask_height);
 			new_ball[i]->angle = tBall.angle + (-20 + (40 * i));
 			for (int j = 0; j < 8; j++)
 				new_ball[i]->trail_circle[7 - j].setDefaults(tBall.x, tBall.y, (0.875 * (j + 1)));

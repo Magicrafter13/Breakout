@@ -3,10 +3,10 @@
 #include "objects.hpp"
 
 bool off_screen(ball &object) {
-	return ((object.x + object.rad <= 0) ||
-		(object.x - object.rad >= 400) ||
-		(object.y + object.rad <= 0) ||
-		(object.y - object.rad >= 240));
+	return ((object.x + object.width <= 0) ||
+		(object.x - object.width >= 400) ||
+		(object.y + object.height <= 0) ||
+		(object.y - object.height >= 240));
 }
 
 void movePaddle(bool right, paddle &the_paddle, std::vector<ball> &ball_vec) {

@@ -299,7 +299,7 @@ int main(int argc, char **argv)
 	consoleSetWindow(&debugBox, 18, 4, 9, 12);
 
 	the_paddle.setDefaults(175, 215, 50, 10, paddleID);
-	the_ball[0].setDefaults(200.0, 200.0, 7.0, 1);
+	the_ball[0].setDefaults(200.0, 200.0, 14.0, 14.0, 1, 11.6, 11.6);
 	for (auto &tBall : the_ball)
 		for (int i = 0; i < 8; i++)
 			tBall.trail_circle[7 - i].setDefaults(200.0, 120.0, (0.875 * (i + 1)));

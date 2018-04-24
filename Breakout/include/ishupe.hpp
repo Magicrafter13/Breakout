@@ -36,6 +36,18 @@ Variable Requirements:
 */
 template <class type_1>
 bool test_collision(ball &object_1, type_1 &object_2, bool test_horizontal) {
+	double ball_x = object_1.getLeft(true) + ((object_1.width - object_1.mask_width) / 2);
+	double ball_y = object_1.getTop(false) + ((object_1.height - object_1.mask_height) / 2);
+	double ball_width = object_1.mask_width;
+	double ball_height = object_1.mask_height;
+	return ((ball_x <= (object_2.x + object_2.width)) &&
+		((ball_x + ball_width) >= object_2.x) &&
+		(ball_y <= (object_2.y + object_2.height)) &&
+		((ball_y + ball_height) >= object_2.y));
+	/*return ((object_1.x <= (object_2.x + object_2.width)) &&
+		((object_1.x + object_1.width) >= object_2.x) &&
+		(object_1.y <= (object_2.y + object_2.height)) &&
+		((object_1.y + object_1.height) >= object_2.y));
 	double line1a2 = object_1.x, line3a4 = object_1.y, line5a6 = object_1.x, line7a8 = object_1.y;
 	if (test_horizontal) {
 		line1a2 -= object_1.rad;
@@ -55,7 +67,7 @@ bool test_collision(ball &object_1, type_1 &object_2, bool test_horizontal) {
 			line5a6 <= object_2.x + object_2.width &&
 			line7a8 >= object_2.y &&
 			line7a8 <= object_2.y + object_2.height
-			));
+			));*/
 }
 
 /*

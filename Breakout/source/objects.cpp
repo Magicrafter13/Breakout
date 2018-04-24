@@ -5,7 +5,7 @@ size_t brick_texture_by_type[brick_types] = {
 	0,
 	1, 2, 3, 4, 5,
 	10, 11, 12, 13, 14,
-	0
+	15
 };
 
 size_t brick_second_texture_by_type[brick_types] = {

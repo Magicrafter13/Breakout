@@ -28,6 +28,7 @@ extern PrintConsole bottomScreen, versionWin, killBox, debugBox;
 
 #define O3DS_CHECKS 250
 #define N3DS_CHECKS 300
+#define BRICK_FILES 16
 
 extern std::string versiontxtt, versiontxtn;
 extern std::string buildnumber, ishupeversion;

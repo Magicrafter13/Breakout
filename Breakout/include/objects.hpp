@@ -156,7 +156,6 @@ private:
 	int wait_frame = 0;
 	double dX, dY;
 	double dWidth, dHeight;
-	bool defaults_set = false;
 public:
 	double x, y;
 	int texture_id;
@@ -178,18 +177,18 @@ public:
 	*/
 	void setDefaults(double fx, double fy, double fwidth, double fheight, bool is_used, int brick_type)
 	{
-		if (!defaults_set) {
-			x = fx; dX = fx;
-			y = fy; dY = fy;
-			width = fwidth; dWidth = fwidth;
-			height = fheight; dHeight = fheight;
-			internal_is_used = is_used;
-			exists = is_used;
-			internal_brick_type = brick_type;
-			if (brick_type != 0) texture_id = brick_texture_by_type[brick_type];
-			set_hits();
-			defaults_set = true;
-		}
+		x = fx; dX = fx;
+		y = fy; dY = fy;
+		width = fwidth; dWidth = fwidth;
+		height = fheight; dHeight = fheight;
+		internal_is_used = is_used;
+		exists = is_used;
+		internal_brick_type = brick_type;
+		if (brick_type != 0) texture_id = brick_texture_by_type[brick_type];
+		set_hits();
+	}
+	int type() {
+		return internal_brick_type;
 	}
 	void draw() {
 		if (wait_frame == 9) {

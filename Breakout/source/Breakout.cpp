@@ -138,7 +138,7 @@ void closeSD()
 /*initialize textures*/
 void init_game_textures() {
 	size_t id;
-	for (id = 0; id < 15; id++) {
+	for (id = 0; id < BRICK_FILES; id++) {
 		std::string temp = "romfs:/sprites/brick/brick";
 		if (id < 10) temp += "0";
 		temp += std::to_string(id) + ".png";
@@ -236,10 +236,7 @@ void initialize_brick_array() {
 		int array_step = 0;
 		for (int a = 0; a < 5; a++)
 			for (int b = 0; b < 10; b++) {
-				if (level_mask[q][array_step] == 0)
-					brick_array[q][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, false, 0);
-				else
-					brick_array[q][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, true, level_mask[q][array_step]);
+				brick_array[q][array_step].setDefaults((40 * b) + 2, ((20 * a) + 2), 36, 16, (level_mask[q][array_step] != 0), level_mask[q][array_step]);
 				array_step++;
 			}
 	}
@@ -602,7 +599,7 @@ int breakout()
 				if (tBall.hasHitPadd && tBall.hasHitWall) tBall.exists = false;
 				int bricks_available = 0;
 				for (int brick_array_pos = 0; brick_array_pos < 50; brick_array_pos++)
-					if (brick_array[level][brick_array_pos].exists)
+					if (brick_array[level][brick_array_pos].exists && brick_array[level][brick_array_pos].type() != 11)
 						bricks_available++;
 				if (bricks_available == 0) change_level = true;
 			}
@@ -623,12 +620,12 @@ int breakout()
 		}
 	}
 	//to avoid a glitch, if more than one brick is hit on the same frame the direction is reversed
-	for (auto &tBall : the_ball) {
+	/*for (auto &tBall : the_ball) {
 		if (tBall.bricks_hit > 1) {
 			tBall.angle += 180.0;
 			setAngleGood(tBall.angle);
 		}
-	}
+	}*/
 
 	/*plays random SFX if a brick has been hit*/
 	for (auto &tBall : the_ball) {
@@ -877,7 +874,8 @@ int level_designer() {
 			}
 		}
 		if (kDown & KEY_SELECT) {
-			for (int i = 0; i < 50; i++) level_mask[0][i] = designed_level[selection][i];
+			for (int i = 0; i < 50; i++)
+				level_mask[0][i] = designed_level[selection][i];
 			initialize_brick_array();
 			lives = 3;
 			int result = 3;

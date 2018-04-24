@@ -26,6 +26,9 @@ extern PrintConsole bottomScreen, versionWin, killBox, debugBox;
 #define SAVE_FILES 3
 #define AMOUNT_OF_POWERUPS 5
 
+#define O3DS_CHECKS 250
+#define N3DS_CHECKS 300
+
 extern std::string versiontxtt, versiontxtn;
 extern std::string buildnumber, ishupeversion;
 extern std::vector<FILE*> saved_level;

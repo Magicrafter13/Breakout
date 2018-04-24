@@ -89,11 +89,12 @@ int level_mask[def_level_count][50] = {
 void trail_new_frame(std::vector<ball> &ball_vec)
 {
 	for (auto &tBall : ball_vec) {
-		tBall.trail_new_frame_x.insert(tBall.trail_new_frame_x.begin(), tBall.ball_mcirc.x);
-		tBall.trail_new_frame_y.insert(tBall.trail_new_frame_y.begin(), tBall.ball_mcirc.y);
-		tBall.trail_new_frame_x.resize(8); tBall.trail_new_frame_y.resize(8);
-		tBall.trail_new_frame_x.shrink_to_fit(); tBall.trail_new_frame_y.shrink_to_fit();
-		for (int i = 0; i < 8; i++) tBall.trail_new_frame_circle[i].setPosition(tBall.trail_new_frame_x[i], tBall.trail_new_frame_y[i]);
+		tBall.trail_x.insert(tBall.trail_x.begin(), tBall.x);
+		tBall.trail_y.insert(tBall.trail_y.begin(), tBall.y);
+		tBall.trail_x.resize(8); tBall.trail_y.resize(8);
+		tBall.trail_x.shrink_to_fit(); tBall.trail_y.shrink_to_fit();
+		for (int i = 0; i < 8; i++)
+			tBall.trail_circle[i].setPosition(tBall.trail_x[i], tBall.trail_y[i]);
 	}
 }
 
@@ -304,7 +305,7 @@ int main(int argc, char **argv)
 	the_ball[0].setDefaults(200.0, 200.0, 7.0, 1);
 	for (auto &tBall : the_ball)
 		for (int i = 0; i < 8; i++)
-			tBall.trail_new_frame_circle[7 - i].setDefaults(200.0, 120.0, (0.875 * (i + 1)));
+			tBall.trail_circle[7 - i].setDefaults(200.0, 120.0, (0.875 * (i + 1)));
 	
 	int bottom_screen_text = 0;
 
@@ -498,21 +499,20 @@ int breakout()
 	}
 	if ((kDown | kHeld) & KEY_A && !ball_was_shot) {
 		if (the_paddle.has_laser && !the_paddle.laser_on_screen) {
-			the_paddle.the_laser.setDefaults(the_paddle.paddle_mrect.x + (the_paddle.paddle_mrect.width / 2.0) - (the_paddle.the_laser.width / 2.0), the_paddle.paddle_mrect.y, 3, 30, laserID);
+			the_paddle.the_laser.setDefaults(the_paddle.x + (the_paddle.width / 2.0) - (the_paddle.the_laser.width / 2.0), the_paddle.y, 3, 30, laserID);
 			the_paddle.laser_on_screen = true;
 		}
 	}
 
 	if (the_paddle.laser_on_screen) {
-		the_paddle.the_laser.setPosition(the_paddle.the_laser.x, the_paddle.the_laser.y - 8);
-		//trail_new_frame(the_paddle.the_laser);
+		the_paddle.the_laser.move(0, -8);
 		int the_number = 30;
-		int other_number = the_paddle.paddle_mrect.y - the_paddle.the_laser.y;
+		int other_number = the_paddle.y - the_paddle.the_laser.y;
 		if (other_number < the_number) the_number = other_number;
 		for (int i = 0; i < the_number; i++)
 			pp2d_draw_texture(the_paddle.the_laser.texture_id, the_paddle.the_laser.x, the_paddle.the_laser.y + i);
 		for (int i = 0; i < 50; i++)
-			if (test_collision(the_paddle.the_laser, brick_array[level][i].brick_mrect) && brick_array[level][i].exists) {
+			if (test_collision(the_paddle.the_laser, brick_array[level][i]) && brick_array[level][i].exists) {
 				brick_array[level][i].destroy();
 				the_paddle.laser_on_screen = false;
 			}
@@ -523,11 +523,11 @@ int breakout()
 		tBall.bricks_hit = 0;
 	change_level = false;
 	//main hit detection engine (runs 300 times per frame)
-	for (int i = 0; i < (cMode ? 100 : 300); i++) {
+	for (int i = 0; i < (cMode ? O3DS_CHECKS : N3DS_CHECKS); i++) {
 		for (auto &tBall : the_ball) {
 			if (tBall.exists && !tBall.is_attached) {
 				tBall.has_interacted = false;
-				tBall.hasHitPadd = (the_paddle.getTop(false) <= tBall.getBottom(false) && (the_paddle.paddle_mrect.x <= tBall.ball_mcirc.x && tBall.ball_mcirc.x <= the_paddle.paddle_mrect.x + the_paddle.paddle_mrect.width)); //balls x coordinate is <= paddles x coordinate + it's width
+				tBall.hasHitPadd = (the_paddle.getTop(false) <= tBall.getBottom(false) && (the_paddle.x <= tBall.x && tBall.x <= the_paddle.x + the_paddle.width)); //balls x coordinate is <= paddles x coordinate + it's width
 				if (tBall.hasHitPadd && tBall.getBottom(false) >= the_paddle.getTop(false) + 0.02) tBall.hasHitPadd = false;
 				if (tBall.hasHitPadd) tBall.has_hit_paddle = true;
 				//Add gravity powerup (magnet but different) rotates around paddle until button pressed.
@@ -540,17 +540,16 @@ int breakout()
 					tBall.angle = (tBall.getTop(false) <= 0.00) ? (360.0 - tBall.angle) : (180.0 - tBall.angle);
 				}
 
-				while (tBall.angle < 0.0) tBall.angle += 360.0;
-				while (tBall.angle > 360.0) tBall.angle -= 360.0;
+				setAngleGood(tBall.angle);
 
 				//first time ball is detected touching paddle
 				if (tBall.hasHitPadd && !tBall.isInPaddle) {
 					tBall.has_interacted = true;
 					tBall.isInPaddle = true;
-					double paddle_width_ninth = the_paddle.paddle_mrect.width / 9.0;
+					double paddle_width_ninth = the_paddle.width / 9.0;
 					int angle = 1;
 					for (double z = 1.0; z < 9.0; z += 1.0)
-						if (tBall.getBottom(true) >= the_paddle.paddle_mrect.x + (paddle_width_ninth * z))
+						if (tBall.getBottom(true) >= the_paddle.x + (paddle_width_ninth * z))
 							angle += 1;
 					//change ball angle according to the area of paddle hit
 					double angle_of_change = 0.0;
@@ -570,8 +569,8 @@ int breakout()
 				}
 				//large if statement to determine if a brick has been hit (run once per brick)
 				for (int j = 0; j < 50; j++) {
-					if (test_collision(tBall.ball_mcirc, brick_array[level][j].brick_mrect, false)) tBall.brickHitV = true;
-					if (test_collision(tBall.ball_mcirc, brick_array[level][j].brick_mrect, true)) tBall.brickHitH = true;
+					if (test_collision(tBall, brick_array[level][j], false)) tBall.brickHitV = true;
+					if (test_collision(tBall, brick_array[level][j], true)) tBall.brickHitH = true;
 					//code if brick(s) hit
 					if (tBall.brickHitV || tBall.brickHitH) {
 						//check if brick is actually in play
@@ -627,8 +626,7 @@ int breakout()
 	for (auto &tBall : the_ball) {
 		if (tBall.bricks_hit > 1) {
 			tBall.angle += 180.0;
-			if (tBall.angle > 360.0)
-				tBall.angle -= 360.0;
+			setAngleGood(tBall.angle);
 		}
 	}
 
@@ -648,9 +646,9 @@ int breakout()
 	for (int i = 0; i < 50; i++)
 		if (brick_array[level][i].has_powerup_on_screen) {
 			brick_array[level][i].my_powerup.y += 1;
-			if (off_screen(brick_array[level][i].my_powerup.mask)) brick_array[level][i].has_powerup_on_screen = false;
-			if (test_collision<powerup,mRectangle> (brick_array[level][i].my_powerup, the_paddle.paddle_mrect)) {
-				run_powerup(brick_array[level][i].my_powerup.my_type);
+			if (off_screen(brick_array[level][i].my_powerup)) brick_array[level][i].has_powerup_on_screen = false;
+			if (test_collision<powerup,paddle> (brick_array[level][i].my_powerup, the_paddle)) {
+				run_powerup(brick_array[level][i].my_powerup.type);
 				brick_array[level][i].has_powerup_on_screen = false;
 			}
 			brick_array[level][i].draw();
@@ -661,7 +659,7 @@ int breakout()
 			draw_object(brick_array[level][i]);
 	for (auto tBall : the_ball)
 		for (int i = 7; i > 0; i--)
-			pp2d_draw_texture_scale(extraBallID[i], (tBall.trail_new_frame_circle[i].x - tBall.trail_new_frame_circle[i].rad) + 1.0, (tBall.trail_new_frame_circle[i].y - tBall.trail_new_frame_circle[i].rad) + 2.0, (7 - i) / 8.0, (7 - i) / 8.0); //RGBA8(0xFF, 0xFF, 0xFF, 32 * (7 - i))
+			pp2d_draw_texture_scale(extraBallID[i], (tBall.trail_circle[i].x - tBall.trail_circle[i].rad) + 1.0, (tBall.trail_circle[i].y - tBall.trail_circle[i].rad) + 2.0, (7 - i) / 8.0, (7 - i) / 8.0); //RGBA8(0xFF, 0xFF, 0xFF, 32 * (7 - i))
 	for (auto tBall : the_ball)
 		draw_object(tBall);
 	if (update_text) {
@@ -669,7 +667,7 @@ int breakout()
 		for (int i = 0; i < 3; i++) std::cout << "                                        ";
 		std::cout << ANSI "13;0" PEND;
 		std::cout << "Score: " << points << "\n" << "Lives: " << lives << "\n";
-		std::cout << "Collision being tested " << (cMode ? 100 : 300) << "x/frame." << std::endl;
+		std::cout << "Collision being tested " << (cMode ? O3DS_CHECKS : N3DS_CHECKS) << "x/frame." << std::endl;
 		std::cout << debug_string << std::endl;
 		update_text = false;
 	}

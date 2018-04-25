@@ -323,8 +323,11 @@ public:
 	bool is_attached;
 	bool isInWall, isInPaddle;
 	int bricks_hit;
+	double mask_x, mask_y;
 	double mask_width;
 	double mask_height;
+	bool has_rotated_this_frame = false;
+	bool inside_brick[50] = {lvlFullLine(0), lvlFullLine(0), lvlFullLine(0), lvlFullLine(0), lvlFullLine(0)};
 	/*
 	sets ball's default position, size, and type
 	*/
@@ -336,6 +339,8 @@ public:
 		height = fheight; dHeight = fheight;
 		mask_width = fMw;
 		mask_height = fMh;
+		mask_x = x + ((width - mask_width) / 2);
+		mask_y = y + ((height - mask_height) / 2);
 		internal_ball_type = ball_type;
 		if (*ball_texture_id[ball_type] != stZ) texture_id = *ball_texture_id[ball_type];
 		exists = true;

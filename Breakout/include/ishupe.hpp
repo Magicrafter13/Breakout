@@ -18,6 +18,14 @@ bool test_collision(type_1 &object_1, type_2 &object_2) {
 		((object_1.y + object_1.height) >= object_2.y));
 }
 
+template <class type_1>
+bool test_collision(ball &tBall, type_1 &obj) {
+	return ((tBall.mask_x <= (obj.x + obj.width)) &&
+		((tBall.mask_x + tBall.mask_width) >= obj.x) &&
+		(tBall.mask_y <= (obj.y + obj.height)) &&
+		((tBall.mask_y + tBall.mask_height) >= obj.y));
+}
+
 /*
 Returns true if two objects are colliding
 

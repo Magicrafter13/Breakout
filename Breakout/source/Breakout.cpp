@@ -299,7 +299,7 @@ int main(int argc, char **argv)
 	consoleSetWindow(&debugBox, 18, 4, 9, 12);
 
 	the_paddle.setDefaults(175, 215, 50, 10, paddleID);
-	the_ball[0].setDefaults(200.0, 200.0, 14.0, 14.0, 1, 11.6, 11.6);
+	the_ball[0].setDefaults(193.0, 193.0, 14.0, 14.0, 1, 11.6, 11.6);
 	for (auto &tBall : the_ball)
 		for (int i = 0; i < 8; i++)
 			tBall.trail_circle[7 - i].setDefaults(200.0, 120.0, (0.875 * (i + 1)));
@@ -516,8 +516,10 @@ int breakout()
 		if (off_screen(the_paddle.the_laser)) the_paddle.laser_on_screen = false;
 	}
 	/*run main engine code if the ball is not attached to the paddle*/
-	for (auto &tBall : the_ball)
+	for (auto &tBall : the_ball) {
 		tBall.bricks_hit = 0;
+		tBall.has_rotated_this_frame = false;
+	}
 	change_level = false;
 	//main hit detection engine (runs 300 times per frame)
 	for (int i = 0; i < (cMode ? O3DS_CHECKS : N3DS_CHECKS); i++) {
@@ -565,12 +567,10 @@ int breakout()
 					tBall.angle = (360.0 - tBall.angle) + angle_of_change;
 				}
 				//large if statement to determine if a brick has been hit (run once per brick)
+				bool hitV = false, hitH = false, hitBothSameTime = false;
 				for (int j = 0; j < 50; j++) {
-					if (test_collision(tBall, brick_array[level][j], false)) tBall.brickHitV = true;
-					if (test_collision(tBall, brick_array[level][j], true)) tBall.brickHitH = true;
-					//code if brick(s) hit
-					if (tBall.brickHitV || tBall.brickHitH) {
-						//check if brick is actually in play
+					setAngleGood(tBall.angle);
+					if (test_collision(tBall, brick_array[level][j], false) || test_collision(tBall, brick_array[level][j], true)) {
 						if (brick_array[level][j].exists) {
 							brick_array[level][j].destroy();
 							if (!brick_array[level][j].exists) {
@@ -580,10 +580,49 @@ int breakout()
 							}
 							tBall.bricks_hit++;
 							//if brick hit V and H reverse direction
-							tBall.angle = (tBall.brickHitV ? (tBall.brickHitH ? tBall.angle - 180.0 : 360.0 - tBall.angle) : (tBall.brickHitH ? 180 - tBall.angle : tBall.angle));
+							if (!tBall.inside_brick[j]) {
+								/*if ((tBall.mask_x + tBall.mask_width < brick_array[level][j].x + (1 / (cMode ? O3DS_CHECKS : N3DS_CHECKS))) ||
+									(tBall.mask_x > brick_array[level][j].x + brick_array[level][j].width - (1 / (cMode ? O3DS_CHECKS : N3DS_CHECKS))))
+									hitV = true;
+								else if ((tBall.mask_y + tBall.mask_height < brick_array[level][j].y + (1 / (cMode ? O3DS_CHECKS : N3DS_CHECKS))) ||
+									(tBall.mask_y > brick_array[level][j].y + brick_array[level][j].height - (1 / (cMode ? O3DS_CHECKS : N3DS_CHECKS))))
+									hitH = true;*/
+								if ((tBall.mask_x + tBall.mask_width) - brick_array[level][j].x == (tBall.mask_y + tBall.mask_height) - brick_array[level][j].y)
+									hitBothSameTime = true;
+								else if (tBall.angle >= 0 && tBall.angle < 90) {
+									if ((tBall.mask_y + tBall.mask_height) - brick_array[level][j].y < (tBall.mask_x + tBall.mask_width) - brick_array[level][j].x)
+										hitH = true;
+									else
+										hitV = true;
+								}
+								else if (tBall.angle >= 90 && tBall.angle < 180) {
+									if ((tBall.mask_y + tBall.mask_height) - brick_array[level][j].y < (brick_array[level][j].x + brick_array[level][j].width) - tBall.mask_x)
+										hitH = true;
+									else
+										hitV = true;
+								}
+								else if (tBall.angle >= 180 && tBall.angle < 270) {
+									if ((brick_array[level][j].x + brick_array[level][j].width) - tBall.mask_x < (brick_array[level][j].y + brick_array[level][j].height) - tBall.mask_y)
+										hitH = true;
+									else
+										hitV = true;
+								}
+								else if (tBall.angle >= 270 && tBall.angle < 360) {
+									if ((brick_array[level][j].y + brick_array[level][j].height) - tBall.mask_y < (tBall.mask_x + tBall.mask_width) - brick_array[level][j].x)
+										hitH = true;
+									else
+										hitV = true;
+								}
+								tBall.inside_brick[j] = true;
+							}
 						}
-						tBall.brickHitV = false; tBall.brickHitH = false;
 					}
+					else
+						tBall.inside_brick[j] = false;
+				}
+				if ((hitV || hitH) && tBall.has_rotated_this_frame == false) {
+					tBall.angle = (hitH ? 180.0 : 360.0) - tBall.angle;
+					tBall.has_rotated_this_frame = true;
 				}
 				setBallDirection(tBall, 2.0);
 				if (tBall.hasHitPadd && tBall.isInPaddle)

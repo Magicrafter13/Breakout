@@ -34,7 +34,7 @@ int press_select_frame = 0; bool press_select_visible = true;
 
 paddle the_paddle; std::vector<ball> the_ball(1); brick brick_array[def_level_count][50];
 SFX_s *ball_bounce[8];
-size_t titleID, thanksBetaID, waveformID, paddleID, ball00ID, pressSelectID, laserPaddleID, laserID, paddleBigID, paddleSmallID;
+size_t titleID, thanksBetaID, waveformID, paddleID, ball00ID, pressSelectID, laserPaddleID, laserID, paddleBigID, paddleSmallID, testID;
 std::vector<size_t> extraBallID, pLaserID(6), pLifeID(6), pMultiBallID(6), pPaddleBigID(6), pPaddleSmallID(6);
 
 bool cMode = false, update_text;
@@ -207,16 +207,18 @@ void init_game_textures() {
 		"ball00.png",
 		"paddle.png",
 		"paddle_big.png",
-		"paddle_small.png"
+		"paddle_small.png",
+		"test.png"
 	};
 	std::vector<size_t*> rootI = {
 		&ball00ID,
 		&paddleID,
 		&paddleBigID,
-		&paddleSmallID
+		&paddleSmallID,
+		&testID
 	};
 	i = id;
-	for (id = i; id < i + 4; id++) {
+	for (id = i; id < i + rootS.size(); id++) {
 		pp2d_load_texture_png(id, ("romfs:/sprites/" + rootS[id - i]).c_str());
 		*rootI[id - i] = id;
 	}
@@ -567,7 +569,7 @@ int breakout()
 					tBall.angle = (360.0 - tBall.angle) + angle_of_change;
 				}
 				//large if statement to determine if a brick has been hit (run once per brick)
-				bool hitV = false, hitH = false, hitBothSameTime = false;
+				//bool hitV = false, hitH = false, hitBothSameTime = false;
 				for (int j = 0; j < 50; j++) {
 					setAngleGood(tBall.angle);
 					if (test_collision(tBall, brick_array[level][j], false) || test_collision(tBall, brick_array[level][j], true)) {
@@ -578,6 +580,7 @@ int breakout()
 								last_power = brick_array[level][j].random_powerup();
 								if (last_power != 0) brick_array[level][j].spawn_powerup(last_power);
 							}
+							bool hitH = false, hitV = false;
 							tBall.bricks_hit++;
 							//if brick hit V and H reverse direction
 							if (!tBall.inside_brick[j]) {
@@ -621,18 +624,24 @@ int breakout()
 								}*/
 								tBall.inside_brick[j] = true;
 							}
+							if (hitH && hitV)
+								tBall.angle += 180.0;
+							else if (hitH)
+								tBall.angle = 360.0 - tBall.angle;
+							else if (hitV)
+								tBall.angle = 180.0 - tBall.angle;
 						}
 					}
 					else
 						tBall.inside_brick[j] = false;
 				}
-				if ((hitV || hitH) && tBall.has_rotated_this_frame == false) {
+				/*if ((hitV || hitH) && tBall.has_rotated_this_frame == false) {
 					if (hitV && hitH)
 						tBall.angle += 180.0;
 					else
 						tBall.angle = (hitH ? 360.0 : 180.0) - tBall.angle;
 					tBall.has_rotated_this_frame = true;
-				}
+				}*/
 				setBallDirection(tBall, 2.0);
 				if (tBall.hasHitPadd && tBall.isInPaddle)
 					moveBall(tBall, cMode);
@@ -700,8 +709,13 @@ int breakout()
 		}
 	draw_object(the_paddle);
 	for (int i = 0; i < 50; i++)
-		if (brick_array[level][i].exists)
+		if (brick_array[level][i].exists) {
 			draw_object(brick_array[level][i]);
+			for (double j = 0.0; j < brick_array[level][i].width; j += 1.0) {
+				pp2d_draw_texture(testID, brick_array[level][i].x + j, brick_array[level][i].e1(brick_array[level][i].x + j));
+				pp2d_draw_texture(testID, brick_array[level][i].x + j, brick_array[level][i].e2(brick_array[level][i].x + j));
+			}
+		}
 	for (auto tBall : the_ball)
 		for (int i = 7; i > 0; i--)
 			pp2d_draw_texture_scale(extraBallID[i], (tBall.trail_circle[i].x - tBall.trail_circle[i].rad) + 1.0, (tBall.trail_circle[i].y - tBall.trail_circle[i].rad) + 2.0, (7 - i) / 8.0, (7 - i) / 8.0); //RGBA8(0xFF, 0xFF, 0xFF, 32 * (7 - i))

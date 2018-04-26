@@ -170,7 +170,7 @@ public:
 		return (height / width) * X + b;
 	}
 	double e2(double X) {
-		double b = y - (-height / width) * x;
+		double b = (y + height) - (-height / width) * x;
 		return (-height / width) * X + b;
 	}
 	/*
@@ -335,7 +335,7 @@ public:
 	double mask_width;
 	double mask_height;
 	bool has_rotated_this_frame = false;
-	bool inside_brick[50] = {lvlFullLine(0), lvlFullLine(0), lvlFullLine(0), lvlFullLine(0), lvlFullLine(0)};
+	bool inside_brick[50] = {lvlFullLine(false), lvlFullLine(false), lvlFullLine(false), lvlFullLine(false), lvlFullLine(false)};
 	double mid(bool X) {
 		return (X ? mask_x + (mask_width / 2.0) : mask_y + (mask_height / 2.0));
 	}

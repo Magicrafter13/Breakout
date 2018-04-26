@@ -587,7 +587,13 @@ int breakout()
 								else if ((tBall.mask_y + tBall.mask_height < brick_array[level][j].y + (1 / (cMode ? O3DS_CHECKS : N3DS_CHECKS))) ||
 									(tBall.mask_y > brick_array[level][j].y + brick_array[level][j].height - (1 / (cMode ? O3DS_CHECKS : N3DS_CHECKS))))
 									hitH = true;*/
-								if ((tBall.mask_x + tBall.mask_width) - brick_array[level][j].x == (tBall.mask_y + tBall.mask_height) - brick_array[level][j].y)
+								if ((brick_array[level][j].e1(tBall.mid(true)) > tBall.mid(false) && brick_array[level][j].e2(tBall.mid(true)) > tBall.mid(false)) ||
+									(brick_array[level][j].e2(tBall.mid(true)) < tBall.mid(false) && brick_array[level][j].e1(tBall.mid(true)) < tBall.mid(false)))
+									hitH = true;
+								if ((brick_array[level][j].e1(tBall.mid(true)) < tBall.mid(false) && brick_array[level][j].e2(tBall.mid(true)) > tBall.mid(false)) ||
+									(brick_array[level][j].e2(tBall.mid(true)) < tBall.mid(false) && brick_array[level][j].e1(tBall.mid(true)) > tBall.mid(false)))
+									hitV = true;
+								/*if ((tBall.mask_x + tBall.mask_width) - brick_array[level][j].x == (tBall.mask_y + tBall.mask_height) - brick_array[level][j].y)
 									hitBothSameTime = true;
 								else if (tBall.angle >= 0 && tBall.angle < 90) {
 									if ((tBall.mask_y + tBall.mask_height) - brick_array[level][j].y < (tBall.mask_x + tBall.mask_width) - brick_array[level][j].x)
@@ -612,7 +618,7 @@ int breakout()
 										hitH = true;
 									else
 										hitV = true;
-								}
+								}*/
 								tBall.inside_brick[j] = true;
 							}
 						}
@@ -621,7 +627,10 @@ int breakout()
 						tBall.inside_brick[j] = false;
 				}
 				if ((hitV || hitH) && tBall.has_rotated_this_frame == false) {
-					tBall.angle = (hitH ? 180.0 : 360.0) - tBall.angle;
+					if (hitV && hitH)
+						tBall.angle += 180.0;
+					else
+						tBall.angle = (hitH ? 360.0 : 180.0) - tBall.angle;
 					tBall.has_rotated_this_frame = true;
 				}
 				setBallDirection(tBall, 2.0);

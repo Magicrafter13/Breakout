@@ -165,6 +165,14 @@ public:
 	int powerup_timer = 0;
 	bool exists;
 	double width, height;
+	double e1(double X) {
+		double b = y - (height / width) * x;
+		return (height / width) * X + b;
+	}
+	double e2(double X) {
+		double b = y - (-height / width) * x;
+		return (-height / width) * X + b;
+	}
 	/*
 	fx: Default X
 	fy: Default Y
@@ -328,6 +336,9 @@ public:
 	double mask_height;
 	bool has_rotated_this_frame = false;
 	bool inside_brick[50] = {lvlFullLine(0), lvlFullLine(0), lvlFullLine(0), lvlFullLine(0), lvlFullLine(0)};
+	double mid(bool X) {
+		return (X ? mask_x + (mask_width / 2.0) : mask_y + (mask_height / 2.0));
+	}
 	/*
 	sets ball's default position, size, and type
 	*/

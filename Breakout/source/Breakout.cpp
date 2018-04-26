@@ -595,11 +595,13 @@ int breakout()
 									hitH = true;
 									hitV = true;
 								}
-								else if ((brick_array[level][j].e1(tBall.mid(true)) > tBall.mid(false) && brick_array[level][j].e4(tBall.mid(true)) > tBall.mid(false)) ||
-									(brick_array[level][j].e2(tBall.mid(true)) < tBall.mid(false) && brick_array[level][j].e3(tBall.mid(true)) < tBall.mid(false)))
+								else if (((brick_array[level][j].e1(tBall.mid(true)) > tBall.mid(false) && brick_array[level][j].e4(tBall.mid(true)) > tBall.mid(false)) ||
+									(brick_array[level][j].e2(tBall.mid(true)) < tBall.mid(false) && brick_array[level][j].e3(tBall.mid(true)) < tBall.mid(false))) &&
+									(tBall.mid(false) < brick_array[level][j].y || tBall.mid(false) > brick_array[level][j].y + brick_array[level][j].height))
 									hitH = true;
-								else if ((brick_array[level][j].e1(tBall.mid(true)) < tBall.mid(false) && brick_array[level][j].e2(tBall.mid(true)) > tBall.mid(false)) ||
-									(brick_array[level][j].e4(tBall.mid(true)) < tBall.mid(false) && brick_array[level][j].e3(tBall.mid(true)) > tBall.mid(false)))
+								else if (((brick_array[level][j].e1(tBall.mid(true)) < tBall.mid(false) && brick_array[level][j].e2(tBall.mid(true)) > tBall.mid(false)) ||
+									(brick_array[level][j].e4(tBall.mid(true)) < tBall.mid(false) && brick_array[level][j].e3(tBall.mid(true)) > tBall.mid(false))) &&
+									(tBall.mid(true) < brick_array[level][j].x || tBall.mid(true) > brick_array[level][j].x + brick_array[level][j].width))
 									hitV = true;
 								/*if ((tBall.mask_x + tBall.mask_width) - brick_array[level][j].x == (tBall.mask_y + tBall.mask_height) - brick_array[level][j].y)
 									hitBothSameTime = true;

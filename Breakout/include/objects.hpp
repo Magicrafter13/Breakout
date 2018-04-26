@@ -166,12 +166,20 @@ public:
 	bool exists;
 	double width, height;
 	double e1(double X) {
-		double b = y - (height / width) * x;
-		return (height / width) * X + b;
+		double b = y - 1 * x;
+		return 1 * X + b;
+	}
+	double e3(double X) {
+		double b = (y + height) - 1 * (x + width);
+		return 1 * X + b;
 	}
 	double e2(double X) {
-		double b = (y + height) - (-height / width) * x;
-		return (-height / width) * X + b;
+		double b = (y + height) + 1 * x;
+		return -1 * X + b;
+	}
+	double e4(double X) {
+		double b = y + 1 * (x + width);
+		return -1 * X + b;
 	}
 	/*
 	fx: Default X

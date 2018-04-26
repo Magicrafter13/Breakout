@@ -590,11 +590,16 @@ int breakout()
 								else if ((tBall.mask_y + tBall.mask_height < brick_array[level][j].y + (1 / (cMode ? O3DS_CHECKS : N3DS_CHECKS))) ||
 									(tBall.mask_y > brick_array[level][j].y + brick_array[level][j].height - (1 / (cMode ? O3DS_CHECKS : N3DS_CHECKS))))
 									hitH = true;*/
-								if ((brick_array[level][j].e1(tBall.mid(true)) > tBall.mid(false) && brick_array[level][j].e2(tBall.mid(true)) > tBall.mid(false)) ||
-									(brick_array[level][j].e2(tBall.mid(true)) < tBall.mid(false) && brick_array[level][j].e1(tBall.mid(true)) < tBall.mid(false)))
+								if ((brick_array[level][j].e1(tBall.mid(true)) == tBall.mid(false)) ||
+									(brick_array[level][j].e2(tBall.mid(true)) == tBall.mid(false))) {
 									hitH = true;
-								if ((brick_array[level][j].e1(tBall.mid(true)) < tBall.mid(false) && brick_array[level][j].e2(tBall.mid(true)) > tBall.mid(false)) ||
-									(brick_array[level][j].e2(tBall.mid(true)) < tBall.mid(false) && brick_array[level][j].e1(tBall.mid(true)) > tBall.mid(false)))
+									hitV = true;
+								}
+								else if ((brick_array[level][j].e1(tBall.mid(true)) > tBall.mid(false) && brick_array[level][j].e4(tBall.mid(true)) > tBall.mid(false)) ||
+									(brick_array[level][j].e2(tBall.mid(true)) < tBall.mid(false) && brick_array[level][j].e3(tBall.mid(true)) < tBall.mid(false)))
+									hitH = true;
+								else if ((brick_array[level][j].e1(tBall.mid(true)) < tBall.mid(false) && brick_array[level][j].e2(tBall.mid(true)) > tBall.mid(false)) ||
+									(brick_array[level][j].e4(tBall.mid(true)) < tBall.mid(false) && brick_array[level][j].e3(tBall.mid(true)) > tBall.mid(false)))
 									hitV = true;
 								/*if ((tBall.mask_x + tBall.mask_width) - brick_array[level][j].x == (tBall.mask_y + tBall.mask_height) - brick_array[level][j].y)
 									hitBothSameTime = true;
@@ -712,8 +717,10 @@ int breakout()
 		if (brick_array[level][i].exists) {
 			draw_object(brick_array[level][i]);
 			for (double j = 0.0; j < brick_array[level][i].width; j += 1.0) {
-				pp2d_draw_texture(testID, brick_array[level][i].x + j, brick_array[level][i].e1(brick_array[level][i].x + j));
+				//pp2d_draw_texture(testID, brick_array[level][i].x + j, brick_array[level][i].e1(brick_array[level][i].x + j));
 				pp2d_draw_texture(testID, brick_array[level][i].x + j, brick_array[level][i].e2(brick_array[level][i].x + j));
+				//pp2d_draw_texture(testID, brick_array[level][i].x + j, brick_array[level][i].e3(brick_array[level][i].x + j));
+				pp2d_draw_texture(testID, brick_array[level][i].x + j, brick_array[level][i].e4(brick_array[level][i].x + j));
 			}
 		}
 	for (auto tBall : the_ball)

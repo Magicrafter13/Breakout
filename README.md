@@ -1,5 +1,5 @@
 # ATTENTION
-This software is no longer being maintained, and most likely will never be changed again. The new project can be found here: [Breakout Redux](https://github.com/Magicrafter13/Breakout-Redux)  
+This software is no longer being maintained, and most likely will never be changed again. The new project can be found here: [Breakout Redux](https://github.com/Magicrafter13/BreakoutRedux)  
 For preservation's sake, and for myself if I ever want to check tou my old projects these are the requirements to compile this software.
 
 - [libctru 1.4.0](https://github.com/devkitPro/libctru/releases/tag/v1.4.0)

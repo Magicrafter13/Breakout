@@ -1,3 +1,11 @@
+# ATTENTION
+This software is no longer being maintained, and most likely will never be changed again. The new project can be found here: [Breakout Redux](https://github.com/Magicrafter13/Breakout-Redux)  
+For preservation's sake, and for myself if I ever want to check tou my old projects these are the requirements to compile this software.
+
+- [libctru 1.4.0](https://github.com/devkitPro/libctru/releases/tag/v1.4.0)
+- [citro3d 1.3.1](https://github.com/devkitPro/citro3d/releases/tag/v1.3.1)
+- zlib from [3ds_portlibs](https://github.com/devkitPro/3ds_portlibs) (Good luck with this one...)
+
 # Breakout
 A simple Breakout clone for the 3DS [Uses pp2d, citro3d, and of course ctrulib.]
 
